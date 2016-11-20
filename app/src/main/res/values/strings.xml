@@ -1,0 +1,14 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Termux:Tasker</string>
+    <!-- The plugin name as shown in Tasker. -->
+    <string name="plugin_name">Termux</string>
+    <string name="execute_in_terminal">Execute in a Terminal</string>
+
+    <!-- From Tasker API: -->
+    <string name="twofortyfouram_locale_breadcrumb_format" tools:ignore="UnusedResources">%1$s%2$s%3$s</string>
+    <string name="twofortyfouram_locale_breadcrumb_separator" tools:ignore="UnusedResources">\u0020&gt;\u0020</string>
+    <string name="twofortyfouram_locale_menu_dontsave">Cancel</string>
+    <string name="twofortyfouram_locale_menu_help">Help</string>
+    <string name="twofortyfouram_locale_menu_save">Done</string>
+
+</resources>

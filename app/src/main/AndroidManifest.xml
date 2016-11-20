@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.termux.tasker"
+          android:sharedUserId="com.termux">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/plugin_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <!--
+        This is the "edit" Activity. Note that Locale will reject plug-in Activities for the following reasons:·
+         - Missing "android:label=[...]"
+         - Missing "android:icon=[...]"
+         - The Activity isn't exported (e.g. android:exported="false")
+         - The Activity isn't enabled (e.g. android:enabled="false")
+         - The Activity requires permissions not available to Locale
+        -->
+        <activity
+            android:name=".TaskerEditActivity"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/plugin_name"
+            android:uiOptions="splitActionBarWhenNarrow">
+            <!-- this Intent filter allows the plug-in to be discovered by Locale -->
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+            </intent-filter>
+        </activity>
+
+        <!--
+         This is the "fire" BroadcastReceiver. Note that Locale will reject plug-in BroadcastReceivers
+         for the following reasons:
+        - The BroadcastReceiver isn't exported (e.g. android:exported="false")
+        - The BroadcastReceiver isn't enabled (e.g. android:enabled="false")
+        - The BroadcastReceiver requires permissions not available to Locale
+        - There are multiple BroadcastReceivers for com.twofortyfouram.locale.intent.action.FIRE_SETTING
+        -->
+        <receiver
+            android:name=".FireReceiver"
+            android:exported="true"
+            android:process=":background">
+            <!-- This Intent filter allows the plug-in to discovered by Locale. -->
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

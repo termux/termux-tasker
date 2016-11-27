@@ -4,9 +4,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
-import android.widget.Spinner;
 
 import java.io.File;
 
@@ -20,22 +23,26 @@ import java.io.File;
  * a previously saved plug-in instance that the user is editing.</li>
  * </ul>
  */
-public final class TaskerEditActivity extends AbstractPluginActivity {
+public final class EditConfigurationActivity extends AbstractPluginActivity {
 
-    public static final File TASKER_DIR = new File("/data/data/com.termux/files/home/.tasker/");
+    public static final File TASKER_DIR = new File("/data/data/com.termux/files/home/.termux/tasker/");
 
-    private Spinner mExecutableSpinner;
+    private AutoCompleteTextView mExecutableText;
     private CheckBox mInTerminalCheckbox;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.app_name);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         if (!(TASKER_DIR.exists() && TASKER_DIR.isDirectory() && TASKER_DIR.listFiles().length > 0)) {
             mIsCancelled = true;
             new AlertDialog.Builder(this)
-                    .setTitle("No ~/.tasker directory")
-                    .setMessage("You need to create a ~/.tasker directory containing scripts to be executed.")
+                    .setTitle(R.string.no_tasker_folder_title)
+                    .setMessage(R.string.no_tasker_folder_message)
                     .setPositiveButton(android.R.string.ok, null)
                     .setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
@@ -49,31 +56,50 @@ public final class TaskerEditActivity extends AbstractPluginActivity {
 
         setContentView(R.layout.edit_activity);
 
+
         final Intent intent = getIntent();
         BundleScrubber.scrub(intent);
         final Bundle localeBundle = intent.getBundleExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE);
         BundleScrubber.scrub(localeBundle);
 
-        mExecutableSpinner = (Spinner) findViewById(R.id.executable_path);
+        mExecutableText = (AutoCompleteTextView) findViewById(R.id.executable_path);
         mInTerminalCheckbox = (CheckBox) findViewById(R.id.in_terminal);
 
-        File[] files = TASKER_DIR.listFiles();
-        String[] fileNames = new String[files.length];
+        final File[] files = TASKER_DIR.listFiles();
+        final String[] fileNames = new String[files.length];
         for (int i = 0; i < files.length; i++) fileNames[i] = files[i].getName();
 
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, fileNames);
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mExecutableSpinner.setAdapter(spinnerArrayAdapter);
+        mExecutableText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                final String currentValue = editable.toString();
+                for (String s : fileNames) {
+                    if (s.equals(currentValue)) {
+                        mExecutableText.setError(null);
+                        return;
+                    }
+                }
+                mExecutableText.setError("No such file");
+            }
+        });
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, fileNames);
+        mExecutableText.setAdapter(adapter);
 
         if (savedInstanceState == null) {
             if (PluginBundleManager.isBundleValid(localeBundle)) {
                 final String selectedExecutable = localeBundle.getString(PluginBundleManager.EXTRA_EXECUTABLE);
-                for (int i = 0; i < fileNames.length; i++) {
-                    if (fileNames[i].equals(selectedExecutable)) {
-                        mExecutableSpinner.setSelection(i);
-                        break;
-                    }
-                }
+                mExecutableText.setText(selectedExecutable);
                 final boolean inTerminal = localeBundle.getBoolean(PluginBundleManager.EXTRA_TERMINAL);
                 mInTerminalCheckbox.setChecked(inTerminal);
             }
@@ -83,7 +109,7 @@ public final class TaskerEditActivity extends AbstractPluginActivity {
     @Override
     public void finish() {
         if (!isCanceled()) {
-            final String executable = mExecutableSpinner.getSelectedItem().toString();
+            final String executable = mExecutableText.getText().toString();
             final boolean inTerminal = mInTerminalCheckbox.isChecked();
 
             if (executable.length() > 0) {
@@ -100,7 +126,7 @@ public final class TaskerEditActivity extends AbstractPluginActivity {
                 final Bundle resultBundle = PluginBundleManager.generateBundle(getApplicationContext(), executable, inTerminal);
 
                 // The blurb is a concise status text to be displayed in the host's UI.
-                final String blurb = generateBlurb(executable);
+                final String blurb = generateBlurb(executable, inTerminal);
 
                 resultIntent.putExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE, resultBundle);
                 resultIntent.putExtra(com.twofortyfouram.locale.Intent.EXTRA_STRING_BLURB, blurb);
@@ -115,10 +141,10 @@ public final class TaskerEditActivity extends AbstractPluginActivity {
      * @param executable The toast message to be displayed by the plug-in. Cannot be null.
      * @return A blurb for the plug-in.
      */
-    static String generateBlurb(final String executable) {
-        // context.getResources().getInteger(R.integer.twofortyfouram_locale_maximum_blurb_length);
-        String message = "Execute ~/.tasker/" + executable;
-        final int maxBlurbLength = 60;
+    String generateBlurb(final String executable, boolean inTerminal) {
+        final int stringResource = inTerminal ? R.string.blurb_in_terminal : R.string.blurb_in_background;
+        final String message = getString(stringResource, executable);
+        final int maxBlurbLength = 60; // R.integer.twofortyfouram_locale_maximum_blurb_length.
         return (message.length() > maxBlurbLength) ? message.substring(0, maxBlurbLength) : message;
     }
 

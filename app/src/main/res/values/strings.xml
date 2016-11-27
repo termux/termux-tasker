@@ -1,14 +1,23 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Termux:Tasker</string>
-    <!-- The plugin name as shown in Tasker. -->
+    <!-- The app_name is the name of the app that is visible when listing installed apps.
+         It's also used by Tasker in "Select Action Category" > "Plugin" dialog, so keep this one short
+         (Termux:Tasker line breaks in an ugly way). -->
+    <string name="app_name">Termux:Task</string>
+    <!-- The plugin name as shown in Tasker in the Task Edit activity.-->
     <string name="plugin_name">Termux</string>
-    <string name="execute_in_terminal">Execute in a Terminal</string>
+    <string name="execute_in_terminal">Execute in a terminal session</string>
+    <string name="executable_path_hint">Executable in ~/.termux/tasker/</string>
+
+    <string name="no_tasker_folder_title">No ~/.termux/tasker/ directory</string>
+    <string name="no_tasker_folder_message">You need to create a ~/.termux/tasker/ directory containing scripts to be executed.</string>
+
+    <string name="blurb_in_background">Execute ~/.termux/tasker/%s.</string>
+    <string name="blurb_in_terminal">Execute ~/.termux/tasker/%s in a terminal session.</string>
 
     <!-- From Tasker API: -->
     <string name="twofortyfouram_locale_breadcrumb_format" tools:ignore="UnusedResources">%1$s%2$s%3$s</string>
     <string name="twofortyfouram_locale_breadcrumb_separator" tools:ignore="UnusedResources">\u0020&gt;\u0020</string>
     <string name="twofortyfouram_locale_menu_dontsave">Cancel</string>
-    <string name="twofortyfouram_locale_menu_help">Help</string>
     <string name="twofortyfouram_locale_menu_save">Done</string>
 
 </resources>

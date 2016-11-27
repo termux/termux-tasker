@@ -8,7 +8,7 @@ import android.util.Log;
 /**
  * Class for managing the {@link com.twofortyfouram.locale.Intent#EXTRA_BUNDLE} for this plug-in.
  */
-public final class PluginBundleManager {
+final class PluginBundleManager {
 
     /**
      * Type: {@code String}.

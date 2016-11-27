@@ -33,7 +33,7 @@ public final class FireReceiver extends BroadcastReceiver {
         final String executable = bundle.getString(PluginBundleManager.EXTRA_EXECUTABLE);
         final boolean inTerminal = bundle.getBoolean(PluginBundleManager.EXTRA_TERMINAL);
 
-        File executableFile = new File(TaskerEditActivity.TASKER_DIR, executable);
+        File executableFile = new File(EditConfigurationActivity.TASKER_DIR, executable);
         if (!executableFile.isFile()) {
             String message = "Termux:Tasker - no such executable:\n" + executable;
             Toast.makeText(context, message, Toast.LENGTH_LONG).show();

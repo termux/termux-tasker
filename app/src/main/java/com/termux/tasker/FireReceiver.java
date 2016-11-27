@@ -28,10 +28,7 @@ public final class FireReceiver extends BroadcastReceiver {
         final Bundle bundle = intent.getBundleExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE);
         BundleScrubber.scrub(bundle);
 
-        if (!PluginBundleManager.isBundleValid(bundle)) {
-            Log.e(Constants.LOG_TAG, "Invalid bundle");
-            return;
-        }
+        if (!PluginBundleManager.isBundleValid(bundle)) return;
 
         final String executable = bundle.getString(PluginBundleManager.EXTRA_EXECUTABLE);
         final boolean inTerminal = bundle.getBoolean(PluginBundleManager.EXTRA_TERMINAL);
@@ -49,9 +46,7 @@ public final class FireReceiver extends BroadcastReceiver {
         // Note: Must match TermuxService#ACTION_EXECUTE constant:
         Intent executeIntent = new Intent(ACTION_EXECUTE, scriptUri);
         executeIntent.setClassName("com.termux", TERMUX_SERVICE);
-        if (!inTerminal) {
-            executeIntent.putExtra("com.termux.execute.background", true);
-        }
+        if (!inTerminal) executeIntent.putExtra("com.termux.execute.background", true);
         context.startService(executeIntent);
     }
 

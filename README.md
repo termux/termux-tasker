@@ -1,5 +1,7 @@
 Termux:Task
 ===========
+[![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
+
 A Tasker plug-in to execute [Termux](https://termux.com) programs.
 
 - [Termux:Task on Google Play](https://play.google.com/store/apps/details?id=com.termux.tasker)

@@ -2,9 +2,10 @@ Termux:Task
 ===========
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
-A Tasker plug-in to execute [Termux](https://termux.com) programs.
+A [Termux](https://termux.com) add-on app allowing Termux programs to be executed from [Tasker](https://tasker.dinglisch.net/).
 
 - [Termux:Task on Google Play](https://play.google.com/store/apps/details?id=com.termux.tasker)
+- [Termux:Task on F-Droid](https://f-droid.org/repository/browse/?fdid=com.termux.tasker)
 
 License
 =======

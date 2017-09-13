@@ -11,6 +11,13 @@ import android.util.Log;
 final class PluginBundleManager {
 
     /**
+     * Type: {@code sting}.
+     *
+     * The arguments to pass to the script.
+     */
+    public static final String EXTRA_ARGUMENTS = "com.termux.execute.arguments";
+
+    /**
      * Type: {@code String}.
      *
      * The path to the executable to execute.
@@ -51,6 +58,11 @@ final class PluginBundleManager {
             return false;
         }
 
+        if (!bundle.containsKey(EXTRA_ARGUMENTS)) {
+            Log.e(Constants.LOG_TAG, String.format("bundle must contain extra %s", EXTRA_ARGUMENTS));
+            return false;
+        }
+
         if (!bundle.containsKey(BUNDLE_EXTRA_INT_VERSION_CODE)) {
             Log.e(Constants.LOG_TAG, String.format("bundle must contain extra %s", BUNDLE_EXTRA_INT_VERSION_CODE));
             return false;
@@ -61,8 +73,11 @@ final class PluginBundleManager {
          * extras above so that the error message is more useful. (E.g. the caller will see what extras are
          * missing, rather than just a message that there is the wrong number).
          */
-        if (3 != bundle.keySet().size()) {
-            Log.e(Constants.LOG_TAG, String.format("bundle must contain 3 keys, but currently contains %d keys", bundle.keySet().size()));
+        if (4 != bundle.keySet().size()) {
+            if (bundle.containsKey("net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS")){
+                return true;
+            }
+            Log.e(Constants.LOG_TAG, String.format("bundle must contain 4 keys, but currently contains %d keys", bundle.keySet().size()));
             return false;
         }
 
@@ -79,9 +94,10 @@ final class PluginBundleManager {
         return true;
     }
 
-    public static Bundle generateBundle(final Context context, final String executable, final boolean inTerminal) {
+    public static Bundle generateBundle(final Context context, final String executable, final String arguments, final boolean inTerminal) {
         final Bundle result = new Bundle();
         result.putInt(BUNDLE_EXTRA_INT_VERSION_CODE, Constants.getVersionCode(context));
+        result.putString(EXTRA_ARGUMENTS,arguments);
         result.putString(EXTRA_EXECUTABLE, executable);
         result.putBoolean(EXTRA_TERMINAL, inTerminal);
         return result;

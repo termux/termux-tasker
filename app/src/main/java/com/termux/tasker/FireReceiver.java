@@ -9,6 +9,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This is the "fire" BroadcastReceiver for a Locale Plug-in.
@@ -31,7 +35,13 @@ public final class FireReceiver extends BroadcastReceiver {
         if (!PluginBundleManager.isBundleValid(bundle)) return;
 
         final String executable = bundle.getString(PluginBundleManager.EXTRA_EXECUTABLE);
+        final String arguments = bundle.getString(PluginBundleManager.EXTRA_ARGUMENTS);
         final boolean inTerminal = bundle.getBoolean(PluginBundleManager.EXTRA_TERMINAL);
+        Matcher matcher = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(arguments);
+        List<String> list = new ArrayList<String>();
+        while (matcher.find()){
+            list.add(matcher.group(1).replace("\"",""));
+        }
 
         File executableFile = new File(EditConfigurationActivity.TASKER_DIR, executable);
         if (!executableFile.isFile()) {
@@ -47,6 +57,7 @@ public final class FireReceiver extends BroadcastReceiver {
         Intent executeIntent = new Intent(ACTION_EXECUTE, scriptUri);
         executeIntent.setClassName("com.termux", TERMUX_SERVICE);
         if (!inTerminal) executeIntent.putExtra("com.termux.execute.background", true);
+        executeIntent.putExtra(PluginBundleManager.EXTRA_ARGUMENTS, list.toArray(new String[list.size()]));
         context.startService(executeIntent);
     }
 

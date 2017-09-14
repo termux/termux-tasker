@@ -10,6 +10,7 @@ import android.text.TextWatcher;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
+import android.widget.EditText;
 
 import java.io.File;
 
@@ -28,6 +29,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     public static final File TASKER_DIR = new File("/data/data/com.termux/files/home/.termux/tasker/");
 
     private AutoCompleteTextView mExecutableText;
+    private EditText mArgumentsText;
     private CheckBox mInTerminalCheckbox;
 
     @Override
@@ -63,6 +65,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         BundleScrubber.scrub(localeBundle);
 
         mExecutableText = (AutoCompleteTextView) findViewById(R.id.executable_path);
+        mArgumentsText = (EditText) findViewById(R.id.arguments);
         mInTerminalCheckbox = (CheckBox) findViewById(R.id.in_terminal);
 
         final File[] files = TASKER_DIR.listFiles();
@@ -100,6 +103,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             if (PluginBundleManager.isBundleValid(localeBundle)) {
                 final String selectedExecutable = localeBundle.getString(PluginBundleManager.EXTRA_EXECUTABLE);
                 mExecutableText.setText(selectedExecutable);
+                final String selectedArguments = localeBundle.getString(PluginBundleManager.EXTRA_ARGUMENTS);
+                mArgumentsText.setText(selectedArguments);
                 final boolean inTerminal = localeBundle.getBoolean(PluginBundleManager.EXTRA_TERMINAL);
                 mInTerminalCheckbox.setChecked(inTerminal);
             }
@@ -110,6 +115,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     public void finish() {
         if (!isCanceled()) {
             final String executable = mExecutableText.getText().toString();
+            final String arguments =  mArgumentsText.getText().toString();
             final boolean inTerminal = mInTerminalCheckbox.isChecked();
 
             if (executable.length() > 0) {
@@ -123,10 +129,14 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                  * Android platform objects (A Serializable class private to this plug-in's APK cannot be
                  * stored in the Bundle, as Locale's classloader will not recognize it).
                  */
-                final Bundle resultBundle = PluginBundleManager.generateBundle(getApplicationContext(), executable, inTerminal);
+                final Bundle resultBundle = PluginBundleManager.generateBundle(getApplicationContext(), executable, arguments, inTerminal);
 
                 // The blurb is a concise status text to be displayed in the host's UI.
-                final String blurb = generateBlurb(executable, inTerminal);
+                final String blurb = generateBlurb(executable, arguments, inTerminal);
+                if (TaskerPlugin.Setting.hostSupportsOnFireVariableReplacement(this)){
+                    TaskerPlugin.Setting.setVariableReplaceKeys(resultBundle,new String[] {PluginBundleManager.EXTRA_EXECUTABLE,
+                            PluginBundleManager.EXTRA_ARGUMENTS,PluginBundleManager.EXTRA_TERMINAL});
+                }
 
                 resultIntent.putExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE, resultBundle);
                 resultIntent.putExtra(com.twofortyfouram.locale.Intent.EXTRA_STRING_BLURB, blurb);
@@ -141,9 +151,9 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
      * @param executable The toast message to be displayed by the plug-in. Cannot be null.
      * @return A blurb for the plug-in.
      */
-    String generateBlurb(final String executable, boolean inTerminal) {
+    String generateBlurb(final String executable, final String arguments, boolean inTerminal) {
         final int stringResource = inTerminal ? R.string.blurb_in_terminal : R.string.blurb_in_background;
-        final String message = getString(stringResource, executable);
+        final String message =getString(stringResource, executable,arguments);
         final int maxBlurbLength = 60; // R.integer.twofortyfouram_locale_maximum_blurb_length.
         return (message.length() > maxBlurbLength) ? message.substring(0, maxBlurbLength) : message;
     }

@@ -11,13 +11,14 @@
     <string name="no_tasker_folder_title">No ~/.termux/tasker/ directory</string>
     <string name="no_tasker_folder_message">You need to create a ~/.termux/tasker/ directory containing scripts to be executed.</string>
 
-    <string name="blurb_in_background">Execute ~/.termux/tasker/%s.</string>
-    <string name="blurb_in_terminal">Execute ~/.termux/tasker/%s in a terminal session.</string>
+    <string name="blurb_in_background">Execute ~/.termux/tasker/%1$s %2$s</string>
+    <string name="blurb_in_terminal">Execute ~/.termux/tasker/%1$s %2$s in a terminal session.</string>
 
     <!-- From Tasker API: -->
     <string name="twofortyfouram_locale_breadcrumb_format" tools:ignore="UnusedResources">%1$s%2$s%3$s</string>
     <string name="twofortyfouram_locale_breadcrumb_separator" tools:ignore="UnusedResources">\u0020&gt;\u0020</string>
     <string name="twofortyfouram_locale_menu_dontsave">Cancel</string>
     <string name="twofortyfouram_locale_menu_save">Done</string>
+    <string name="arguments_hint">Arguments</string>
 
 </resources>

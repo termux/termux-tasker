@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -58,7 +59,13 @@ public final class FireReceiver extends BroadcastReceiver {
         executeIntent.setClassName("com.termux", TERMUX_SERVICE);
         if (!inTerminal) executeIntent.putExtra("com.termux.execute.background", true);
         executeIntent.putExtra(PluginBundleManager.EXTRA_ARGUMENTS, list.toArray(new String[list.size()]));
-        context.startService(executeIntent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // https://developer.android.com/about/versions/oreo/background.html
+            context.startForegroundService(executeIntent);
+        } else {
+            context.startService(executeIntent);
+        }
     }
 
     /** Ensure readable and executable file if user forgot to do so. */

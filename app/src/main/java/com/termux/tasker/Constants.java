@@ -26,5 +26,4 @@ public final class Constants {
             throw new RuntimeException(e);
         }
     }
-
 }

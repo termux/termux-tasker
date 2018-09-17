@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-
 /**
  * Class for managing the {@link com.twofortyfouram.locale.Intent#EXTRA_BUNDLE} for this plug-in.
  */
@@ -102,5 +101,4 @@ final class PluginBundleManager {
         result.putBoolean(EXTRA_TERMINAL, inTerminal);
         return result;
     }
-
 }

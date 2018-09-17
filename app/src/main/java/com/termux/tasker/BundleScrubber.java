@@ -2,7 +2,6 @@ package com.termux.tasker;
 
 import android.content.Intent;
 import android.os.Bundle;
-
 /**
  * Helper class to scrub Bundles of invalid extras. This is a workaround for an Android bug:
  * <http://code.google.com/p/android/issues/detail?id=16006>.
@@ -20,8 +19,7 @@ public final class BundleScrubber {
      * @return true if the Intent was scrubbed, false if the Intent was not modified.
      */
     public static boolean scrub(final Intent intent) {
-        if (null == intent) return false;
-        return scrub(intent.getExtras());
+        return null != intent && scrub(intent.getExtras());
     }
 
     /**

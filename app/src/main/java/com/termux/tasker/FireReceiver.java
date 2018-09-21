@@ -39,7 +39,7 @@ public final class FireReceiver extends BroadcastReceiver {
         final String arguments = bundle.getString(PluginBundleManager.EXTRA_ARGUMENTS);
         final boolean inTerminal = bundle.getBoolean(PluginBundleManager.EXTRA_TERMINAL);
         Matcher matcher = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(arguments);
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         while (matcher.find()){
             list.add(matcher.group(1).replace("\"",""));
         }

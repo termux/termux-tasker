@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- The app_name is the name of the app that is visible when listing installed apps.
          It's also used by Tasker in "Select Action Category" > "Plugin" dialog, so keep this one short

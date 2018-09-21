@@ -1,7 +1,6 @@
 package com.termux.tasker;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -46,12 +45,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                     .setTitle(R.string.no_tasker_folder_title)
                     .setMessage(R.string.no_tasker_folder_message)
                     .setPositiveButton(android.R.string.ok, null)
-                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialogInterface) {
-                            finish();
-                        }
-                    })
+                    .setOnDismissListener(dialogInterface -> finish())
                     .show();
             return;
         }
@@ -64,9 +58,9 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         final Bundle localeBundle = intent.getBundleExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE);
         BundleScrubber.scrub(localeBundle);
 
-        mExecutableText = (AutoCompleteTextView) findViewById(R.id.executable_path);
-        mArgumentsText = (EditText) findViewById(R.id.arguments);
-        mInTerminalCheckbox = (CheckBox) findViewById(R.id.in_terminal);
+        mExecutableText = findViewById(R.id.executable_path);
+        mArgumentsText = findViewById(R.id.arguments);
+        mInTerminalCheckbox = findViewById(R.id.in_terminal);
 
         final File[] files = TASKER_DIR.listFiles();
         final String[] fileNames = new String[files.length];
@@ -96,7 +90,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             }
         });
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, fileNames);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, fileNames);
         mExecutableText.setAdapter(adapter);
 
         if (savedInstanceState == null) {
@@ -157,5 +151,4 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         final int maxBlurbLength = 60; // R.integer.twofortyfouram_locale_maximum_blurb_length.
         return (message.length() > maxBlurbLength) ? message.substring(0, maxBlurbLength) : message;
     }
-
 }

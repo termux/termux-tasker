@@ -225,6 +225,112 @@ class TaskerPlugin {
 
     // ----------------------------- SETTING PLUGIN ONLY --------------------------------- //
 
+    private static boolean hostSupports(Bundle extrasFromHost, int capabilityFlag) {
+        Integer flags = (Integer) getBundleValueSafe(extrasFromHost, EXTRA_HOST_CAPABILITIES, Integer.class, "hostSupports");
+        return (flags != null) && ((flags & capabilityFlag) > 0);
+    }
+
+    // ----------------------------- CONDITION/EVENT PLUGIN ONLY --------------------------------- //
+
+    public static class Condition {
+
+        /**
+         * Used by: plugin QueryReceiver
+         * <p>
+         * Indicates to plugin whether the host will process variables which it passes back
+         *
+         * @param extrasFromHost intent extras from the intent received by the QueryReceiver
+         * @see #addVariableBundle(Bundle, Bundle)
+         */
+        public static boolean hostSupportsVariableReturn(Bundle extrasFromHost) {
+            return hostSupports(extrasFromHost, EXTRA_HOST_CAPABILITY_CONDITION_RETURN_VARIABLES);
+        }
+    }
+
+    // ----------------------------- EVENT PLUGIN ONLY --------------------------------- //
+
+    private static boolean variableNameIsLocal(String varName) {
+
+        int digitCount = 0;
+        int length = varName.length();
+
+        for (int x = 0; x < length; x++) {
+            char ch = varName.charAt(x);
+
+            if (Character.isUpperCase(ch))
+                return false;
+            else if (Character.isDigit(ch))
+                digitCount++;
+        }
+
+        return digitCount != (varName.length() - 1);
+    }
+    // ---------------------------------- HOST  ----------------------------------------- //
+
+    /**
+     * Generate a sequence of secure random positive integers which is guaranteed not to repeat
+     * in the last 100 calls to this function.
+     *
+     * @return a random positive integer
+     */
+    public static int getPositiveNonRepeatingRandomInteger() {
+
+        // initialize on first call
+        if (sr == null) {
+            sr = new SecureRandom();
+            lastRandomsSeen = new int[RANDOM_HISTORY_SIZE];
+
+            for (int x = 0; x < lastRandomsSeen.length; x++)
+                lastRandomsSeen[x] = -1;
+        }
+
+        int toReturn;
+        do {
+            // pick a number
+            toReturn = sr.nextInt(Integer.MAX_VALUE);
+
+            // check we haven't see it recently
+            for (int seen : lastRandomsSeen) {
+                if (seen == toReturn) {
+                    toReturn = -1;
+                    break;
+                }
+            }
+        }
+        while (toReturn == -1);
+
+        // update history
+        lastRandomsSeen[randomInsertPointer] = toReturn;
+        randomInsertPointer = (randomInsertPointer + 1) % lastRandomsSeen.length;
+
+        return toReturn;
+    }
+
+    // ---------------------------------- HELPER FUNCTIONS -------------------------------- //
+
+    private static Object getBundleValueSafe(Bundle b, String key, Class<?> expectedClass, String funcName) {
+        Object value = null;
+
+        if (b != null) {
+            if (b.containsKey(key)) {
+                Object obj = b.get(key);
+                if (obj == null)
+                    Log.w(TAG, funcName + ": " + key + ": null value");
+                else if (obj.getClass() != expectedClass)
+                    Log.w(TAG, funcName + ": " + key + ": expected " + expectedClass.getClass().getName() + ", got " + obj.getClass().getName());
+                else
+                    value = obj;
+            }
+        }
+        return value;
+    }
+
+    private static Object getExtraValueSafe(Intent i, String key, Class<?> expectedClass, String funcName) {
+        return (i.hasExtra(key)) ?
+                getBundleValueSafe(i.getExtras(), key, expectedClass, funcName) :
+                null;
+    }
+
     public static class Setting {
 
         /**
@@ -339,9 +445,8 @@ class TaskerPlugin {
                 else {
                     String callerPackage = callingActivity.getPackageName();
 
-                    // Tasker only supporteed this from 1.0.10
-                    supportedFlag =
-                            (callerPackage.startsWith(BASE_KEY)) &&
+                    // Tasker only supported this from 1.0.10
+                    supportedFlag = (callerPackage.startsWith(BASE_KEY)) &&
                                     (getPackageVersionCode(editActivity.getPackageManager(), callerPackage) > FIRST_ON_FIRE_VARIABLES_TASKER_VERSION)
                     ;
                 }
@@ -372,10 +477,8 @@ class TaskerPlugin {
             if (timeoutMS < 0)
                 Log.w(TAG, "requestTimeoutMS: ignoring negative timeout (" + timeoutMS + ")");
             else {
-                if (
-                        (timeoutMS > REQUESTED_TIMEOUT_MS_MAX) &&
-                                (timeoutMS != REQUESTED_TIMEOUT_MS_NEVER)
-                        ) {
+                if ((timeoutMS > REQUESTED_TIMEOUT_MS_MAX) &&
+                        (timeoutMS != REQUESTED_TIMEOUT_MS_NEVER)) {
                     Log.w(TAG, "requestTimeoutMS: requested timeout " + timeoutMS + " exceeds maximum, setting to max (" + REQUESTED_TIMEOUT_MS_MAX + ")");
                     timeoutMS = REQUESTED_TIMEOUT_MS_MAX;
                 }
@@ -506,24 +609,22 @@ class TaskerPlugin {
         }
     }
 
-    // ----------------------------- CONDITION/EVENT PLUGIN ONLY --------------------------------- //
+    public static int getPackageVersionCode(PackageManager pm, String packageName) {
 
-    public static class Condition {
+        int code = -1;
 
-        /**
-         * Used by: plugin QueryReceiver
-         * <p>
-         * Indicates to plugin whether the host will process variables which it passes back
-         *
-         * @param extrasFromHost intent extras from the intent received by the QueryReceiver
-         * @see #addVariableBundle(Bundle, Bundle)
-         */
-        public static boolean hostSupportsVariableReturn(Bundle extrasFromHost) {
-            return hostSupports(extrasFromHost, EXTRA_HOST_CAPABILITY_CONDITION_RETURN_VARIABLES);
+        if (pm != null) {
+            try {
+                PackageInfo pi = pm.getPackageInfo(packageName, 0);
+                if (pi != null)
+                    code = pi.versionCode;
+            } catch (Exception e) {
+                Log.e(TAG, "getPackageVersionCode: exception getting package info");
+            }
         }
-    }
 
-    // ----------------------------- EVENT PLUGIN ONLY --------------------------------- //
+        return code;
+    }
 
     public static class Event {
 
@@ -550,7 +651,7 @@ class TaskerPlugin {
          * Note that for security reasons it is advisable to also store a message ID with the bundle
          * which can be compared to known IDs on receipt. The host cannot validate the source of
          * REQUEST_QUERY intents so fake data may be passed. Replay attacks are also possible.
-         * addPassThroughMesssageID() can be used to add an ID if the plugin doesn't wish to add it's
+         * addPassThroughMessageID() can be used to add an ID if the plugin doesn't wish to add it's
          * own ID to the pass through bundle.
          * <p>
          * Note also that there are several situations where REQUEST_QUERY will not result in a
@@ -663,7 +764,11 @@ class TaskerPlugin {
             return passThroughBundle;
         }
     }
-    // ---------------------------------- HOST  ----------------------------------------- //
+
+    // state tracking for random number sequence
+    private static int[] lastRandomsSeen = null;
+    private static int randomInsertPointer = 0;
+    private static SecureRandom sr = null;
 
     public static class Host {
 
@@ -728,12 +833,12 @@ class TaskerPlugin {
          * @see #REQUESTED_TIMEOUT_MS_NONE, REQUESTED_TIMEOUT_MS_MAX, REQUESTED_TIMEOUT_MS_NEVER
          */
         public static void addHintTimeoutMS(Intent toPlugin, int timeoutMS) {
-            getHintsBundle(toPlugin, "addHintTimeoutMS").putInt(BUNDLE_KEY_HINT_TIMEOUT_MS, timeoutMS);
+            getHintsBundle(toPlugin).putInt(BUNDLE_KEY_HINT_TIMEOUT_MS, timeoutMS);
         }
 
-        private static Bundle getHintsBundle(Intent intent, String funcName) {
+        private static Bundle getHintsBundle(Intent intent) {
 
-            Bundle hintsBundle = (Bundle) getExtraValueSafe(intent, EXTRA_HINTS_BUNDLE, Bundle.class, funcName);
+            Bundle hintsBundle = (Bundle) getExtraValueSafe(intent, EXTRA_HINTS_BUNDLE, Bundle.class, "addHintTimeoutMS");
 
             if (hintsBundle == null) {
                 hintsBundle = new Bundle();
@@ -786,119 +891,5 @@ class TaskerPlugin {
         public static void cleanSettingReplaceVariables(Bundle b) {
             b.remove(Setting.BUNDLE_KEY_VARIABLE_REPLACE_STRINGS);
         }
-    }
-
-    // ---------------------------------- HELPER FUNCTIONS -------------------------------- //
-
-    private static Object getBundleValueSafe(Bundle b, String key, Class<?> expectedClass, String funcName) {
-        Object value = null;
-
-        if (b != null) {
-            if (b.containsKey(key)) {
-                Object obj = b.get(key);
-                if (obj == null)
-                    Log.w(TAG, funcName + ": " + key + ": null value");
-                else if (obj.getClass() != expectedClass)
-                    Log.w(TAG, funcName + ": " + key + ": expected " + expectedClass.getClass().getName() + ", got " + obj.getClass().getName());
-                else
-                    value = obj;
-            }
-        }
-        return value;
-    }
-
-    private static Object getExtraValueSafe(Intent i, String key, Class<?> expectedClass, String funcName) {
-        return (i.hasExtra(key)) ?
-                getBundleValueSafe(i.getExtras(), key, expectedClass, funcName) :
-                null;
-    }
-
-    private static boolean hostSupports(Bundle extrasFromHost, int capabilityFlag) {
-        Integer flags = (Integer) getBundleValueSafe(extrasFromHost, EXTRA_HOST_CAPABILITIES, Integer.class, "hostSupports");
-        return
-                (flags != null) &&
-                        ((flags & capabilityFlag) > 0)
-                ;
-    }
-
-    public static int getPackageVersionCode(PackageManager pm, String packageName) {
-
-        int code = -1;
-
-        if (pm != null) {
-            try {
-                PackageInfo pi = pm.getPackageInfo(packageName, 0);
-                if (pi != null)
-                    code = pi.versionCode;
-            } catch (Exception e) {
-                Log.e(TAG, "getPackageVersionCode: exception getting package info");
-            }
-        }
-
-        return code;
-    }
-
-    private static boolean variableNameIsLocal(String varName) {
-
-        int digitCount = 0;
-        int length = varName.length();
-
-        for (int x = 0; x < length; x++) {
-            char ch = varName.charAt(x);
-
-            if (Character.isUpperCase(ch))
-                return false;
-            else if (Character.isDigit(ch))
-                digitCount++;
-        }
-
-        if (digitCount == (varName.length() - 1))
-            return false;
-
-        return true;
-    }
-
-    // state tracking for random number sequence
-    private static int[] lastRandomsSeen = null;
-    private static int randomInsertPointer = 0;
-    private static SecureRandom sr = null;
-
-    /**
-     * Generate a sequence of secure random positive integers which is guaranteed not to repeat
-     * in the last 100 calls to this function.
-     *
-     * @return a random positive integer
-     */
-    public static int getPositiveNonRepeatingRandomInteger() {
-
-        // initialize on first call
-        if (sr == null) {
-            sr = new SecureRandom();
-            lastRandomsSeen = new int[RANDOM_HISTORY_SIZE];
-
-            for (int x = 0; x < lastRandomsSeen.length; x++)
-                lastRandomsSeen[x] = -1;
-        }
-
-        int toReturn;
-        do {
-            // pick a number
-            toReturn = sr.nextInt(Integer.MAX_VALUE);
-
-            // check we havn't see it recently
-            for (int seen : lastRandomsSeen) {
-                if (seen == toReturn) {
-                    toReturn = -1;
-                    break;
-                }
-            }
-        }
-        while (toReturn == -1);
-
-        // update history
-        lastRandomsSeen[randomInsertPointer] = toReturn;
-        randomInsertPointer = (randomInsertPointer + 1) % lastRandomsSeen.length;
-
-        return toReturn;
     }
 }

@@ -35,7 +35,8 @@
             android:paddingTop="@dimen/activity_vertical_margin"
             android:hint="@string/arguments_hint"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="" />
     </android.support.design.widget.TextInputLayout>
     <CheckBox
         android:id="@+id/in_terminal"

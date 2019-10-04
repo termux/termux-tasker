@@ -4,14 +4,7 @@ container:
   memory: 8G
 
 task:
-  name: Run tests
-  script: ./gradlew test
-
-task:
   name: Build release apk
-
-  depends_on:
-    - Run tests
 
   environment:
     KEYSTORE: ENCRYPTED[360cfee3ec21324505dfeb107e8d02f2deae4c183350a2e123d842d760ee029e3d0df07037fd9b48ee27da93e838af4a]

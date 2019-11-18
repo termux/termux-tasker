@@ -6,6 +6,7 @@
     <string name="app_name">Termux:Task</string>
     <!-- The plugin name as shown in Tasker in the Task Edit activity.-->
     <string name="plugin_name">Termux</string>
+    <string name="select_folder">Select folder</string>
     <string name="execute_in_terminal">Execute in a terminal session</string>
     <string name="executable_path_hint">Executable in ~/.termux/tasker/</string>
 
@@ -21,5 +22,6 @@
     <string name="twofortyfouram_locale_menu_dontsave">Cancel</string>
     <string name="twofortyfouram_locale_menu_save">Done</string>
     <string name="arguments_hint">Arguments</string>
+
 
 </resources>

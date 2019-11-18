@@ -16,6 +16,10 @@
         android:id="@+id/executable_path_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <Spinner
+            android:id="@+id/listoffile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
         <AutoCompleteTextView
             android:id="@+id/executable_path"
             android:paddingBottom="@dimen/activity_vertical_margin"
@@ -46,5 +50,16 @@
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:text="@string/execute_in_terminal" />
-
+<Button
+    android:id="@+id/setfolder"
+    android:text="@string/select_folder"
+    android:layout_gravity="center"
+    android:textAllCaps="false"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/currentfolder"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

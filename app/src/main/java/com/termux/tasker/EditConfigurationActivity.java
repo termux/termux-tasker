@@ -7,7 +7,9 @@ import androidx.core.app.ActivityCompat;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,8 +20,16 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import com.obsez.android.lib.filechooser.ChooserDialog;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.termux.tasker.Global.TASKER_DIR;
 /**
  * This is the "Edit" activity for a Locale Plug-in.
  * <p>
@@ -32,11 +42,15 @@ import java.io.File;
  */
 public class EditConfigurationActivity extends AbstractPluginActivity {
 
-    public static final File TASKER_DIR = new File("/data/data/com.termux/files/home/.termux/tasker/");
+//    public static final File TASKER_DIR = new File("/data/data/com.termux/files/home/.termux/tasker/");
 
     private AutoCompleteTextView mExecutableText;
     private EditText mArgumentsText;
     private CheckBox mInTerminalCheckbox;
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE" };
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -45,7 +59,7 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.app_name);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
+        verifyStoragePermissions(this);
         if (!(TASKER_DIR.exists() && TASKER_DIR.isDirectory() && TASKER_DIR.listFiles().length > 0)) {
             mIsCancelled = true;
             new AlertDialog.Builder(this)
@@ -59,7 +73,26 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
 
         setContentView(R.layout.edit_activity);
 
-
+        var listoffile=(Spinner)findViewById(R.id.listoffile);
+        ArrayAdapter<String> fileadapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,getFilesAllName(Tas))
+        Button setfolder=(Button) findViewById(R.id.setfolder);
+        setfolder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new ChooserDialog(EditConfigurationActivity.this)
+                        .withFilter(true, true)
+                        // to handle the result(s)
+                        .withChosenListener(new ChooserDialog.Result() {
+                            @Override
+                            public void onChoosePath(String path, File pathFile) {
+                                Global.TASKER_DIRstr=path;
+                                Global.TASKER_DIR=new File(path);
+                            }
+                        })
+                        .build()
+                        .show();
+            }
+        });
         final Intent intent = getIntent();
         BundleScrubber.scrub(intent);
         final Bundle localeBundle = intent.getBundleExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE);
@@ -157,5 +190,39 @@ public class EditConfigurationActivity extends AbstractPluginActivity {
         final String message =getString(stringResource, executable,arguments);
         final int maxBlurbLength = 60; // R.integer.twofortyfouram_locale_maximum_blurb_length.
         return (message.length() > maxBlurbLength) ? message.substring(0, maxBlurbLength) : message;
+    }
+
+    public static void verifyStoragePermissions(Activity activity) {
+        try {
+            int permission = ActivityCompat.checkSelfPermission(activity,
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE,REQUEST_EXTERNAL_STORAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode==REQUEST_EXTERNAL_STORAGE)
+        {
+
+        }
+    }
+
+    public static List<String> getFilesAllName(String path) {
+        File file=new File(path);
+        File[] files=file.listFiles();
+        if (files == null)
+        return null;
+        ArrayList<String> s = new ArrayList<>();
+        for(int i =0;i<files.length;i++){
+            s.add(files[i].getAbsolutePath());
+        }
+        return s;
     }
 }

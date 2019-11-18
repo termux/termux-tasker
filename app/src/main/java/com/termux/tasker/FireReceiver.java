@@ -41,10 +41,11 @@ public final class FireReceiver extends BroadcastReceiver {
         Matcher matcher = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(arguments);
         List<String> list = new ArrayList<>();
         while (matcher.find()){
+            Log.d("thereceiver::",list.toString());
             list.add(matcher.group(1).replace("\"",""));
         }
 
-        File executableFile = new File(EditConfigurationActivity.TASKER_DIR, executable);
+        File executableFile = new File(Global.TASKER_DIR, executable);
         if (!executableFile.isFile()) {
             String message = "Termux:Tasker - no such executable:\n" + executable;
             Toast.makeText(context, message, Toast.LENGTH_LONG).show();

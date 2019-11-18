@@ -12,7 +12,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     tools:context="com.termux.tasker.EditConfigurationActivity">
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/executable_path_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -24,8 +24,8 @@
             android:hint="@string/executable_path_hint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/argument_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="" />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
     <CheckBox
         android:id="@+id/in_terminal"
         android:layout_width="match_parent"

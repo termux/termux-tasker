@@ -1,13 +1,15 @@
 package com.termux.tasker;
 
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 /**
  * Superclass for plug-in Activities. This class takes care of initializing aspects of the plug-in's UI to
  * look more integrated with the plug-in host.
  */
-public abstract class AbstractPluginActivity extends AppCompatActivity {
+class AbstractPluginActivity extends AppCompatActivity {
 
     /**
      * Flag boolean that can only be set to true via the "Don't Save" menu item in

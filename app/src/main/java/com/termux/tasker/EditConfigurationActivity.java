@@ -1,18 +1,25 @@
 package com.termux.tasker;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
 import java.io.File;
-
 /**
  * This is the "Edit" activity for a Locale Plug-in.
  * <p>
@@ -23,7 +30,7 @@ import java.io.File;
  * a previously saved plug-in instance that the user is editing.</li>
  * </ul>
  */
-public final class EditConfigurationActivity extends AbstractPluginActivity {
+public class EditConfigurationActivity extends AbstractPluginActivity {
 
     public static final File TASKER_DIR = new File("/data/data/com.termux/files/home/.termux/tasker/");
 

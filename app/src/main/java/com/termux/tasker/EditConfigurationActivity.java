@@ -134,6 +134,31 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
                 resultIntent.putExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE, resultBundle);
                 resultIntent.putExtra(com.twofortyfouram.locale.Intent.EXTRA_STRING_BLURB, blurb);
+
+                // Configuration information for Tasker variables returned from the executed task
+                //
+                // Not run if we are opening a terminal because the user might not care about this
+                // if they are running something that will literally pop up in front of them (Plus
+                // getting that information requires additional work for now)
+                if(!inTerminal) {
+                    if (TaskerPlugin.hostSupportsRelevantVariables(getIntent().getExtras())) {
+                        TaskerPlugin.addRelevantVariableList(resultIntent, new String[]{
+                                "%stdout\nStandard Output\nThe <B>output</B> of running the command",
+                                "%stderr\nStandard Error\nThe <B>error output</B> of running the command",
+                                "%result\nExit Code\nThe exit code set by the command upon completion.\n" +
+                                        "0 often means success and anything else is usually a failure of some sort"
+                        });
+                    }
+
+                    // To use variables, we can't have a timeout of 0, but if someone doesn't pay
+                    // attention to this and runs a task that never ends, 10 seconds seems like a
+                    // reasonable timeout. If they need more time, or want this to run entirely
+                    // asynchronously, that can be set
+                    if (TaskerPlugin.Setting.hostSupportsSynchronousExecution(getIntent().getExtras())) {
+                        TaskerPlugin.Setting.requestTimeoutMS(resultIntent, 10000);
+                    }
+                }
+
                 setResult(RESULT_OK, resultIntent);
             }
         }

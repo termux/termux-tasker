@@ -1,5 +1,6 @@
 package com.termux.tasker;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +23,8 @@ public final class FireReceiver extends BroadcastReceiver {
 
     public static final String TERMUX_SERVICE = "com.termux.app.TermuxService";
     public static final String ACTION_EXECUTE = "com.termux.service_execute";
+
+    public static final String ORIGINAL_INTENT = "originalIntent";
 
     public void onReceive(final Context context, final Intent intent) {
         if (!com.twofortyfouram.locale.Intent.ACTION_FIRE_SETTING.equals(intent.getAction())) {
@@ -59,6 +62,18 @@ public final class FireReceiver extends BroadcastReceiver {
         executeIntent.setClassName("com.termux", TERMUX_SERVICE);
         if (!inTerminal) executeIntent.putExtra("com.termux.execute.background", true);
         executeIntent.putExtra(PluginBundleManager.EXTRA_ARGUMENTS, list.toArray(new String[list.size()]));
+
+        // Do we have a timeout other than 0 to set variables?
+        if (isOrderedBroadcast()) {
+            // If so, we set this so we can return the variables from a PendingIntent we'll send to termux for it to call
+            setResultCode(TaskerPlugin.Setting.RESULT_CODE_PENDING);
+
+            Intent resultsService = new Intent(context, ResultsService.class);
+            resultsService.putExtra(ORIGINAL_INTENT, intent);
+
+            PendingIntent pending = PendingIntent.getService(context, 1, resultsService, PendingIntent.FLAG_ONE_SHOT);
+            executeIntent.putExtra("pendingIntent", pending);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // https://developer.android.com/about/versions/oreo/background.html

@@ -48,6 +48,7 @@
             </intent-filter>
         </receiver>
 
+        <service android:name=".ResultsService" />
     </application>
 
 </manifest>

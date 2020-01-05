@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- The app_name is the name of the app that is visible when listing installed apps.
-         It's also used by Tasker in "Select Action Category" > "Plugin" dialog, so keep this one short
-         (Termux:Tasker line breaks in an ugly way). -->
-    <string name="app_name">Termux:Task</string>
+         It's also used by Tasker in "Select Action Category" > "Plugin" dialog, so keep this one short -->
+    <string name="app_name">Termux:Tasker</string>
     <!-- The plugin name as shown in Tasker in the Task Edit activity.-->
     <string name="plugin_name">Termux</string>
     <string name="execute_in_terminal">Execute in a terminal session</string>

@@ -1,4 +1,4 @@
-# Termux:Task
+# Termux:Tasker
 
 [![Build status](https://api.cirrus-ci.com/github/termux/termux-tasker.svg?branch=master)](https://cirrus-ci.com/termux/termux-tasker)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
@@ -8,7 +8,7 @@ from [Tasker](https://tasker.dinglisch.net/).
 
 ## Installation
 
-Termux:Task application can be obtained from:
+Termux:Tasker application can be obtained from:
 
 - [Google Play](https://play.google.com/store/apps/details?id=com.termux.tasker)
 - [F-Droid](https://f-droid.org/en/packages/com.termux.tasker/)
@@ -26,7 +26,7 @@ all currently installed plugins.
 
 1. Create a new Tasker Action.
 2. In the resulting Select Action Category dialog, select Plugin.
-3. In the resulting Termux:Task dialog, select Termux:Task.
+3. In the resulting Action Plugin dialog, select Termux:Tasker.
 4. Edit the configuration to specify the executable in `~/.termux/tasker/` to
    execute, and if it should be executed in the background (the default) or in a
    new terminal session.

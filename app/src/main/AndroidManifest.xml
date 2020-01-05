@@ -5,8 +5,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -21,7 +20,7 @@
         <activity
             android:name=".EditConfigurationActivity"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_launcher"
             android:label="@string/plugin_name"
             android:uiOptions="splitActionBarWhenNarrow">
             <!-- this Intent filter allows the plug-in to be discovered by Locale -->

@@ -128,8 +128,10 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                 // The blurb is a concise status text to be displayed in the host's UI.
                 final String blurb = generateBlurb(executable, arguments, inTerminal);
                 if (TaskerPlugin.Setting.hostSupportsOnFireVariableReplacement(this)){
-                    TaskerPlugin.Setting.setVariableReplaceKeys(resultBundle,new String[] {PluginBundleManager.EXTRA_EXECUTABLE,
-                            PluginBundleManager.EXTRA_ARGUMENTS,PluginBundleManager.EXTRA_TERMINAL});
+                    TaskerPlugin.Setting.setVariableReplaceKeys(resultBundle,new String[] {
+                            PluginBundleManager.EXTRA_EXECUTABLE,
+                            PluginBundleManager.EXTRA_ARGUMENTS
+                    });
                 }
 
                 resultIntent.putExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE, resultBundle);

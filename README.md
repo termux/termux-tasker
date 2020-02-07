@@ -1,6 +1,6 @@
 # Termux:Tasker
 
-[![Build status](https://api.cirrus-ci.com/github/termux/termux-tasker.svg?branch=master)](https://cirrus-ci.com/termux/termux-tasker)
+[![Build status](https://github.com/termux/termux-tasker/workflows/Build/badge.svg)](https://github.com/termux/termux-tasker/actions)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
 A [Termux](https://termux.com) add-on app allowing Termux programs to be executed

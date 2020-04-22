@@ -4,7 +4,7 @@
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
 A [Termux](https://termux.com) add-on app allowing Termux programs to be executed
-from [Tasker](https://tasker.dinglisch.net/).
+from [Tasker](https://tasker.joaoapps.com/).
 
 ## Installation
 

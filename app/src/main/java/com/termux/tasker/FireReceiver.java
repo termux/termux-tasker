@@ -39,13 +39,13 @@ public final class FireReceiver extends BroadcastReceiver {
         if (!PluginBundleManager.isBundleValid(bundle)) return;
 
         final String executable = bundle.getString(PluginBundleManager.EXTRA_EXECUTABLE);
-        final String arguments = bundle.getString(PluginBundleManager.EXTRA_ARGUMENTS);
+        final String arguments_string = bundle.getString(PluginBundleManager.EXTRA_ARGUMENTS);
         final boolean inTerminal = bundle.getBoolean(PluginBundleManager.EXTRA_TERMINAL);
-        Matcher matcher = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(arguments);
-        List<String> list = new ArrayList<>();
-        while (matcher.find()){
-            list.add(matcher.group(1).replace("\"",""));
-        }
+
+        // Parse arguments_string into a list of arguments like normally done on shells like bourne shell
+        // Arguemnts are split on whitespaces unless quoted with single or double quotes
+        // Double quotes and backslashes can be escaped with backslashes in arguments surrounded with double quotes
+        List<String> arguments_list = ArgumentTokenizer.tokenize(arguments_string);
 
         File executableFile = new File(EditConfigurationActivity.TASKER_DIR, executable);
         if (!executableFile.isFile()) {
@@ -61,7 +61,7 @@ public final class FireReceiver extends BroadcastReceiver {
         Intent executeIntent = new Intent(ACTION_EXECUTE, scriptUri);
         executeIntent.setClassName("com.termux", TERMUX_SERVICE);
         if (!inTerminal) executeIntent.putExtra("com.termux.execute.background", true);
-        executeIntent.putExtra(PluginBundleManager.EXTRA_ARGUMENTS, list.toArray(new String[list.size()]));
+        executeIntent.putExtra(PluginBundleManager.EXTRA_ARGUMENTS, arguments_list.toArray(new String[arguments_list.size()]));
 
         // Do we have a timeout other than 0 to set variables?
         if (isOrderedBroadcast()) {

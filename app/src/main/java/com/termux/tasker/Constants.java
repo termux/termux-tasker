@@ -1,29 +1,25 @@
 package com.termux.tasker;
 
-import android.content.Context;
+import java.io.File;
 
 public final class Constants {
 
-    public static final String LOG_TAG = "termux-tasker";
+    public static final String TERMUX_PACKAGE = "com.termux";
+    public static final String TERMUX_SERVICE = "com.termux.app.TermuxService";
 
-    /**
-     * Determines the "versionCode" in the {@code AndroidManifest}.
-     *
-     * @param context to read the versionCode.
-     * @return versionCode of the app.
-     */
-    public static int getVersionCode(final Context context) {
-        if (null == context) {
-            throw new IllegalArgumentException("context cannot be null"); //$NON-NLS-1$
-        }
+    public static final String FILES_PATH = "/data/data/com.termux/files";
+    public static final String PREFIX_PATH = FILES_PATH + "/usr";
+    public static final String HOME_PATH = FILES_PATH + "/home";
+    public static final String TASKER_PATH = HOME_PATH + "/.termux/tasker";
 
-        try {
-            return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;
-        } catch (final UnsupportedOperationException e) {
-            // This exception is thrown by test contexts.
-            return 1;
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public static final File FILES_DIR = new File(FILES_PATH);
+    public static final File PREFIX_DIR = new File(PREFIX_PATH);
+    public static final File HOME_DIR = new File(HOME_PATH);
+    public static final File TASKER_DIR = new File(TASKER_PATH);
+
+    public static final String PERMISSION_RUN_COMMAND = "com.termux.permission.RUN_COMMAND";
+
+    public static final String ALLOW_EXTERNAL_APPS_PROPERTY = "allow-external-apps";
+    public static final String ALLOW_EXTERNAL_APPS_PROPERTY_DEFAULT_VALUE = "false";
+
 }

@@ -1,8 +1,11 @@
 package com.termux.tasker;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.termux.tasker.utils.Logger;
+
 /**
  * Superclass for plug-in Activities. This class takes care of initializing aspects of the plug-in's UI to
  * look more integrated with the plug-in host.
@@ -27,17 +30,18 @@ public abstract class AbstractPluginActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            case R.id.twofortyfouram_locale_menu_dontsave:
-                mIsCancelled = true;
-                finish();
-                return true;
-            case R.id.twofortyfouram_locale_menu_save:
-                finish();
-                return true;
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        } else if (id == R.id.twofortyfouram_locale_menu_dontsave) {
+            mIsCancelled = true;
+            finish();
+            return true;
+        } else if (id == R.id.twofortyfouram_locale_menu_save) {
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

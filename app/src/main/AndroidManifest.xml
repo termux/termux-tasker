@@ -9,6 +9,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <!--
         This is the "edit" Activity. Note that Locale will reject plug-in Activities for the following reasons:·
          - Missing "android:label=[...]"
@@ -40,14 +41,18 @@
         <receiver
             android:name=".FireReceiver"
             android:exported="true"
-            android:process=":background">
+            android:process=":background"
+            android:permission="com.termux.permission.RUN_COMMAND">
             <!-- This Intent filter allows the plug-in to discovered by Locale. -->
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".ResultsService" />
+        <!--
+         This is service that will receive execution result from the execution service via a PendingIntent
+        -->
+        <service android:name=".PluginResultsService"/>
     </application>
 
 </manifest>

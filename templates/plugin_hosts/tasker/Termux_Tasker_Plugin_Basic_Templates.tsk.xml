@@ -1,0 +1,982 @@
+<TaskerData sr="" dvi="1" tv="5.11.7.beta">
+	<Task sr="task978">
+		<cdate>1604448827988</cdate>
+		<edate>1607249956160</edate>
+		<id>978</id>
+		<nme>Termux Tasker Plugin Basic Templates</nme>
+		<pri>100</pri>
+		<Share sr="Share">
+			<d>A task that provides templates for running basic commands with the Termux:Tasker plugin. This task requires Termux:Tasker version `&gt;= 0.5`. Tasker must be granted `com.termux.permission.RUN_COMMAND` permission. The `termux_tasker_basic_bash_test` and `termux_tasker_basic_python_test` scripts must be installed at `~/.termux/tasker/termux_tasker_basic_bash_test` and `~/.termux/tasker/termux_tasker_basic_python_test` respectively. The Template 4 will also require the `allow-external-apps` property to be set to `true` in `~/.termux/termux.properties` file since the `$PREFIX/bin/bash` absolute path is outside the `~/.termux/tasker/` directory, otherwise its plugin action will fail. For android `&gt;= 10`, Termux must also be granted `Draw Over Apps` permissions so that foreground commands automatically start executing without the user having to manually click the `Termux` notification in the status bar dropdown notifications list for the commands to start.
+
+Check [Termux:Tasker Github](https://github.com/termux/termux-tasker) for more details on plugin configuration and variables and how to handle them.
+
+
+Template 1 runs the `~/.termux/tasker/termux_tasker_basic_bash_test` `bash` script in the background and sends it 2 simple constant string args and gets the result back in `%stdout`. The args sent do not contain any quotes or special characters and can simply be sent surrounded with double quotes.
+
+
+Template 2 runs the `~/.termux/tasker/termux_tasker_basic_bash_test` `bash` script in the background and sends it 2 complex dynamic args that may contain quotes or special characters, basically a literal string. The result is received back in the `%stdout` variable. The `termux_tasker_basic_bash_test` executable is passed to the plugin using the `%executable` variable. The `%argument_1` and `%argument_2` variables are used to store the dynamic values to be sent as `$1` and `$2` respectively to `termux_tasker_basic_bash_test` and are sent surrounded with single quotes instead of double quotes. They are first set in the `%arguments` variable surrounded with single quotes and separated by a whitespace which is passed to the plugin. The `%argument_1` and `%argument_2` variables may contain any type of characters, even a single quote, but single quotes must be escaped before the plugin action is run. To escape the single quotes, `Variable Search Replace` action is run to replace all single quotes `'` with one single quote, followed by one backslash, followed by two single quotes `'\''`. So `%arguement_1` surrounded with single quotes that would have been passed like `'some arg with single quote ' in it'` will be passed as `'some arg with single quote '\'' in it'`. This is basically 3 parts `'some arg with single quote '`, `\'` and `' in it'` but when processed, it will be considered as one single argument with the value `some arg with single quote ' in it` that is passed to the executable as `$1`. The `Variable Search Replace` action must be used separately for each argument variable before adding it to the `%arguments` variable.  Do not set multiple arguments in the same variable and use `Variable Search Replace` action on it since that will result in incorrect quoting. This template shows how you can dynamically create plugin commands at runtime using variables and send them to the plugin for execution.
+
+
+Template 3 is the same as Template 2, but it runs the `~/.termux/tasker/termux_tasker_basic_python_test` `python` script instead in the background. It can be used as a template to run `python` scripts instead of `bash` scripts.
+
+
+Template 4 runs `$PREFIX/bin/bash` commamd in the foreground to print the path of the current working directory in a foreground terminal session. It does this by passing `echo "I'm in '$(pwd)'"; sleep 5;` to `bash` `-c` option after appropriate escaping. The default value of working directory is set to `~/`. Since commands will be run in a foreground terminal session, the `%stdout`, `%stderr` and `%result` variables will not be returned and only `%err` and `%errmsg` may be returned if the action fails.
+
+
+The `$PREFIX/` is a shortcut for the termux prefix directory `/data/data/com.termux/files/usr/`. The `~/` is a shortcut for the termux home directory `/data/data/com.termux/files/home/`. These shortcuts can be used in the `Executable` and the `Working Directory` plugin fields. The scripts or binaries in the `~/.termux/tasker/` directory do not require them to prefixed with the full path, just set the name in the `Executable` field, like its done for `termux_tasker_basic_bash_test` script in Template 1 and 2 and `termux_tasker_basic_python_test` in Template 3.
+
+
+The `%command_failed` variable will be set if the plugin action failed, this is detected by whether `%err` or `%errmsg` is set by the plugin action or if `%result` does not equal `0` for background commands. If you run multiple plugin actions in the same task or are using `Local Variable Passthrough`, then you must clear the `%command_failed` variable and optionally the `%errmsg`, `%stdout`, `%stderr` and `%result` variables with the `Variable Clear` action before running each plugin action, in case they were already set, like by a previously failed plugin action after which the task was not stopped.
+
+
+To debug arguments being passed or any errors, you can check `logcat` after increasing log level to `Debug`. Check `Debugging` section of `README.md` for more details.
+##
+
+
+**Parameters:** `-`
+
+
+**Returns:** `-`
+
+
+**Control:**
+
+```
+version_name: 0.1.0
+```</d>
+			<p>false</p>
+			<t></t>
+		</Share>
+		<Action sr="act0" ve="7">
+			<code>300</code>
+			<label>A task that provides templates for running basic commands with the Termux:Tasker plugin. This task requires Termux:Tasker version `&gt;= 0.5`. Tasker must be granted `com.termux.permission.RUN_COMMAND` permission. The `termux_tasker_basic_bash_test` and `termux_tasker_basic_python_test` scripts must be installed at `~/.termux/tasker/termux_tasker_basic_bash_test` and `~/.termux/tasker/termux_tasker_basic_python_test` respectively. The Template 4 will also require the `allow-external-apps` property to be set to `true` in `~/.termux/termux.properties` file since the `$PREFIX/bin/bash` absolute path is outside the `~/.termux/tasker/` directory, otherwise its plugin action will fail. For android `&gt;= 10`, Termux must also be granted `Draw Over Apps` permissions so that foreground commands automatically start executing without the user having to manually click the `Termux` notification in the status bar dropdown notifications list for the commands to start.
+
+Check [Termux:Tasker Github](https://github.com/termux/termux-tasker) for more details on plugin configuration and variables and how to handle them.
+
+
+Template 1 runs the `~/.termux/tasker/termux_tasker_basic_bash_test` `bash` script in the background and sends it 2 simple constant string args and gets the result back in `%stdout`. The args sent do not contain any quotes or special characters and can simply be sent surrounded with double quotes.
+
+
+Template 2 runs the `~/.termux/tasker/termux_tasker_basic_bash_test` `bash` script in the background and sends it 2 complex dynamic args that may contain quotes or special characters, basically a literal string. The result is received back in the `%stdout` variable. The `termux_tasker_basic_bash_test` executable is passed to the plugin using the `%executable` variable. The `%argument_1` and `%argument_2` variables are used to store the dynamic values to be sent as `$1` and `$2` respectively to `termux_tasker_basic_bash_test` and are sent surrounded with single quotes instead of double quotes. They are first set in the `%arguments` variable surrounded with single quotes and separated by a whitespace which is passed to the plugin. The `%argument_1` and `%argument_2` variables may contain any type of characters, even a single quote, but single quotes must be escaped before the plugin action is run. To escape the single quotes, `Variable Search Replace` action is run to replace all single quotes `'` with one single quote, followed by one backslash, followed by two single quotes `'\''`. So `%arguement_1` surrounded with single quotes that would have been passed like `'some arg with single quote ' in it'` will be passed as `'some arg with single quote '\'' in it'`. This is basically 3 parts `'some arg with single quote '`, `\'` and `' in it'` but when processed, it will be considered as one single argument with the value `some arg with single quote ' in it` that is passed to the executable as `$1`. The `Variable Search Replace` action must be used separately for each argument variable before adding it to the `%arguments` variable.  Do not set multiple arguments in the same variable and use `Variable Search Replace` action on it since that will result in incorrect quoting. This template shows how you can dynamically create plugin commands at runtime using variables and send them to the plugin for execution.
+
+
+Template 3 is the same as Template 2, but it runs the `~/.termux/tasker/termux_tasker_basic_python_test` `python` script instead in the background. It can be used as a template to run `python` scripts instead of `bash` scripts.
+
+
+Template 4 runs `$PREFIX/bin/bash` commamd in the foreground to print the path of the current working directory in a foreground terminal session. It does this by passing `echo "I'm in '$(pwd)'"; sleep 5;` to `bash` `-c` option after appropriate escaping. The default value of working directory is set to `~/`. Since commands will be run in a foreground terminal session, the `%stdout`, `%stderr` and `%result` variables will not be returned and only `%err` and `%errmsg` may be returned if the action fails.
+
+
+The `$PREFIX/` is a shortcut for the termux prefix directory `/data/data/com.termux/files/usr/`. The `~/` is a shortcut for the termux home directory `/data/data/com.termux/files/home/`. These shortcuts can be used in the `Executable` and the `Working Directory` plugin fields. The scripts or binaries in the `~/.termux/tasker/` directory do not require them to prefixed with the full path, just set the name in the `Executable` field, like its done for `termux_tasker_basic_bash_test` script in Template 1 and 2 and `termux_tasker_basic_python_test` in Template 3.
+
+
+The `%command_failed` variable will be set if the plugin action failed, this is detected by whether `%err` or `%errmsg` is set by the plugin action or if `%result` does not equal `0` for background commands. If you run multiple plugin actions in the same task or are using `Local Variable Passthrough`, then you must clear the `%command_failed` variable and optionally the `%errmsg`, `%stdout`, `%stderr` and `%result` variables with the `Variable Clear` action before running each plugin action, in case they were already set, like by a previously failed plugin action after which the task was not stopped.
+
+
+To debug arguments being passed or any errors, you can check `logcat` after increasing log level to `Debug`. Check `Debugging` section of `README.md` for more details.
+##
+
+
+**Parameters:** `-`
+
+
+**Returns:** `-`
+
+
+**Control:**
+
+```
+version_name: 0.1.0
+```</label>
+		</Action>
+		<Action sr="act1" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%task_name</Str>
+			<Str sr="arg1" ve="3">Termux Tasker Plugin Basic Templates</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+		</Action>
+		<Action sr="act10" ve="7">
+			<code>377</code>
+			<Bundle sr="arg0">
+				<Vals sr="val">
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES>&lt;StringArray sr=""&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;%td_button
+Button
+The label of the button that was clicked&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;&lt;/StringArray&gt;</net.dinglisch.android.tasker.RELEVANT_VARIABLES>
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>[Ljava.lang.String;</net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>
+				</Vals>
+			</Bundle>
+			<Str sr="arg1" ve="3">Template 1 Command
+Failed</Str>
+			<Str sr="arg2" ve="3">%command_failed</Str>
+			<Str sr="arg3" ve="3">OK</Str>
+			<Str sr="arg4" ve="3"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="30"/>
+			<Int sr="arg7" val="0"/>
+		</Action>
+		<Action sr="act11" ve="7">
+			<code>137</code>
+			<Int sr="arg0" val="0"/>
+			<Str sr="arg1" ve="3"/>
+		</Action>
+		<Action sr="act12" ve="7">
+			<code>43</code>
+		</Action>
+		<Action sr="act13" ve="7">
+			<code>377</code>
+			<Bundle sr="arg0">
+				<Vals sr="val">
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES>&lt;StringArray sr=""&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;%td_button
+Button
+The label of the button that was clicked&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;&lt;/StringArray&gt;</net.dinglisch.android.tasker.RELEVANT_VARIABLES>
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>[Ljava.lang.String;</net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>
+				</Vals>
+			</Bundle>
+			<Str sr="arg1" ve="3">Template 1 Command Result</Str>
+			<Str sr="arg2" ve="3">stdout =
+```
+%stdout
+```
+
+stderr =
+```
+%stderr
+```</Str>
+			<Str sr="arg3" ve="3">OK</Str>
+			<Str sr="arg4" ve="3"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="30"/>
+			<Int sr="arg7" val="0"/>
+		</Action>
+		<Action sr="act14" ve="7">
+			<code>38</code>
+		</Action>
+		<Action sr="act15" ve="7">
+			<code>300</code>
+			<label>Template 1 End</label>
+		</Action>
+		<Action sr="act16" ve="7">
+			<code>300</code>
+			<label>Template 2 Start</label>
+		</Action>
+		<Action sr="act17" ve="7">
+			<code>135</code>
+			<label>Goto "Template 3 Start"
+Enable this action to skip running this template</label>
+			<on>false</on>
+			<Int sr="arg0" val="1"/>
+			<Int sr="arg1" val="1"/>
+			<Str sr="arg2" ve="3">Template 3 Start</Str>
+		</Action>
+		<Action sr="act18" ve="7">
+			<code>300</code>
+			<label>Run `termux_tasker_basic_bash_test '%argument_1' '%argument_2'` Command In Background</label>
+		</Action>
+		<Action sr="act19" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%argument_1</Str>
+			<Str sr="arg1" ve="3">json</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+		</Action>
+		<Action sr="act2" ve="7">
+			<code>300</code>
+			<label>Template 1 Start</label>
+		</Action>
+		<Action sr="act20" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%argument_2</Str>
+			<Str sr="arg1" ve="3">{
+    "name":"I'm Termux",
+    "license":"GPLv3",
+    "addons": {
+        "1":"Termux:API",
+        "2":"Termux:Boot",
+        "3":"Termux:Float",
+        "4":"Termux:Styling",
+        "5":"Termux:Tasker",
+        "6":"Termux:Widget"
+    }
+}</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+		</Action>
+		<Action sr="act21" ve="7">
+			<code>598</code>
+			<label>replace all single quotes (') with ('\'')</label>
+			<Str sr="arg0" ve="3">%argument_1</Str>
+			<Str sr="arg1" ve="3">'</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="1"/>
+			<Int sr="arg4" val="0"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="1"/>
+			<Str sr="arg7" ve="3">'\\''</Str>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%argument_1</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act22" ve="7">
+			<code>598</code>
+			<label>replace all single quotes (') with ('\'')</label>
+			<Str sr="arg0" ve="3">%argument_2</Str>
+			<Str sr="arg1" ve="3">'</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="1"/>
+			<Int sr="arg4" val="0"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="1"/>
+			<Str sr="arg7" ve="3">'\\''</Str>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%argument_2</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act23" ve="7">
+			<code>547</code>
+			<label>Set `termux_tasker_basic_bash_test` to %executable</label>
+			<Str sr="arg0" ve="3">%executable</Str>
+			<Str sr="arg1" ve="3">termux_tasker_basic_bash_test</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+		</Action>
+		<Action sr="act24" ve="7">
+			<code>547</code>
+			<label>Set `'%argument_1' '%argument_2'` to %arguments</label>
+			<Str sr="arg0" ve="3">%arguments</Str>
+			<Str sr="arg1" ve="3">'%argument_1' '%argument_2'</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+		</Action>
+		<Action sr="act25" ve="7">
+			<code>549</code>
+			<Str sr="arg0" ve="3">%command_failed/%errmsg/%stdout/%stderr/%result</Str>
+			<Int sr="arg1" val="1"/>
+			<Int sr="arg2" val="1"/>
+			<Int sr="arg3" val="0"/>
+		</Action>
+		<Action sr="act26" ve="7">
+			<code>1256900802</code>
+			<label>Run Termux:Tasker Plugin Command</label>
+			<se>false</se>
+			<Bundle sr="arg0">
+				<Vals sr="val">
+					<com.termux.execute.arguments>%arguments</com.termux.execute.arguments>
+					<com.termux.execute.arguments-type>java.lang.String</com.termux.execute.arguments-type>
+					<com.termux.tasker.extra.EXECUTABLE>%executable</com.termux.tasker.extra.EXECUTABLE>
+					<com.termux.tasker.extra.EXECUTABLE-type>java.lang.String</com.termux.tasker.extra.EXECUTABLE-type>
+					<com.termux.tasker.extra.TERMINAL>false</com.termux.tasker.extra.TERMINAL>
+					<com.termux.tasker.extra.TERMINAL-type>java.lang.Boolean</com.termux.tasker.extra.TERMINAL-type>
+					<com.termux.tasker.extra.VERSION_CODE>4</com.termux.tasker.extra.VERSION_CODE>
+					<com.termux.tasker.extra.VERSION_CODE-type>java.lang.Integer</com.termux.tasker.extra.VERSION_CODE-type>
+					<com.termux.tasker.extra.WORKDIR></com.termux.tasker.extra.WORKDIR>
+					<com.termux.tasker.extra.WORKDIR-type>java.lang.String</com.termux.tasker.extra.WORKDIR-type>
+					<com.twofortyfouram.locale.intent.extra.BLURB>%executable %arguments</com.twofortyfouram.locale.intent.extra.BLURB>
+					<com.twofortyfouram.locale.intent.extra.BLURB-type>java.lang.String</com.twofortyfouram.locale.intent.extra.BLURB-type>
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES>&lt;StringArray sr=""&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;%stdout
+Standard Output
+The &amp;lt;B&amp;gt;stdout&amp;lt;/B&amp;gt; of the command.&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES1&gt;%stderr
+Standard Error
+The &amp;lt;B&amp;gt;stderr&amp;lt;/B&amp;gt; of the command.&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES1&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES2&gt;%result
+Exit Code
+The &amp;lt;B&amp;gt;exit code&amp;lt;/B&amp;gt; of the command. 0 often means success and anything else is usually a failure of some sort.&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES2&gt;&lt;/StringArray&gt;</net.dinglisch.android.tasker.RELEVANT_VARIABLES>
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>[Ljava.lang.String;</net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>
+					<net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS>com.termux.tasker.extra.EXECUTABLE com.termux.execute.arguments com.termux.tasker.extra.WORKDIR</net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS>
+					<net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS-type>java.lang.String</net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS-type>
+					<net.dinglisch.android.tasker.subbundled>true</net.dinglisch.android.tasker.subbundled>
+					<net.dinglisch.android.tasker.subbundled-type>java.lang.Boolean</net.dinglisch.android.tasker.subbundled-type>
+				</Vals>
+			</Bundle>
+			<Str sr="arg1" ve="3">com.termux.tasker</Str>
+			<Str sr="arg2" ve="3">com.termux.tasker.EditConfigurationActivity</Str>
+			<Int sr="arg3" val="10"/>
+		</Action>
+		<Action sr="act27" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%command_failed</Str>
+			<Str sr="arg1" ve="3">err = `%err`
+
+errmsg =
+```
+%errmsg
+```
+
+exit_code = `%result`
+
+stdout =
+```
+%stdout
+```
+
+stderr =
+```
+%stderr
+```</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+			<ConditionList sr="if">
+				<bool0>Or</bool0>
+				<bool1>Or</bool1>
+				<Condition sr="c0" ve="3">
+					<lhs>%err</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+				<Condition sr="c1" ve="3">
+					<lhs>%errmsg</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+				<Condition sr="c2" ve="3">
+					<lhs>%result</lhs>
+					<op>1</op>
+					<rhs>0</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act28" ve="7">
+			<code>37</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command_failed</lhs>
+					<op>12</op>
+					<rhs>\%err
+\%errmsg</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act29" ve="7">
+			<code>598</code>
+			<label>remove %err and %errmsg if not set</label>
+			<se>false</se>
+			<Str sr="arg0" ve="3">%command_failed</Str>
+			<Str sr="arg1" ve="3">^err = `\%err`[\n]+errmsg =[\n]```[\n]\%errmsg[\n]```[\n]+</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="1"/>
+			<Str sr="arg7" ve="3"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command_failed</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act3" ve="7">
+			<code>135</code>
+			<label>Goto "Template 2 Start"
+Enable this action to skip running this template</label>
+			<on>false</on>
+			<Int sr="arg0" val="1"/>
+			<Int sr="arg1" val="1"/>
+			<Str sr="arg2" ve="3">Template 2 Start</Str>
+		</Action>
+		<Action sr="act30" ve="7">
+			<code>377</code>
+			<Bundle sr="arg0">
+				<Vals sr="val">
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES>&lt;StringArray sr=""&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;%td_button
+Button
+The label of the button that was clicked&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;&lt;/StringArray&gt;</net.dinglisch.android.tasker.RELEVANT_VARIABLES>
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>[Ljava.lang.String;</net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>
+				</Vals>
+			</Bundle>
+			<Str sr="arg1" ve="3">Template 2 Command
+Failed</Str>
+			<Str sr="arg2" ve="3">%command_failed</Str>
+			<Str sr="arg3" ve="3">OK</Str>
+			<Str sr="arg4" ve="3"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="30"/>
+			<Int sr="arg7" val="0"/>
+		</Action>
+		<Action sr="act31" ve="7">
+			<code>137</code>
+			<Int sr="arg0" val="0"/>
+			<Str sr="arg1" ve="3"/>
+		</Action>
+		<Action sr="act32" ve="7">
+			<code>43</code>
+		</Action>
+		<Action sr="act33" ve="7">
+			<code>377</code>
+			<Bundle sr="arg0">
+				<Vals sr="val">
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES>&lt;StringArray sr=""&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;%td_button
+Button
+The label of the button that was clicked&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;&lt;/StringArray&gt;</net.dinglisch.android.tasker.RELEVANT_VARIABLES>
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>[Ljava.lang.String;</net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>
+				</Vals>
+			</Bundle>
+			<Str sr="arg1" ve="3">Template 2 Command Result</Str>
+			<Str sr="arg2" ve="3">stdout =
+```
+%stdout
+```
+
+stderr =
+```
+%stderr
+```</Str>
+			<Str sr="arg3" ve="3">OK</Str>
+			<Str sr="arg4" ve="3"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="30"/>
+			<Int sr="arg7" val="0"/>
+		</Action>
+		<Action sr="act34" ve="7">
+			<code>38</code>
+		</Action>
+		<Action sr="act35" ve="7">
+			<code>300</code>
+			<label>Template 2 End</label>
+		</Action>
+		<Action sr="act36" ve="7">
+			<code>300</code>
+			<label>Template 3 Start</label>
+		</Action>
+		<Action sr="act37" ve="7">
+			<code>135</code>
+			<label>Goto "Template 4 Start"
+Enable this action to skip running this template</label>
+			<on>false</on>
+			<Int sr="arg0" val="1"/>
+			<Int sr="arg1" val="1"/>
+			<Str sr="arg2" ve="3">Template 4 Start</Str>
+		</Action>
+		<Action sr="act38" ve="7">
+			<code>300</code>
+			<label>Run `termux_tasker_basic_python_test '%argument_1' '%argument_2'` Command In Background</label>
+		</Action>
+		<Action sr="act39" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%argument_1</Str>
+			<Str sr="arg1" ve="3">json</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+		</Action>
+		<Action sr="act4" ve="7">
+			<code>300</code>
+			<label>Run `termux_tasker_basic_bash_test "hello," "termux!"` Command In Background</label>
+		</Action>
+		<Action sr="act40" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%argument_2</Str>
+			<Str sr="arg1" ve="3">{
+    "name":"I'm Termux",
+    "license":"GPLv3",
+    "addons": {
+        "1":"Termux:API",
+        "2":"Termux:Boot",
+        "3":"Termux:Float",
+        "4":"Termux:Styling",
+        "5":"Termux:Tasker",
+        "6":"Termux:Widget"
+    }
+}</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+		</Action>
+		<Action sr="act41" ve="7">
+			<code>598</code>
+			<label>replace all single quotes (') with ('\'')</label>
+			<Str sr="arg0" ve="3">%argument_1</Str>
+			<Str sr="arg1" ve="3">'</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="1"/>
+			<Int sr="arg4" val="0"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="1"/>
+			<Str sr="arg7" ve="3">'\\''</Str>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%argument_1</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act42" ve="7">
+			<code>598</code>
+			<label>replace all single quotes (') with ('\'')</label>
+			<Str sr="arg0" ve="3">%argument_2</Str>
+			<Str sr="arg1" ve="3">'</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="1"/>
+			<Int sr="arg4" val="0"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="1"/>
+			<Str sr="arg7" ve="3">'\\''</Str>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%argument_2</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act43" ve="7">
+			<code>547</code>
+			<label>Set `termux_tasker_basic_python_test` to %executable</label>
+			<Str sr="arg0" ve="3">%executable</Str>
+			<Str sr="arg1" ve="3">termux_tasker_basic_python_test</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+		</Action>
+		<Action sr="act44" ve="7">
+			<code>547</code>
+			<label>Set `'%argument_1' '%argument_2'` to %arguments</label>
+			<Str sr="arg0" ve="3">%arguments</Str>
+			<Str sr="arg1" ve="3">'%argument_1' '%argument_2'</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+		</Action>
+		<Action sr="act45" ve="7">
+			<code>549</code>
+			<Str sr="arg0" ve="3">%command_failed/%errmsg/%stdout/%stderr/%result</Str>
+			<Int sr="arg1" val="1"/>
+			<Int sr="arg2" val="1"/>
+			<Int sr="arg3" val="0"/>
+		</Action>
+		<Action sr="act46" ve="7">
+			<code>1256900802</code>
+			<label>Run Termux:Tasker Plugin Command</label>
+			<se>false</se>
+			<Bundle sr="arg0">
+				<Vals sr="val">
+					<com.termux.execute.arguments>%arguments</com.termux.execute.arguments>
+					<com.termux.execute.arguments-type>java.lang.String</com.termux.execute.arguments-type>
+					<com.termux.tasker.extra.EXECUTABLE>%executable</com.termux.tasker.extra.EXECUTABLE>
+					<com.termux.tasker.extra.EXECUTABLE-type>java.lang.String</com.termux.tasker.extra.EXECUTABLE-type>
+					<com.termux.tasker.extra.TERMINAL>false</com.termux.tasker.extra.TERMINAL>
+					<com.termux.tasker.extra.TERMINAL-type>java.lang.Boolean</com.termux.tasker.extra.TERMINAL-type>
+					<com.termux.tasker.extra.VERSION_CODE>4</com.termux.tasker.extra.VERSION_CODE>
+					<com.termux.tasker.extra.VERSION_CODE-type>java.lang.Integer</com.termux.tasker.extra.VERSION_CODE-type>
+					<com.termux.tasker.extra.WORKDIR></com.termux.tasker.extra.WORKDIR>
+					<com.termux.tasker.extra.WORKDIR-type>java.lang.String</com.termux.tasker.extra.WORKDIR-type>
+					<com.twofortyfouram.locale.intent.extra.BLURB>%executable %arguments</com.twofortyfouram.locale.intent.extra.BLURB>
+					<com.twofortyfouram.locale.intent.extra.BLURB-type>java.lang.String</com.twofortyfouram.locale.intent.extra.BLURB-type>
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES>&lt;StringArray sr=""&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;%stdout
+Standard Output
+The &amp;lt;B&amp;gt;stdout&amp;lt;/B&amp;gt; of the command.&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES1&gt;%stderr
+Standard Error
+The &amp;lt;B&amp;gt;stderr&amp;lt;/B&amp;gt; of the command.&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES1&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES2&gt;%result
+Exit Code
+The &amp;lt;B&amp;gt;exit code&amp;lt;/B&amp;gt; of the command. 0 often means success and anything else is usually a failure of some sort.&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES2&gt;&lt;/StringArray&gt;</net.dinglisch.android.tasker.RELEVANT_VARIABLES>
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>[Ljava.lang.String;</net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>
+					<net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS>com.termux.tasker.extra.EXECUTABLE com.termux.execute.arguments com.termux.tasker.extra.WORKDIR</net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS>
+					<net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS-type>java.lang.String</net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS-type>
+					<net.dinglisch.android.tasker.subbundled>true</net.dinglisch.android.tasker.subbundled>
+					<net.dinglisch.android.tasker.subbundled-type>java.lang.Boolean</net.dinglisch.android.tasker.subbundled-type>
+				</Vals>
+			</Bundle>
+			<Str sr="arg1" ve="3">com.termux.tasker</Str>
+			<Str sr="arg2" ve="3">com.termux.tasker.EditConfigurationActivity</Str>
+			<Int sr="arg3" val="10"/>
+		</Action>
+		<Action sr="act47" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%command_failed</Str>
+			<Str sr="arg1" ve="3">err = `%err`
+
+errmsg =
+```
+%errmsg
+```
+
+exit_code = `%result`
+
+stdout =
+```
+%stdout
+```
+
+stderr =
+```
+%stderr
+```</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+			<ConditionList sr="if">
+				<bool0>Or</bool0>
+				<bool1>Or</bool1>
+				<Condition sr="c0" ve="3">
+					<lhs>%err</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+				<Condition sr="c1" ve="3">
+					<lhs>%errmsg</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+				<Condition sr="c2" ve="3">
+					<lhs>%result</lhs>
+					<op>1</op>
+					<rhs>0</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act48" ve="7">
+			<code>37</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command_failed</lhs>
+					<op>12</op>
+					<rhs>\%err
+\%errmsg</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act49" ve="7">
+			<code>598</code>
+			<label>remove %err and %errmsg if not set</label>
+			<se>false</se>
+			<Str sr="arg0" ve="3">%command_failed</Str>
+			<Str sr="arg1" ve="3">^err = `\%err`[\n]+errmsg =[\n]```[\n]\%errmsg[\n]```[\n]+</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="1"/>
+			<Str sr="arg7" ve="3"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command_failed</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act5" ve="7">
+			<code>549</code>
+			<Str sr="arg0" ve="3">%command_failed/%errmsg/%stdout/%stderr/%result</Str>
+			<Int sr="arg1" val="1"/>
+			<Int sr="arg2" val="1"/>
+			<Int sr="arg3" val="0"/>
+		</Action>
+		<Action sr="act50" ve="7">
+			<code>377</code>
+			<Bundle sr="arg0">
+				<Vals sr="val">
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES>&lt;StringArray sr=""&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;%td_button
+Button
+The label of the button that was clicked&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;&lt;/StringArray&gt;</net.dinglisch.android.tasker.RELEVANT_VARIABLES>
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>[Ljava.lang.String;</net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>
+				</Vals>
+			</Bundle>
+			<Str sr="arg1" ve="3">Template 3 Command
+Failed</Str>
+			<Str sr="arg2" ve="3">%command_failed</Str>
+			<Str sr="arg3" ve="3">OK</Str>
+			<Str sr="arg4" ve="3"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="30"/>
+			<Int sr="arg7" val="0"/>
+		</Action>
+		<Action sr="act51" ve="7">
+			<code>137</code>
+			<Int sr="arg0" val="0"/>
+			<Str sr="arg1" ve="3"/>
+		</Action>
+		<Action sr="act52" ve="7">
+			<code>43</code>
+		</Action>
+		<Action sr="act53" ve="7">
+			<code>377</code>
+			<Bundle sr="arg0">
+				<Vals sr="val">
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES>&lt;StringArray sr=""&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;%td_button
+Button
+The label of the button that was clicked&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;&lt;/StringArray&gt;</net.dinglisch.android.tasker.RELEVANT_VARIABLES>
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>[Ljava.lang.String;</net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>
+				</Vals>
+			</Bundle>
+			<Str sr="arg1" ve="3">Template 3 Command Result</Str>
+			<Str sr="arg2" ve="3">stdout =
+```
+%stdout
+```
+
+stderr =
+```
+%stderr
+```</Str>
+			<Str sr="arg3" ve="3">OK</Str>
+			<Str sr="arg4" ve="3"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="30"/>
+			<Int sr="arg7" val="0"/>
+		</Action>
+		<Action sr="act54" ve="7">
+			<code>38</code>
+		</Action>
+		<Action sr="act55" ve="7">
+			<code>300</code>
+			<label>Template 3 End</label>
+		</Action>
+		<Action sr="act56" ve="7">
+			<code>300</code>
+			<label>Template 4 Start</label>
+		</Action>
+		<Action sr="act57" ve="7">
+			<code>135</code>
+			<label>Goto "Return"
+Enable this action to skip running this template</label>
+			<on>false</on>
+			<Int sr="arg0" val="1"/>
+			<Int sr="arg1" val="1"/>
+			<Str sr="arg2" ve="3">Return</Str>
+		</Action>
+		<Action sr="act58" ve="7">
+			<code>300</code>
+			<label>Run `$PREFIX/bin/bash -c "echo \"I'm in '$(pwd)'\"; sleep 5;"` Command In Foreground</label>
+		</Action>
+		<Action sr="act59" ve="7">
+			<code>549</code>
+			<Str sr="arg0" ve="3">%command_failed/%errmsg/%stdout/%stderr/%result</Str>
+			<Int sr="arg1" val="1"/>
+			<Int sr="arg2" val="1"/>
+			<Int sr="arg3" val="0"/>
+		</Action>
+		<Action sr="act6" ve="7">
+			<code>1256900802</code>
+			<label>Run Termux:Tasker Plugin Command</label>
+			<se>false</se>
+			<Bundle sr="arg0">
+				<Vals sr="val">
+					<com.termux.execute.arguments>"hello," "termux!"</com.termux.execute.arguments>
+					<com.termux.execute.arguments-type>java.lang.String</com.termux.execute.arguments-type>
+					<com.termux.tasker.extra.EXECUTABLE>termux_tasker_basic_bash_test</com.termux.tasker.extra.EXECUTABLE>
+					<com.termux.tasker.extra.EXECUTABLE-type>java.lang.String</com.termux.tasker.extra.EXECUTABLE-type>
+					<com.termux.tasker.extra.TERMINAL>false</com.termux.tasker.extra.TERMINAL>
+					<com.termux.tasker.extra.TERMINAL-type>java.lang.Boolean</com.termux.tasker.extra.TERMINAL-type>
+					<com.termux.tasker.extra.VERSION_CODE>4</com.termux.tasker.extra.VERSION_CODE>
+					<com.termux.tasker.extra.VERSION_CODE-type>java.lang.Integer</com.termux.tasker.extra.VERSION_CODE-type>
+					<com.termux.tasker.extra.WORKDIR></com.termux.tasker.extra.WORKDIR>
+					<com.termux.tasker.extra.WORKDIR-type>java.lang.String</com.termux.tasker.extra.WORKDIR-type>
+					<com.twofortyfouram.locale.intent.extra.BLURB>termux_tasker_basic_bash_test "hello," "termux!"</com.twofortyfouram.locale.intent.extra.BLURB>
+					<com.twofortyfouram.locale.intent.extra.BLURB-type>java.lang.String</com.twofortyfouram.locale.intent.extra.BLURB-type>
+					<net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS>com.termux.tasker.extra.EXECUTABLE com.termux.execute.arguments com.termux.tasker.extra.WORKDIR</net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS>
+					<net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS-type>java.lang.String</net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS-type>
+					<net.dinglisch.android.tasker.subbundled>true</net.dinglisch.android.tasker.subbundled>
+					<net.dinglisch.android.tasker.subbundled-type>java.lang.Boolean</net.dinglisch.android.tasker.subbundled-type>
+				</Vals>
+			</Bundle>
+			<Str sr="arg1" ve="3">com.termux.tasker</Str>
+			<Str sr="arg2" ve="3">com.termux.tasker.EditConfigurationActivity</Str>
+			<Int sr="arg3" val="10"/>
+		</Action>
+		<Action sr="act60" ve="7">
+			<code>1256900802</code>
+			<label>Run Termux:Tasker Plugin Command</label>
+			<se>false</se>
+			<Bundle sr="arg0">
+				<Vals sr="val">
+					<com.termux.execute.arguments>-c "echo \"I'm in '$(pwd)'\"; sleep 5;"</com.termux.execute.arguments>
+					<com.termux.execute.arguments-type>java.lang.String</com.termux.execute.arguments-type>
+					<com.termux.tasker.extra.EXECUTABLE>$PREFIX/bin/bash</com.termux.tasker.extra.EXECUTABLE>
+					<com.termux.tasker.extra.EXECUTABLE-type>java.lang.String</com.termux.tasker.extra.EXECUTABLE-type>
+					<com.termux.tasker.extra.TERMINAL>true</com.termux.tasker.extra.TERMINAL>
+					<com.termux.tasker.extra.TERMINAL-type>java.lang.Boolean</com.termux.tasker.extra.TERMINAL-type>
+					<com.termux.tasker.extra.VERSION_CODE>4</com.termux.tasker.extra.VERSION_CODE>
+					<com.termux.tasker.extra.VERSION_CODE-type>java.lang.Integer</com.termux.tasker.extra.VERSION_CODE-type>
+					<com.termux.tasker.extra.WORKDIR>~/</com.termux.tasker.extra.WORKDIR>
+					<com.termux.tasker.extra.WORKDIR-type>java.lang.String</com.termux.tasker.extra.WORKDIR-type>
+					<com.twofortyfouram.locale.intent.extra.BLURB>$PREFIX/bin/bash -c "echo \"I'm in '$(pwd)'\"; sleep 5;"
+
+✓ </com.twofortyfouram.locale.intent.extra.BLURB>
+					<com.twofortyfouram.locale.intent.extra.BLURB-type>java.lang.String</com.twofortyfouram.locale.intent.extra.BLURB-type>
+					<net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS>com.termux.tasker.extra.EXECUTABLE com.termux.execute.arguments com.termux.tasker.extra.WORKDIR</net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS>
+					<net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS-type>java.lang.String</net.dinglisch.android.tasker.extras.VARIABLE_REPLACE_KEYS-type>
+					<net.dinglisch.android.tasker.subbundled>true</net.dinglisch.android.tasker.subbundled>
+					<net.dinglisch.android.tasker.subbundled-type>java.lang.Boolean</net.dinglisch.android.tasker.subbundled-type>
+				</Vals>
+			</Bundle>
+			<Str sr="arg1" ve="3">com.termux.tasker</Str>
+			<Str sr="arg2" ve="3">com.termux.tasker.EditConfigurationActivity</Str>
+			<Int sr="arg3" val="10"/>
+		</Action>
+		<Action sr="act61" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%command_failed</Str>
+			<Str sr="arg1" ve="3">err = `%err`
+
+errmsg =
+```
+%errmsg
+```</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+			<ConditionList sr="if">
+				<bool0>Or</bool0>
+				<Condition sr="c0" ve="3">
+					<lhs>%err</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+				<Condition sr="c1" ve="3">
+					<lhs>%errmsg</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act62" ve="7">
+			<code>37</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command_failed</lhs>
+					<op>12</op>
+					<rhs>\%err
+\%errmsg</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act63" ve="7">
+			<code>377</code>
+			<Bundle sr="arg0">
+				<Vals sr="val">
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES>&lt;StringArray sr=""&gt;&lt;_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;%td_button
+Button
+The label of the button that was clicked&lt;/_array_net.dinglisch.android.tasker.RELEVANT_VARIABLES0&gt;&lt;/StringArray&gt;</net.dinglisch.android.tasker.RELEVANT_VARIABLES>
+					<net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>[Ljava.lang.String;</net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>
+				</Vals>
+			</Bundle>
+			<Str sr="arg1" ve="3">Template 4 Command
+Failed</Str>
+			<Str sr="arg2" ve="3">%command_failed</Str>
+			<Str sr="arg3" ve="3">OK</Str>
+			<Str sr="arg4" ve="3"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="30"/>
+			<Int sr="arg7" val="0"/>
+		</Action>
+		<Action sr="act64" ve="7">
+			<code>137</code>
+			<Int sr="arg0" val="0"/>
+			<Str sr="arg1" ve="3"/>
+		</Action>
+		<Action sr="act65" ve="7">
+			<code>38</code>
+		</Action>
+		<Action sr="act66" ve="7">
+			<code>300</code>
+			<label>Template 4 End</label>
+		</Action>
+		<Action sr="act67" ve="7">
+			<code>300</code>
+			<label>Return</label>
+		</Action>
+		<Action sr="act7" ve="7">
+			<code>547</code>
+			<Str sr="arg0" ve="3">%command_failed</Str>
+			<Str sr="arg1" ve="3">err = `%err`
+
+errmsg =
+```
+%errmsg
+```
+
+exit_code = `%result`
+
+stdout =
+```
+%stdout
+```
+
+stderr =
+```
+%stderr
+```</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+			<ConditionList sr="if">
+				<bool0>Or</bool0>
+				<bool1>Or</bool1>
+				<Condition sr="c0" ve="3">
+					<lhs>%err</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+				<Condition sr="c1" ve="3">
+					<lhs>%errmsg</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+				<Condition sr="c2" ve="3">
+					<lhs>%result</lhs>
+					<op>1</op>
+					<rhs>0</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act8" ve="7">
+			<code>37</code>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command_failed</lhs>
+					<op>12</op>
+					<rhs>\%err
+\%errmsg</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act9" ve="7">
+			<code>598</code>
+			<label>remove %err and %errmsg if not set</label>
+			<se>false</se>
+			<Str sr="arg0" ve="3">%command_failed</Str>
+			<Str sr="arg1" ve="3">^err = `\%err`[\n]+errmsg =[\n]```[\n]\%errmsg[\n]```[\n]+</Str>
+			<Int sr="arg2" val="0"/>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Str sr="arg5" ve="3"/>
+			<Int sr="arg6" val="1"/>
+			<Str sr="arg7" ve="3"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%command_failed</lhs>
+					<op>12</op>
+					<rhs></rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+	</Task>
+</TaskerData>

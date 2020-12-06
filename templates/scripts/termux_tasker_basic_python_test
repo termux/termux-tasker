@@ -1,0 +1,16 @@
+#!/usr/bin/python
+
+import sys
+
+argv_size = len(sys.argv) - 1
+
+# if parameter count is not 2
+if argv_size != 2:
+	print("Invalid parameter count '%s' to 'termux_tasker_basic_python_test'" % argv_size, file=sys.stderr)
+	print("%s" % " ".join(sys.argv[1:]), file=sys.stderr)
+	sys.exit(1)
+
+print("$1=`%s`" % sys.argv[1])
+print("$2=`%s`" % sys.argv[2])
+
+sys.exit(0)

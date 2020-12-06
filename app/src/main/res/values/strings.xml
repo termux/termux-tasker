@@ -1,24 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- The app_name is the name of the app that is visible when listing installed apps.
-         It's also used by Tasker in "Select Action Category" > "Plugin" dialog, so keep this one short -->
+         It's also used by plugin caller app as plugin name like in Tasker in "Select Action Category" > "Plugin" dialog, so keep this one short -->
     <string name="app_name">Termux:Tasker</string>
-    <!-- The plugin name as shown in Tasker in the Task Edit activity.-->
+    <!-- The plugin name as shown in plugin caller app in the Task Edit activity.-->
     <string name="plugin_name">Termux</string>
+    <string name="executable_path_hint">Executable (file in ~/.termux/tasker/ or absolute path to executable)</string>
+    <string name="arguments_hint">Arguments</string>
+    <string name="working_directory_path_hint">Working directory path</string>
     <string name="execute_in_terminal">Execute in a terminal session</string>
-    <string name="executable_path_hint">Executable in ~/.termux/tasker/</string>
+    <string name="executable_absolute_path">Executable Absolute Path: \"%1$s\"</string>
+    <string name="working_directory_absolute_path">Working Directory Absolute Path: \"%1$s\"</string>
 
+    <string name="help">Visit https://github.com/termux/termux-tasker for more info on plugin usage.</string>
+
+    <string name="unknown_app">(unknown)</string>
+    <string name="executable_required">Executable required.</string>
+    <string name="null_or_empty_executable">The executable is null or empty.</string>
+    <string name="null_or_empty_directory">The directory is null or empty.</string>
+    <string name="no_regular_file_found">Regular file not found at path.</string>
+    <string name="no_directory_found">Directory not found at path.</string>
+    <string name="no_readable_file_found">File at path is not readable.</string>
+    <string name="no_executable_file_found">File at path is not an executable.</string>
+    <string name="no_readable_directory_found">Directory at path is not readable.</string>
+    <string name="no_executable_directory_found">Directory at path is not executable.</string>
+    <string name="non_regular_file_found">Non-regular file found at path.</string>
+    <string name="non_directory_file_found">Non-directory file found at path.</string>
+    <string name="directory_creation_failed">Failed to create directory at path: \"%1$s\"</string>
+    <string name="directory_creation_failed_with_exception">Failed to create directory at path: \"%1$s\"\nException: %2$s</string>
+    <string name="variable_in_path">(variable detected)</string>
     <string name="no_tasker_folder_title">No ~/.termux/tasker/ directory</string>
     <string name="no_tasker_folder_message">You need to create a ~/.termux/tasker/ directory containing scripts to be executed.</string>
+    <string name="null_bundle">The bundle is null.</string>
 
-    <string name="blurb_in_background">Execute ~/.termux/tasker/%1$s %2$s</string>
-    <string name="blurb_in_terminal">Execute ~/.termux/tasker/%1$s %2$s in a terminal session.</string>
+    <string name="log_level_title">Log Level</string>
+    <string name="log_level_off">"Off"</string>
+    <string name="log_level_normal">"Normal"</string>
+    <string name="log_level_debug">"Debug"</string>
+    <string name="log_level_verbose">"Verbose"</string>
+    <string name="log_level_unknown">"*Unknown*"</string>
+    <string name="log_level_value">Logcat log level set to \"%1$s\" for the plugin app and all plugin actions</string>
 
-    <!-- From Tasker API: -->
+    <string name="termux_app_not_installed_or_disabled_warning">The Termux app is not installed or is disabled. It is required by the Termux:Tasker plugin app to run plugin commands."</string>
+    <string name="termux_app_prefix_path_inaccessible_warning">The Termux app $PREFIX directory is not accessible by the Termux:Tasker plugin app. This may be because you have not installed or setup
+                    Termux app or Termux app and Termux:Tasker app both have different APK signatures because you have managed to install both apps from different sources.
+                    It may also be because termux $PREFIX directory \"/data/data/com.termux/files/usr\" does not exist or does not have read or execute permissions."</string>
+    <string name="plugin_permission_ungranted_warning">The %1$s App (%2$s) has not been granted the \"%3$s\" permission which is required to run the plugin action."</string>
+    <string name="allow_external_apps_ungranted_warning">Absolute paths for executables outside ~/.termux/tasker/ directory require allow-external-apps property to be set to \"true\" in ~/.termux/termux.properties file.</string>
+
+    <string name="blurb_in_background">%1$s %2$s</string>
+    <string name="blurb_in_terminal">%1$s %2$s\n\n\u2713 Terminal Session</string>
+
+    <!-- From Locale API: -->
     <string name="twofortyfouram_locale_breadcrumb_format" tools:ignore="UnusedResources">%1$s%2$s%3$s</string>
     <string name="twofortyfouram_locale_breadcrumb_separator" tools:ignore="UnusedResources">\u0020&gt;\u0020</string>
     <string name="twofortyfouram_locale_menu_dontsave">Cancel</string>
     <string name="twofortyfouram_locale_menu_save">Done</string>
-    <string name="arguments_hint">Arguments</string>
-
 </resources>

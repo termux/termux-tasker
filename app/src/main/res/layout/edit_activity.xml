@@ -1,50 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:id="@+id/activity_main"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    tools:context="com.termux.tasker.EditConfigurationActivity">
+    android:layout_height="match_parent" >
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/executable_path_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <AutoCompleteTextView
-            android:id="@+id/executable_path"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:completionThreshold="1"
-            android:hint="@string/executable_path_hint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/argument_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/arguments"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:hint="@string/arguments_hint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="" />
-    </android.support.design.widget.TextInputLayout>
-    <CheckBox
-        android:id="@+id/in_terminal"
+    <LinearLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:id="@+id/activity_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        android:text="@string/execute_in_terminal" />
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        tools:context="com.termux.tasker.EditConfigurationActivity">
 
-</LinearLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/executable_path_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <AutoCompleteTextView
+                android:id="@+id/executable_path"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:completionThreshold="1"
+                android:hint="@string/executable_path_hint"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/argument_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/arguments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:inputType=""
+                android:hint="@string/arguments_hint"
+                android:importantForAutofill="no"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/working_directory_path_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <AutoCompleteTextView
+                android:id="@+id/working_directory_path"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:completionThreshold="1"
+                android:hint="@string/working_directory_path_hint"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <CheckBox
+            android:id="@+id/in_terminal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:text="@string/execute_in_terminal"/>
+
+        <TextView
+            android:id="@+id/executable_absolute_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:gravity="start|center_vertical"
+            android:textSize="12sp"
+            android:textStyle="normal"/>
+
+        <TextView
+            android:id="@+id/working_directory_absolute_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:gravity="start|center_vertical"
+            android:textSize="12sp"
+            android:textStyle="normal"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/help"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:gravity="start|center_vertical"
+            android:textSize="14sp"
+            android:textStyle="normal"
+            android:textColor="#000000"
+            android:autoLink="web"
+            android:text="@string/help"/>
+
+        <TextView
+            android:id="@+id/termux_app_files_path_inaccessible_warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:gravity="start|center_vertical"
+            android:textSize="14sp"
+            android:textStyle="normal"
+            android:textColor="#DC143C"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/plugin_permission_ungranted_warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:gravity="start|center_vertical"
+            android:textSize="14sp"
+            android:textStyle="normal"
+            android:textColor="#DC143C"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/allow_external_apps_ungranted_warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:textSize="14sp"
+            android:textStyle="normal"
+            android:textColor="#DC143C"
+            android:visibility="invisible"/>
+
+    </LinearLayout>
+
+</ScrollView>

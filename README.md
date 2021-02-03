@@ -26,11 +26,7 @@ from [Tasker] and other plugin apps.
 
 ### Installation
 
-`Termux:Tasker` application can be obtained from:
-
-- [Google Play](https://play.google.com/store/apps/details?id=com.termux.tasker)
-- [F-Droid](https://f-droid.org/en/packages/com.termux.tasker/)
-- [Kali Nethunter Store](https://store.nethunter.com/en/packages/com.termux.tasker/)
+`Termux:Tasker` application can be obtained from [F-Droid](https://f-droid.org/en/packages/com.termux.tasker/).
 
 Additionally we provide per-commit debug builds for those who want to try
 out the latest features or test their pull request. This build can be obtained
@@ -38,7 +34,7 @@ from one of the workflow runs listed on [Github Actions](https://github.com/term
 page.
 
 
-The APK files in Google Play, F-Droid, Kali Nethunter Store releases (or custom builds from source code) are signed with different signature keys. The `Termux` app and all its plugins use the same [sharedUserId](https://developer.android.com/guide/topics/manifest/manifest-element) `com.termux` and so all their APKs installed on a device must have been signed with the same signature key to work together and so they must all be installed from the same source. Do not attempt to mix them together, i.e do not try to install an app or plugin from Goggle Play and another from F-Droid. Android Package Manager will also normally not allow installation of APKs with a different signatures and you will get an error on installation but this restriction can be bypassed with root or with custom roms. If you wish to install from a different source, then you must uninstall any and all existing Termux app or its plugin APKs from your device first, then install all new APKs from the same new source again. The `~/.termux/tasker/` directory will not be accessible to the plugin and commands will not execute if `Termux` and `Termux:Tasker` APKs have a different signatures.
+The APK files in F-Droid releases or Github Actions builds are signed with different signature keys. The `Termux` app and all its plugins use the same [sharedUserId](https://developer.android.com/guide/topics/manifest/manifest-element) `com.termux` and so all their APKs installed on a device must have been signed with the same signature key to work together and so they must all be installed from the same source. Do not attempt to mix them together, i.e do not try to install an app or plugin from F-Droid and another from different source. Android Package Manager will also normally not allow installation of APKs with a different signatures and you will get an error on installation but this restriction can be bypassed with root or with custom roms. If you wish to install from a different source, then you must uninstall any and all existing Termux app or its plugin APKs from your device first, then install all new APKs from the same new source again. The `~/.termux/tasker/` directory will not be accessible to the plugin and commands will not execute if `Termux` and `Termux:Tasker` APKs have a different signatures.
 ##
 
 

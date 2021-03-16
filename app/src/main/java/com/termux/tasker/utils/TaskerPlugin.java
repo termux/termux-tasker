@@ -1,4 +1,4 @@
-package com.termux.tasker;
+package com.termux.tasker.utils;
 
 // Constants and functions for Tasker *extensions* to the plugin protocol
 // See Also: http://tasker.dinglisch.net/plugins.html

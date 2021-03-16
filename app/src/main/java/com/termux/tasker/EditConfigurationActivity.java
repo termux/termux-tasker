@@ -3,10 +3,15 @@ package com.termux.tasker;
 import android.content.Intent;
 import android.os.Bundle;
 import com.google.android.material.textfield.TextInputEditText;
-import com.termux.tasker.utils.FileUtils;
-import com.termux.tasker.utils.Logger;
+import com.termux.shared.file.TermuxFileUtils;
+import com.termux.shared.logger.Logger;
+import com.termux.shared.models.errors.Error;
+import com.termux.shared.termux.TermuxConstants;
+import com.termux.shared.file.FileUtils;
+import com.termux.shared.termux.TermuxUtils;
+import com.termux.tasker.utils.LoggerUtils;
 import com.termux.tasker.utils.PluginUtils;
-import com.termux.tasker.utils.TermuxAppUtils;
+import com.termux.tasker.utils.TaskerPlugin;
 
 import androidx.appcompat.app.ActionBar;
 
@@ -51,13 +56,15 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     private String[] workingDirectoriesNamesList = new String[0];
     ArrayAdapter<String> workingDirectoriesNamesAdaptor;
 
+    private static final String LOG_TAG = "EditConfigurationActivity";
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle(R.string.app_name);
+            actionBar.setTitle(R.string.application_name);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
@@ -68,6 +75,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         final Bundle localeBundle = intent.getBundleExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE);
         BundleScrubber.scrub(localeBundle);
 
+        TextView mHelp = findViewById(R.id.textview_help);
+        mHelp.setText(this.getString(R.string.help, TermuxConstants.TERMUX_TASKER_GITHUB_REPO_URL));
 
         mExecutablePathText = findViewById(R.id.executable_path);
         mArgumentsText = findViewById(R.id.arguments);
@@ -129,7 +138,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                     final boolean inTerminal = localeBundle.getBoolean(PluginBundleManager.EXTRA_TERMINAL);
                     mInTerminalCheckbox.setChecked(inTerminal);
                 } else {
-                    Logger.logError(this, errmsg);
+                    Logger.logError(LOG_TAG, errmsg);
                 }
             }
         }
@@ -147,7 +156,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         int id = item.getItemId();
 
         if (id == R.id.menu_log_level) {
-            Logger.showSetLogLevelDialog(this);
+            LoggerUtils.showSetLogLevelDialog(this);
             return true;
         }
 
@@ -199,9 +208,9 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                 if(!inTerminal) {
                     if (TaskerPlugin.hostSupportsRelevantVariables(getIntent().getExtras())) {
                         TaskerPlugin.addRelevantVariableList(resultIntent, new String[]{
-                                PluginResultsService.PLUGIN_VARIABLE_STDOUT + "\nStandard Output\nThe <B>stdout</B> of the command.",
-                                PluginResultsService.PLUGIN_VARIABLE_STDERR + "\nStandard Error\nThe <B>stderr</B> of the command.",
-                                PluginResultsService.PLUGIN_VARIABLE_EXIT_CODE + "\nExit Code\nThe <B>exit code</B> of the command. " +
+                                PluginUtils.PLUGIN_VARIABLE_STDOUT + "\nStandard Output\nThe <B>stdout</B> of the command.",
+                                PluginUtils.PLUGIN_VARIABLE_STDERR + "\nStandard Error\nThe <B>stderr</B> of the command.",
+                                PluginUtils.PLUGIN_VARIABLE_EXIT_CODE + "\nExit Code\nThe <B>exit code</B> of the command. " +
                                         "0 often means success and anything else is usually a failure of some sort."
                         });
                     }
@@ -252,8 +261,10 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
         String errmsg;
 
-        // If Termux app is not installed or PREFIX_PATH is not accessible, then show warning
-        errmsg = TermuxAppUtils.checkIfTermuxAppIsInstalledAndAccessible(this);
+        // If Termux app is not installed, enabled or accessible with current context or if
+        // TermuxConstants.TERMUX_PREFIX_DIR_PATH does not exist or has required permissions,
+        // then show warning.
+        errmsg = TermuxUtils.isTermuxAppAccessible(this);
         if (errmsg != null) {
             mTermuxAppFilesPathInaccessibleWarning.setText(errmsg);
             mTermuxAppFilesPathInaccessibleWarning.setVisibility(View.VISIBLE);
@@ -292,37 +303,39 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         mAllowExternalAppsUngrantedWarning.setText(null);
 
         if (executable == null || executable.isEmpty()) {
-            mExecutablePathText.setError(this.getString(R.string.executable_required));
+            mExecutablePathText.setError(this.getString(R.string.error_executable_required));
             validate = false;
             executableDefined = false;
         }
 
-        executable = FileUtils.getAbsolutePathForExecutable(executable);
+        executable = TermuxFileUtils.getCanonicalPath(executable, TermuxConstants.TERMUX_TASKER_SCRIPTS_DIR_PATH, true);
 
         // If executable text contains a variable, then no need to set absolute path or validate the path
-        if (PluginResultsService.isPluginHostAppVariableContainingString(executable)) {
-            mExecutableAbsolutePathText.setText(this.getString(R.string.executable_absolute_path, this.getString(R.string.variable_in_path)));
+        if (PluginUtils.isPluginHostAppVariableContainingString(executable)) {
+            mExecutableAbsolutePathText.setText(this.getString(R.string.msg_executable_absolute_path, this.getString(R.string.msg_variable_in_string)));
             executable = null;
             validate = false;
         } else if (executableDefined) {
-            mExecutableAbsolutePathText.setText(this.getString(R.string.executable_absolute_path, executable));
+            mExecutableAbsolutePathText.setText(this.getString(R.string.msg_executable_absolute_path, executable));
         }
 
         if (validate) {
-            File executableFile = new File(executable);
-
-            String errmsg;
-
-            // If executable is not a file, cannot be read or be executed, then return RESULT_CODE_FAILED to plugin host app
-            // Readable and executable checks are to be ignored if path is in TASKER_PATH since FireReceiver will automatically
-            // set read and execute permissions on execution
-            errmsg = FileUtils.checkIfExecutableFileIsReadableAndExecutable(this, executable, false, true);
-            if (errmsg != null) {
-                mExecutablePathText.setError(errmsg);
+            // If executable is not a file, cannot be read or be executed, then show warning
+            // Missing permissions (but not existence) checks are to be ignored if path is in
+            // TermuxConstants#TERMUX_TASKER_SCRIPTS_DIR_PATH since FireReceiver
+            // will automatically set permissions on execution.
+            Error error = FileUtils.validateRegularFileExistenceAndPermissions("executable", executable,
+                    TermuxConstants.TERMUX_TASKER_SCRIPTS_DIR_PATH,
+                    FileUtils.APP_EXECUTABLE_FILE_PERMISSIONS,false, false,
+                    true);
+            if (error != null) {
+                Error shortError = FileUtils.getShortFileUtilsError(error);
+                mExecutablePathText.setError(shortError.getMessage());
             }
 
-            // If executable is not in TASKER_PATH and allow-external-apps property to not set to "true", then show warning
-            errmsg = PluginUtils.checkIfAllowExternalAppsPolicyIsViolated(this, executable);
+            // If executable is not in TermuxConstants#TERMUX_TASKER_SCRIPTS_DIR_PATH and
+            // "allow-external-apps" property to not set to "true", then show warning
+            String errmsg = PluginUtils.checkIfTermuxTaskerAllowExternalAppsPolicyIsViolated(this, executable);
             if (errmsg != null) {
                 mAllowExternalAppsUngrantedWarning.setText(errmsg);
                 mAllowExternalAppsUngrantedWarning.setVisibility(View.VISIBLE);
@@ -346,13 +359,15 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
         String executablePathText = mExecutablePathText.getText().toString();
 
-        // If executable is null, empty or executable parent is not a directory, then show files in TASKER_DIR
+        // If executable is null, empty or executable parent is not a directory, then show files
+        // in TermuxConstants.TERMUX_TASKER_SCRIPTS_DIR
         if (executable == null || executable.isEmpty() || executableParentFile == null || !executableParentFile.isDirectory()) {
-            files = Constants.TASKER_DIR.listFiles();
+            files = TermuxConstants.TERMUX_TASKER_SCRIPTS_DIR.listFiles();
         }
-        // If executable is a substring of FILES_PATH, then show files in FILES_PATH
-        else if (Constants.FILES_PATH.contains(executable)) {
-            executableParentFile = new File(Constants.FILES_PATH);
+        // If executable is a substring of TermuxConstants.TERMUX_FILES_DIR_PATH, then show
+        // files in TermuxConstants.TERMUX_FILES_DIR_PATH
+        else if (TermuxConstants.TERMUX_FILES_DIR_PATH.contains(executable)) {
+            executableParentFile = new File(TermuxConstants.TERMUX_FILES_DIR_PATH);
             files = executableParentFile.listFiles();
         }
         // If executable path in text field ends with "/", then show files in current directory instead of parent directory
@@ -365,8 +380,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             files = executableParentFile.listFiles();
         }
 
-        //Logger.logVerbose(this, "executable: " + executable);
-        //Logger.logVerbose(this, "executablePathText: " + executablePathText);
+        //Logger.logVerbose(LOG_TAG, "executable: " + executable);
+        //Logger.logVerbose(LOG_TAG, "executablePathText: " + executablePathText);
 
         if (files != null && files.length > 0) {
             Arrays.sort(files);
@@ -374,14 +389,16 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             // If executable is not null, empty or executable parent is not null
             if (executable != null && !executable.isEmpty() && executableParentFile != null) {
                 String executableParentPath = executableParentFile.getAbsolutePath();
-                //Logger.logVerbose(this, "executableParentPath: " + executableParentPath);
+                //Logger.logVerbose(LOG_TAG, "executableParentPath: " + executableParentPath);
 
-                // If executable path in text field starts with "/", then prefix file names with the parent directory in the drop down list
+                // If executable path in text field starts with "/", then prefix file names with the
+                // parent directory in the drop down list
                 if (executablePathText.startsWith("/"))
                     executableFileNamesPrefix = executableParentPath + "/";
-                // If executable path in text field starts with "$PREFIX/" or "~/", then prefix file names with the unexpanded path in the drop down list
+                // If executable path in text field starts with "$PREFIX/" or "~/", then prefix file names
+                // with the unexpanded path in the drop down list
                 else if (executablePathText.startsWith("$PREFIX/") || executablePathText.startsWith("~/")) {
-                    executableFileNamesPrefix = FileUtils.getUnExpandedTermuxPath(executableParentPath + "/");
+                    executableFileNamesPrefix = TermuxFileUtils.getUnExpandedTermuxPath(executableParentPath + "/");
                 }
             }
 
@@ -394,7 +411,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             executableFileNamesList = new String[0];
         }
 
-        //Logger.logVerbose(this, Arrays.toString(executableFileNamesList));
+        //Logger.logVerbose(LOG_TAG, Arrays.toString(executableFileNamesList));
 
         // Update drop down list and show it
         executableFileNamesAdaptor.clear();
@@ -419,30 +436,30 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             workingDirectoryDefined = false;
         }
 
-        workingDirectory = FileUtils.getAbsolutePathForExecutable(workingDirectory);
+        workingDirectory = TermuxFileUtils.getCanonicalPath(workingDirectory, null, true);
 
         // If workingDirectory text contains a variable, then no need to set absolute path or validate the path
-        if (PluginResultsService.isPluginHostAppVariableContainingString(workingDirectory)) {
-            mWorkingDirectoryAbsolutePathText.setText(this.getString(R.string.working_directory_absolute_path, this.getString(R.string.variable_in_path)));
+        if (PluginUtils.isPluginHostAppVariableContainingString(workingDirectory)) {
+            mWorkingDirectoryAbsolutePathText.setText(this.getString(R.string.msg_working_directory_absolute_path, this.getString(R.string.msg_variable_in_string)));
             mWorkingDirectoryAbsolutePathText.setVisibility(View.VISIBLE);
             workingDirectory = null;
             validate = false;
         } else if (workingDirectoryDefined) {
-            mWorkingDirectoryAbsolutePathText.setText(this.getString(R.string.working_directory_absolute_path, workingDirectory));
+            mWorkingDirectoryAbsolutePathText.setText(this.getString(R.string.msg_working_directory_absolute_path, workingDirectory));
             mWorkingDirectoryAbsolutePathText.setVisibility(View.VISIBLE);
         }
 
         if (validate) {
-            File executableFile = new File(workingDirectory);
-
-            String errmsg;
-
-            // If workingDirectory is not a directory or cannot be read, then return RESULT_CODE_FAILED to plugin host app
-            // Existence and readable checks are to be ignored if path is in HOME_PATH since FireReceiver will automatically
-            // create and set read permissions on execution
-            errmsg = FileUtils.checkIfDirectoryIsReadable(this, workingDirectory, false, false, true);
-            if (errmsg != null) {
-                mWorkingDirectoryPathText.setError(errmsg);
+            // If workingDirectory is not a directory or cannot be read, then show warning
+            // Existence and missing permissions checks are to be ignored if path is under allowed
+            // termux working directory paths since FireReceiver will automatically create and set
+            // permissions on execution.
+            Error error = TermuxFileUtils.validateDirectoryFileExistenceAndPermissions("working", workingDirectory,
+                    false, false, false,
+                    false, true);
+            if (error != null) {
+                Error shortError = FileUtils.getShortFileUtilsError(error);
+                mWorkingDirectoryPathText.setError(shortError.getMessage());
             }
         }
 
@@ -464,15 +481,17 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         String workingDirectoryPathText = mWorkingDirectoryPathText.getText().toString();
 
         // If workingDirectory is null, empty or workingDirectory parent is not a directory, then show nothing
-        if (workingDirectory == null || workingDirectory.isEmpty() || workingDirectoryParentFile == null || !workingDirectoryParentFile.isDirectory()) {
+        if (workingDirectory == null || workingDirectory.isEmpty() ||
+                workingDirectoryParentFile == null || !workingDirectoryParentFile.isDirectory()) {
             files = new File[0];
         }
         // If workingDirectory is a substring of FILES_PATH, then show files in FILES_PATH
-        else if (Constants.FILES_PATH.contains(workingDirectory)) {
-            workingDirectoryParentFile = new File(Constants.FILES_PATH);
+        else if (TermuxConstants.TERMUX_FILES_DIR_PATH.contains(workingDirectory)) {
+            workingDirectoryParentFile = TermuxConstants.TERMUX_FILES_DIR;
             files = workingDirectoryParentFile.listFiles();
         }
-        // If workingDirectory path in text field ends with "/", then show files in current directory instead of parent directory
+        // If workingDirectory path in text field ends with "/", then show files in current directory
+        // instead of parent directory
         else if (workingDirectoryPathText.endsWith("/")) {
             workingDirectoryParentFile = workingDirectoryFile;
             files = workingDirectoryParentFile.listFiles();
@@ -482,8 +501,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             files = workingDirectoryParentFile.listFiles();
         }
 
-        //Logger.logVerbose(this, "workingDirectory: " + workingDirectory);
-        //Logger.logVerbose(this, "workingDirectoryPathText: " + workingDirectoryPathText);
+        //Logger.logVerbose(LOG_TAG, "workingDirectory: " + workingDirectory);
+        //Logger.logVerbose(LOG_TAG, "workingDirectoryPathText: " + workingDirectoryPathText);
 
         if (files != null && files.length > 0) {
             Arrays.sort(files);
@@ -491,14 +510,16 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
             // If workingDirectory is not null, empty or workingDirectory parent is not null
             String workingDirectoryParentPath = workingDirectoryParentFile.getAbsolutePath();
-            //Logger.logVerbose(this, "workingDirectoryParentPath: " + workingDirectoryParentPath);
+            //Logger.logVerbose(LOG_TAG, "workingDirectoryParentPath: " + workingDirectoryParentPath);
 
-            // If workingDirectory path in text field starts with "/", then prefix file names with the parent directory in the drop down list
+            // If workingDirectory path in text field starts with "/", then prefix file names with the
+            // parent directory in the drop down list
             if (workingDirectoryPathText.startsWith("/"))
                 workingDirectoryFileNamesPrefix = workingDirectoryParentPath + "/";
-                // If workingDirectory path in text field starts with "$PREFIX/" or "~/", then prefix file names with the unexpanded path in the drop down list
+            // If workingDirectory path in text field starts with "$PREFIX/" or "~/", then prefix
+            // file names with the unexpanded path in the drop down list
             else if (workingDirectoryPathText.startsWith("$PREFIX/") || workingDirectoryPathText.startsWith("~/")) {
-                workingDirectoryFileNamesPrefix = FileUtils.getUnExpandedTermuxPath(workingDirectoryParentPath + "/");
+                workingDirectoryFileNamesPrefix = TermuxFileUtils.getUnExpandedTermuxPath(workingDirectoryParentPath + "/");
             }
 
             // Create a string array of filenames with the optional prefix for the drop down list
@@ -510,7 +531,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             workingDirectoriesNamesList = new String[0];
         }
 
-        //Logger.logVerbose(this, Arrays.toString(workingDirectoriesNamesList));
+        //Logger.logVerbose(LOG_TAG, Arrays.toString(workingDirectoriesNamesList));
 
         // Update drop down list and show it
         workingDirectoriesNamesAdaptor.clear();

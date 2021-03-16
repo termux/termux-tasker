@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.termux.tasker"
-    android:sharedUserId="com.termux">
+    android:sharedUserId="${TERMUX_PACKAGE_NAME}"
+    android:sharedUserLabel="@string/shared_user_label" >
 
     <application
-        android:allowBackup="true"
+        android:name=".TermuxTaskerApplication"
+        android:label="@string/application_name"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+
+        android:allowBackup="true"
+        android:fullBackupOnly="false"
+        android:supportsRtl="true" >
 
         <!--
         This is the "edit" Activity. Note that Locale will reject plug-in Activities for the following reasons:·
@@ -42,7 +46,7 @@
             android:name=".FireReceiver"
             android:exported="true"
             android:process=":background"
-            android:permission="com.termux.permission.RUN_COMMAND">
+            android:permission="${TERMUX_PACKAGE_NAME}.permission.RUN_COMMAND">
             <!-- This Intent filter allows the plug-in to discovered by Locale. -->
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
@@ -52,7 +56,7 @@
         <!--
          This is service that will receive execution result from the execution service via a PendingIntent
         -->
-        <service android:name=".PluginResultsService"/>
+        <service android:name=".PluginResultsService" />
     </application>
 
 </manifest>

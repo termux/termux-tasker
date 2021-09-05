@@ -292,7 +292,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     }
 
     private void processExecutablePath(String executable) {
-        if (mExecutablePathText == null) return;
+        if (mExecutablePathText == null || mExecutablePathText.getWindowToken() == null) return;
 
         boolean validate = true;
         boolean executableDefined = true;
@@ -417,12 +417,12 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         executableFileNamesAdaptor.clear();
         executableFileNamesAdaptor.addAll(new ArrayList<>(Arrays.asList(executableFileNamesList)));
         executableFileNamesAdaptor.notifyDataSetChanged();
-        if (mExecutablePathText.isFocused())
+        if (mExecutablePathText.isFocused() && mExecutablePathText.getWindowToken() != null)
             mExecutablePathText.showDropDown();
     }
 
     private void processWorkingDirectoryPath(String workingDirectory) {
-        if (mWorkingDirectoryPathText == null) return;
+        if (mWorkingDirectoryPathText == null || mWorkingDirectoryPathText.getWindowToken() == null) return;
 
         boolean validate = true;
         boolean workingDirectoryDefined = true;
@@ -537,7 +537,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         workingDirectoriesNamesAdaptor.clear();
         workingDirectoriesNamesAdaptor.addAll(new ArrayList<>(Arrays.asList(workingDirectoriesNamesList)));
         workingDirectoriesNamesAdaptor.notifyDataSetChanged();
-        if (mWorkingDirectoryPathText.isFocused())
+        if (mWorkingDirectoryPathText.isFocused() && mWorkingDirectoryPathText.getWindowToken() != null)
             mWorkingDirectoryPathText.showDropDown();
     }
 

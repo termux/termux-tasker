@@ -17,6 +17,8 @@ import com.termux.shared.models.ExecutionCommand;
 import com.termux.shared.models.ResultConfig;
 import com.termux.shared.models.ResultData;
 import com.termux.shared.models.errors.Errno;
+import com.termux.shared.settings.preferences.TermuxPreferenceConstants.TERMUX_TASKER_APP;
+import com.termux.shared.settings.preferences.TermuxTaskerAppSharedPreferences;
 import com.termux.shared.shell.ResultSender;
 import com.termux.tasker.FireReceiver;
 import com.termux.tasker.PluginResultsService;
@@ -156,7 +158,7 @@ public class PluginUtils {
             pluginResultsServiceIntent.putExtra(EXTRA_ORIGINAL_INTENT, originalIntent);
 
             // Create PendingIntent that can be used by execution service to send result of commands back to PluginResultsService
-            PendingIntent pendingIntent = PendingIntent.getService(context, 1, pluginResultsServiceIntent, PendingIntent.FLAG_ONE_SHOT);
+            PendingIntent pendingIntent = PendingIntent.getService(context, getLastPendingIntentRequestCode(context), pluginResultsServiceIntent, PendingIntent.FLAG_ONE_SHOT);
             executionIntent.putExtra(TERMUX_SERVICE.EXTRA_PENDING_INTENT, pendingIntent);
         } else {
             // If execute in background is not enabled, do not expect results back from execution service and return result now so that plugin action does not timeout
@@ -448,6 +450,31 @@ public class PluginUtils {
         }
 
         return errmsg;
+    }
+
+    /**
+     * Try to get the next unique {@link PendingIntent} request code that isn't already being used by
+     * the app and which would create a unique {@link PendingIntent} that doesn't conflict with that
+     * of any other execution commands.
+     *
+     * @param context The {@link Context} for operations.
+     * @return Returns the request code that should be safe to use.
+     */
+    public synchronized static int getLastPendingIntentRequestCode(final Context context) {
+        if (context == null) return TERMUX_TASKER_APP.DEFAULT_VALUE_KEY_LAST_PENDING_INTENT_REQUEST_CODE;
+
+        TermuxTaskerAppSharedPreferences preferences = TermuxTaskerAppSharedPreferences.build(context);
+        if (preferences == null) return TERMUX_TASKER_APP.DEFAULT_VALUE_KEY_LAST_PENDING_INTENT_REQUEST_CODE;
+
+        int lastPendingIntentRequestCode = preferences.getLastPendingIntentRequestCode();
+
+        int nextPendingIntentRequestCode = lastPendingIntentRequestCode + 1;
+
+        if (nextPendingIntentRequestCode == Integer.MAX_VALUE || nextPendingIntentRequestCode < 0)
+            nextPendingIntentRequestCode = TERMUX_TASKER_APP.DEFAULT_VALUE_KEY_LAST_PENDING_INTENT_REQUEST_CODE;
+
+        preferences.setLastPendingIntentRequestCode(nextPendingIntentRequestCode);
+        return nextPendingIntentRequestCode;
     }
 
 }

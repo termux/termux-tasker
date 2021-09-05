@@ -12,7 +12,9 @@ jobs:
       run: |
         ./gradlew assembleDebug
     - name: Store generated APK file
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: termux-tasker
-        path: ./app/build/outputs/apk/debug/app-debug.apk
+        path: |
+          ./app/build/outputs/apk/debug/termux-tasker-debug.apk
+          ./app/build/outputs/apk/debug/output-metadata.json

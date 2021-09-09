@@ -20,6 +20,7 @@
     <string name="arguments_hint">Arguments</string>
     <string name="working_directory_path_hint">Working directory path</string>
     <string name="execute_in_terminal">Execute in a terminal session</string>
+    <string name="wait_for_result">Wait for result for commands (Requires timeout > 0)</string>
 
     <string name="msg_executable_absolute_path">Executable Absolute Path: \"%1$s\"</string>
     <string name="msg_working_directory_absolute_path">Working Directory Absolute Path: \"%1$s\"</string>
@@ -36,8 +37,11 @@
     <string name="error_plugin_permission_ungranted_warning">The %1$s App (%2$s) has not been granted the \"%3$s\" permission which is required to run the plugin action."</string>
     <string name="error_allow_external_apps_ungranted_warning">Absolute paths for executables outside &TERMUX_TASKER_SCRIPTS_DIR_PATH_SHORT; directory require allow-external-apps property to be set to \"true\" in &TERMUX_PROPERTIES_PRIMARY_PATH_SHORT; file.</string>
 
-    <string name="blurb_in_background">%1$s %2$s</string>
-    <string name="blurb_in_terminal">%1$s %2$s\n\n\u2713 Terminal Session</string>
+    <string name="blurb_executable_and_arguments">%1$s %2$s</string>
+    <string name="blurb_in_terminal">\u2713 Terminal Session</string>
+    <string name="blurb_not_in_terminal">\u2715 Terminal Session</string>
+    <string name="blurb_wait_for_result">\u2713 Wait For Result</string>
+    <string name="blurb_no_wait_for_result">\u2715 Wait For Result</string>
 
     <!-- From Locale API: -->
     <string name="twofortyfouram_locale_breadcrumb_format" tools:ignore="UnusedResources">%1$s%2$s%3$s</string>

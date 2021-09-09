@@ -58,7 +58,7 @@ public final class FireReceiver extends BroadcastReceiver {
         BundleScrubber.scrub(bundle);
 
         // If bundle is not valid, then return RESULT_CODE_FAILED to plugin host app
-        errmsg = PluginBundleManager.isBundleValid(context, bundle);
+        errmsg = PluginBundleManager.parseBundle(context, bundle);
         if (errmsg != null) {
             Logger.logError(LOG_TAG, errmsg);
             PluginUtils.sendImmediateResultToPluginHostApp(this, intent, TaskerPlugin.Setting.RESULT_CODE_FAILED, errmsg);
@@ -71,6 +71,8 @@ public final class FireReceiver extends BroadcastReceiver {
         final String arguments_string = bundle.getString(PluginBundleManager.EXTRA_ARGUMENTS);
         executionCommand.workingDirectory = IntentUtils.getStringExtraIfSet(intent, PluginBundleManager.EXTRA_WORKDIR, null);
         executionCommand.inBackground = !(intent.getBooleanExtra(PluginBundleManager.EXTRA_TERMINAL, false));
+        final boolean waitForResult = bundle.getBoolean(PluginBundleManager.EXTRA_WAIT_FOR_RESULT, true);
+
 
 
         // If Termux app is not installed, enabled or accessible with current context or if
@@ -166,6 +168,7 @@ public final class FireReceiver extends BroadcastReceiver {
 
 
         Logger.logVerboseExtended(LOG_TAG, executionCommand.toString());
+        Logger.logVerbose(LOG_TAG, "Wait For Result: `" + waitForResult + "`");
 
         // Create execution intent with the action TERMUX_SERVICE#ACTION_SERVICE_EXECUTE to be sentto the TERMUX_SERVICE
         Intent executionIntent = new Intent(TERMUX_SERVICE.ACTION_SERVICE_EXECUTE, executionCommand.executableUri);
@@ -177,7 +180,7 @@ public final class FireReceiver extends BroadcastReceiver {
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_BACKGROUND, executionCommand.inBackground);
 
         // Send execution intent to TERMUX_SERVICE
-        PluginUtils.sendExecuteIntentToExecuteService(context, this, intent, executionIntent, executionCommand.inBackground);
+        PluginUtils.sendExecuteIntentToExecuteService(context, this, intent, executionIntent, waitForResult);
     }
 
 }

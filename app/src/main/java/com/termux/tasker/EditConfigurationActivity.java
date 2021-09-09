@@ -28,6 +28,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * This is the "Edit" activity for a Locale Plug-in.
@@ -45,6 +46,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     private TextInputEditText mArgumentsText;
     private AutoCompleteTextView mWorkingDirectoryPathText;
     private CheckBox mInTerminalCheckbox;
+    private CheckBox mWaitForResult;
     private TextView mExecutableAbsolutePathText;
     private TextView mWorkingDirectoryAbsolutePathText;
     private TextView mTermuxAppFilesPathInaccessibleWarning;
@@ -82,6 +84,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         mArgumentsText = findViewById(R.id.arguments);
         mWorkingDirectoryPathText = findViewById(R.id.working_directory_path);
         mInTerminalCheckbox = findViewById(R.id.in_terminal);
+        mWaitForResult = findViewById(R.id.wait_for_result);
         mExecutableAbsolutePathText = findViewById(R.id.executable_absolute_path);
         mWorkingDirectoryAbsolutePathText = findViewById(R.id.working_directory_absolute_path);
         mTermuxAppFilesPathInaccessibleWarning = findViewById(R.id.termux_app_files_path_inaccessible_warning);
@@ -127,7 +130,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             if (localeBundle != null) {
                 String errmsg;
                 // If bundle is valid, then load values from bundle
-                errmsg = PluginBundleManager.isBundleValid(this, localeBundle);
+                errmsg = PluginBundleManager.parseBundle(this, localeBundle);
                 if (errmsg == null) {
                     final String selectedExecutable = localeBundle.getString(PluginBundleManager.EXTRA_EXECUTABLE);
                     mExecutablePathText.setText(selectedExecutable);
@@ -137,6 +140,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                     mWorkingDirectoryPathText.setText(selectedWorkingDirectory);
                     final boolean inTerminal = localeBundle.getBoolean(PluginBundleManager.EXTRA_TERMINAL);
                     mInTerminalCheckbox.setChecked(inTerminal);
+                    final boolean waitForResult = localeBundle.getBoolean(PluginBundleManager.EXTRA_WAIT_FOR_RESULT);
+                    mWaitForResult.setChecked(waitForResult);
                 } else {
                     Logger.logError(LOG_TAG, errmsg);
                 }
@@ -170,6 +175,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             final String arguments =  mArgumentsText.getText() == null ? null : mArgumentsText.getText().toString();
             final String workingDirectory = mWorkingDirectoryPathText.getText() == null ? null : mWorkingDirectoryPathText.getText().toString();
             final boolean inTerminal = mInTerminalCheckbox.isChecked();
+            final boolean waitForResult = mWaitForResult.isChecked();
 
             if (executable != null && executable.length() > 0) {
                 final Intent resultIntent = new Intent();
@@ -182,10 +188,11 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                  * Android platform objects (A Serializable class private to this plug-in's APK cannot be
                  * stored in the Bundle, as Locale's classloader will not recognize it).
                  */
-                final Bundle resultBundle = PluginBundleManager.generateBundle(getApplicationContext(), executable, arguments, workingDirectory, inTerminal);
+                final Bundle resultBundle = PluginBundleManager.generateBundle(getApplicationContext(),
+                        executable, arguments, workingDirectory, inTerminal, waitForResult);
 
                 // The blurb is a concise status text to be displayed in the host's UI.
-                final String blurb = generateBlurb(executable, arguments, inTerminal);
+                final String blurb = generateBlurb(executable, arguments, inTerminal, waitForResult);
 
                 // If host supports variable replacement when running plugin action, then
                 // request it to replace variables in following fields
@@ -201,20 +208,24 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                 resultIntent.putExtra(com.twofortyfouram.locale.Intent.EXTRA_STRING_BLURB, blurb);
 
                 // Configuration information for Tasker variables returned from the executed task
-                //
-                // Do not run if we are opening a terminal, because the user might not care about this
-                // if they are running something that will literally pop up in front of them (Plus
-                // getting that information requires additional work for now)
-                if(!inTerminal) {
+                if(waitForResult) {
+                    List<String> relevantVariableList = new ArrayList<>();
+                    relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_STDOUT + "\nStandard Output\nThe <B>stdout</B> of the command.");
+                    relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_STDOUT_ORIGINAL_LENGTH + "\nStandard Output Original Length\nThe original length of <B>stdout</B>.");
+
+                    // For foreground commands, the session transcript is returned which will contain
+                    // both stdout and stderr combined, basically anything sent to the the pseudo
+                    // terminal /dev/pts, including PS1 prefixes for interactive sessions.
+                    if (!inTerminal) {
+                        relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_STDERR + "\nStandard Error\nThe <B>stderr</B> of the command.");
+                        relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_STDERR_ORIGINAL_LENGTH + "\nStandard Error Original Length\nThe original length of <B>stderr</B>.");
+                    }
+
+                    relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_EXIT_CODE + "\nExit Code\nThe <B>exit code</B> of the command." +
+                            "0 often means success and anything else is usually a failure of some sort.");
+
                     if (TaskerPlugin.hostSupportsRelevantVariables(getIntent().getExtras())) {
-                        TaskerPlugin.addRelevantVariableList(resultIntent, new String[]{
-                                PluginUtils.PLUGIN_VARIABLE_STDOUT + "\nStandard Output\nThe <B>stdout</B> of the command.",
-                                PluginUtils.PLUGIN_VARIABLE_STDOUT_ORIGINAL_LENGTH + "\nStandard Output Original Length\nThe original length of <B>stdout</B>.",
-                                PluginUtils.PLUGIN_VARIABLE_STDERR + "\nStandard Error\nThe <B>stderr</B> of the command.",
-                                PluginUtils.PLUGIN_VARIABLE_STDERR_ORIGINAL_LENGTH + "\nStandard Error Original Length\nThe original length of <B>stderr</B>.",
-                                PluginUtils.PLUGIN_VARIABLE_EXIT_CODE + "\nExit Code\nThe <B>exit code</B> of the command. " +
-                                        "0 often means success and anything else is usually a failure of some sort."
-                        });
+                        TaskerPlugin.addRelevantVariableList(resultIntent, relevantVariableList.toArray(new String[0]));
                     }
                 }
 
@@ -239,13 +250,18 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
      * @param executable value set for the action.
      * @param arguments value set for the action.
      * @param inTerminal value set for the action.
+     * @param waitForResult value set for the action.
      * @return A blurb for the plug-in.
      */
-    String generateBlurb(final String executable, final String arguments, boolean inTerminal) {
-        final int stringResource = inTerminal ? R.string.blurb_in_terminal : R.string.blurb_in_background;
-        final String message = getString(stringResource, executable, arguments);
-        final int maxBlurbLength = 60; // R.integer.twofortyfouram_locale_maximum_blurb_length.
-        return (message.length() > maxBlurbLength) ? message.substring(0, maxBlurbLength) : message;
+    String generateBlurb(final String executable, final String arguments, boolean inTerminal, boolean waitForResult) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(getString(R.string.blurb_executable_and_arguments, executable, arguments));
+        builder.append("\n\n").append(getString(inTerminal ? R.string.blurb_in_terminal : R.string.blurb_not_in_terminal));
+        builder.append("\n").append(getString(waitForResult ? R.string.blurb_wait_for_result : R.string.blurb_no_wait_for_result));
+
+        String blurb = builder.toString();
+        final int maxBlurbLength = 60; // R.integer.twofortyfouram_locale_maximum_blurb_length
+        return (blurb.length() > maxBlurbLength) ? blurb.substring(0, maxBlurbLength) : blurb;
     }
 
     @Override

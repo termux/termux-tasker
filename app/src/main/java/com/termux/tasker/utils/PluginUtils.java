@@ -39,16 +39,17 @@ import java.util.regex.Pattern;
  * {@link TermuxConstants.TERMUX_APP.TERMUX_SERVICE} as the execution service of plugin
  * commands but should work with other plugin host apps.
  * The {@link TermuxConstants.TERMUX_APP.TERMUX_SERVICE} will run the commands with the
- * BackgroundJob class if background mode is enabled and results of commands are only be returned
- * in this case. If background mode is not enabled, a foreground terminal session will be opened
- * and results are not returned.
+ * {@link com.termux.shared.shell.TermuxTask} class if background mode is enabled and
+ * {@link com.termux.shared.shell.TermuxSession} if foreground terminal mode is enabled. The
+ * result of commands is only returned if the plugin action bundle has
+ * {@link com.termux.tasker.PluginBundleManager#EXTRA_WAIT_FOR_RESULT} set to true.
  *
  * Flow to be used for the commands received by {@link FireReceiver}:
  * 1. Call {@link #sendExecuteIntentToExecuteService} from {@link FireReceiver}. This expects the
  * original intent received by {@link FireReceiver}, the execution intent that should be sent to
  * call the execution service containing its {@link ComponentName} and any extras required to run the
  * plugin commands, and a boolean for whether commands are to be run in background mode or not.
- * If the plugin action has a timeout greater than 0 and background mode is enabled, then the
+ * If the plugin action has a timeout greater than 0 and result is to be returned, then the
  * function will automatically create a {@link android.app.PendingIntent} that can be used to
  * return the results back to {@link PluginResultsService} and add the original
  * {@link android.content.Intent} received by {@link FireReceiver} as {@link #EXTRA_ORIGINAL_INTENT}
@@ -68,9 +69,14 @@ import java.util.regex.Pattern;
  * {@link FireReceiver}. A result {@link Bundle} object with the {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE}
  * key should also be sent back in an {@link android.content.Intent} using the
  * {@link android.app.PendingIntent#send(Context, int, Intent)} function. The bundle can contain
- * the keys {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE_STDOUT} (String), {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE_STDERR} (String),
- * {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE_EXIT_CODE} (Integer), {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE_ERR} (Integer) and
- * {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE_ERRMSG} (String) whose values will be sent back to the plugin host app.
+ * the keys whose values will be sent back to the plugin host app:
+ * {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE_STDOUT} (String),
+ * {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE_STDOUT_ORIGINAL_LENGTH} (String)
+ * {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE_STDERR} (String),
+ * {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE_STDERR_ORIGINAL_LENGTH} (String),
+ * {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE_EXIT_CODE} (Integer),
+ * {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE_ERR} (Integer) and
+ * {@link TERMUX_SERVICE#EXTRA_PLUGIN_RESULT_BUNDLE_ERRMSG} (String)
  *
  * 3. The {@link android.app.PendingIntent} sent is received by the {@link PluginResultsService}
  * with the onHandleIntent function which calls the
@@ -88,12 +94,17 @@ import java.util.regex.Pattern;
  * if the result should not be expected to be sent back by the execution service.
  *
  * The {@link #createVariablesBundle} function creates a variables bundle that can be sent back to
- * the plugin host. The bundle will contain the keys {@link #PLUGIN_VARIABLE_STDOUT} (String),
- * {@link #PLUGIN_VARIABLE_STDERR} (String), {@link #PLUGIN_VARIABLE_EXIT_CODE} (String) and
- * {@link #PLUGIN_VARIABLE_ERRMSG} (String). The {@link #PLUGIN_VARIABLE_ERRMSG} key will only be
- * added if the {@link #PLUGIN_VARIABLE_ERR} value to be sent back to the plugin host is greater
- * than {@link TaskerPlugin.Setting#RESULT_CODE_OK}. Any null or empty values are
- * not added to the variables bundle.
+ * the plugin host. The bundle will contain the keys:
+ * {@link #PLUGIN_VARIABLE_STDOUT} (String),
+ * {@link #PLUGIN_VARIABLE_STDOUT_ORIGINAL_LENGTH} (String),
+ * {@link #PLUGIN_VARIABLE_STDERR} (String),
+ * {@link #PLUGIN_VARIABLE_STDERR_ORIGINAL_LENGTH} (String),
+ * {@link #PLUGIN_VARIABLE_EXIT_CODE} (String)
+ * and {@link #PLUGIN_VARIABLE_ERRMSG} (String).
+ *
+ * The {@link #PLUGIN_VARIABLE_ERRMSG} key will only be added if the {@link #PLUGIN_VARIABLE_ERR} value
+ * to be sent back to the plugin host is greater than {@link TaskerPlugin.Setting#RESULT_CODE_OK}.
+ * Any null or empty values are not added to the variables bundle.
  *
  * The value for {@link #PLUGIN_VARIABLE_ERR} is first sanitized by the {@link #sanitizeErrCode}
  * function before it is sent back to the plugin host.
@@ -135,8 +146,12 @@ public class PluginUtils {
      * @param receiver The {@link BroadcastReceiver} of the originalIntent.
      * @param originalIntent The {@link Intent} received by {@link FireReceiver}.
      * @param executionIntent The {@link Intent} to be sent to execution service containing command information.
+     * @param waitForResult This must be set to {@link true} if plugin action should wait for result
+     *                      from the execution service that should be sent back to plugin host synchronously.
      */
-    public static void sendExecuteIntentToExecuteService(final Context context, final BroadcastReceiver receiver, final Intent originalIntent, final Intent executionIntent, final boolean executeInBackground) {
+    public static void sendExecuteIntentToExecuteService(final Context context, final BroadcastReceiver receiver,
+                                                         final Intent originalIntent, final Intent executionIntent,
+                                                         boolean waitForResult) {
         if (context == null) return;
 
         if (executionIntent == null) {
@@ -149,23 +164,30 @@ public class PluginUtils {
             return;
         }
 
-        Logger.logDebug(LOG_TAG, "Sending execution intent to " + executionIntent.getComponent().toString());
+        Logger.logVerbose(LOG_TAG, "Ordered Broadcast (timeout > 0): `" + (receiver != null && receiver.isOrderedBroadcast()) + "`");
 
-        // If timeout for plugin action is greater than 0 and execute in background is enabled
-        if (receiver != null && receiver.isOrderedBroadcast() && executeInBackground) {
+        // If timeout for plugin action is greater than 0 and plugin action should wait for results
+        waitForResult = (receiver != null && receiver.isOrderedBroadcast() && waitForResult);
+        Logger.logDebug(LOG_TAG, "Sending execution intent to " + executionIntent.getComponent().toString() + (waitForResult ? " and " : " without ") + "waiting for result");
+
+        if (waitForResult) {
             // Notify plugin host app that result will be sent later
-            // Result should be sent to PluginResultsService via a PendingIntent by execution service after commands have finished executing
+            // Result should be sent to PluginResultsService via a PendingIntent by execution service
+            // after commands have finished executing
             receiver.setResultCode(TaskerPlugin.Setting.RESULT_CODE_PENDING);
 
-            // Create intent for PluginResultsService class and add original intent received by FireReceiver to it
+            // Create intent for PluginResultsService class and add original intent received by
+            // FireReceiver to it
             Intent pluginResultsServiceIntent = new Intent(context, PluginResultsService.class);
             pluginResultsServiceIntent.putExtra(EXTRA_ORIGINAL_INTENT, originalIntent);
 
-            // Create PendingIntent that can be used by execution service to send result of commands back to PluginResultsService
+            // Create PendingIntent that can be used by execution service to send result of commands
+            // back to PluginResultsService
             PendingIntent pendingIntent = PendingIntent.getService(context, getLastPendingIntentRequestCode(context), pluginResultsServiceIntent, PendingIntent.FLAG_ONE_SHOT);
             executionIntent.putExtra(TERMUX_SERVICE.EXTRA_PENDING_INTENT, pendingIntent);
         } else {
-            // If execute in background is not enabled, do not expect results back from execution service and return result now so that plugin action does not timeout
+            // If execution result is not to be returned, do not expect results back from the
+            // execution service and return result now so that plugin action does not timeout
             sendImmediateResultToPluginHostApp(receiver, originalIntent, TaskerPlugin.Setting.RESULT_CODE_OK, null);
         }
 

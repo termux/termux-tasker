@@ -260,7 +260,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         builder.append("\n").append(getString(waitForResult ? R.string.blurb_wait_for_result : R.string.blurb_no_wait_for_result));
 
         String blurb = builder.toString();
-        final int maxBlurbLength = 60; // R.integer.twofortyfouram_locale_maximum_blurb_length
+        final int maxBlurbLength = 120; // R.integer.twofortyfouram_locale_maximum_blurb_length is set to 60 but we are ignoring that since Tasker doesn't have that limit.
         return (blurb.length() > maxBlurbLength) ? blurb.substring(0, maxBlurbLength) : blurb;
     }
 

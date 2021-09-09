@@ -209,7 +209,9 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                     if (TaskerPlugin.hostSupportsRelevantVariables(getIntent().getExtras())) {
                         TaskerPlugin.addRelevantVariableList(resultIntent, new String[]{
                                 PluginUtils.PLUGIN_VARIABLE_STDOUT + "\nStandard Output\nThe <B>stdout</B> of the command.",
+                                PluginUtils.PLUGIN_VARIABLE_STDOUT_ORIGINAL_LENGTH + "\nStandard Output Original Length\nThe original length of <B>stdout</B>.",
                                 PluginUtils.PLUGIN_VARIABLE_STDERR + "\nStandard Error\nThe <B>stderr</B> of the command.",
+                                PluginUtils.PLUGIN_VARIABLE_STDERR_ORIGINAL_LENGTH + "\nStandard Error Original Length\nThe original length of <B>stderr</B>.",
                                 PluginUtils.PLUGIN_VARIABLE_EXIT_CODE + "\nExit Code\nThe <B>exit code</B> of the command. " +
                                         "0 often means success and anything else is usually a failure of some sort."
                         });

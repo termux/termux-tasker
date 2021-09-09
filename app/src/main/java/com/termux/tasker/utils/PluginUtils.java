@@ -102,8 +102,12 @@ public class PluginUtils {
 
     /** Plugin variable for stdout value of termux command */
     public static final String PLUGIN_VARIABLE_STDOUT = "%stdout"; // Default: "%stdout"
+    /** Plugin variable for original length of stdout value of termux command */
+    public static final String PLUGIN_VARIABLE_STDOUT_ORIGINAL_LENGTH = "%stdout_original_length"; // Default: "%stdout_original_length"
     /** Plugin variable for stderr value of termux command */
     public static final String PLUGIN_VARIABLE_STDERR = "%stderr"; // Default: "%stderr"
+    /** Plugin variable for original length of stderr value of termux command */
+    public static final String PLUGIN_VARIABLE_STDERR_ORIGINAL_LENGTH = "%stderr_original_length"; // Default: "%stderr_original_length"
     /** Plugin variable for exit code value of termux command */
     public static final String PLUGIN_VARIABLE_EXIT_CODE = "%result"; // Default: "%result"
     /** Plugin variable for err value of termux command */
@@ -162,7 +166,7 @@ public class PluginUtils {
             executionIntent.putExtra(TERMUX_SERVICE.EXTRA_PENDING_INTENT, pendingIntent);
         } else {
             // If execute in background is not enabled, do not expect results back from execution service and return result now so that plugin action does not timeout
-            sendImmediateResultToPluginHostApp(receiver, originalIntent, null, null, null, TaskerPlugin.Setting.RESULT_CODE_OK, null);
+            sendImmediateResultToPluginHostApp(receiver, originalIntent, TaskerPlugin.Setting.RESULT_CODE_OK, null);
         }
 
         try {
@@ -176,7 +180,7 @@ public class PluginUtils {
         } catch (Exception e) {
             String errmsg = Logger.getMessageAndStackTraceString("Failed to send execution intent to " + executionIntent.getComponent().toString(), e);
             Logger.logErrorAndShowToast(context, LOG_TAG, errmsg);
-            PluginUtils.sendImmediateResultToPluginHostApp(receiver, originalIntent, null, null, null, TaskerPlugin.Setting.RESULT_CODE_FAILED, errmsg);
+            PluginUtils.sendImmediateResultToPluginHostApp(receiver, originalIntent, TaskerPlugin.Setting.RESULT_CODE_FAILED, errmsg);
         }
     }
 
@@ -185,13 +189,34 @@ public class PluginUtils {
      *
      * @param receiver The {@link BroadcastReceiver} of the originalIntent.
      * @param originalIntent The original {@link Intent} received by {@link FireReceiver}.
+     * @param errCode The value for {@link #PLUGIN_VARIABLE_ERR} variable of plugin action.
+     * @param errmsg The value for {@link #PLUGIN_VARIABLE_ERRMSG} variable of plugin action.
+     */
+    public static void sendImmediateResultToPluginHostApp(final BroadcastReceiver receiver, final Intent originalIntent,
+                                                          final int errCode, final String errmsg) {
+        sendImmediateResultToPluginHostApp(receiver, originalIntent, null, null,
+                null, null, null, errCode, errmsg);
+    }
+
+    /**
+     * Send immediate result to plugin host app in a variables bundle.
+     *
+     * @param receiver The {@link BroadcastReceiver} of the originalIntent.
+     * @param originalIntent The original {@link Intent} received by {@link FireReceiver}.
      * @param stdout The value for {@link #PLUGIN_VARIABLE_STDOUT} variable of plugin action.
+     * @param stdoutOriginalLength The value for {@link #PLUGIN_VARIABLE_STDOUT_ORIGINAL_LENGTH}
+     *                             variable of plugin action.
      * @param stderr The value for {@link #PLUGIN_VARIABLE_STDERR} variable of plugin action.
+     * @param stderrOriginalLength The value for {@link #PLUGIN_VARIABLE_STDERR_ORIGINAL_LENGTH}
+     *                             variable of plugin action.
      * @param exitCode The value for {@link #PLUGIN_VARIABLE_EXIT_CODE} variable of plugin action.
      * @param errCode The value for {@link #PLUGIN_VARIABLE_ERR} variable of plugin action.
      * @param errmsg The value for {@link #PLUGIN_VARIABLE_ERRMSG} variable of plugin action.
      */
-    public static void sendImmediateResultToPluginHostApp(final BroadcastReceiver receiver, final Intent originalIntent, final String stdout, final String stderr, final String exitCode, final int errCode, final String errmsg) {
+    public static void sendImmediateResultToPluginHostApp(final BroadcastReceiver receiver, final Intent originalIntent,
+                                                          final String stdout, String stdoutOriginalLength,
+                                                          final String stderr, String stderrOriginalLength,
+                                                          final String exitCode, final int errCode, final String errmsg) {
         if (receiver == null) return;
 
         // If timeout for plugin action is 0, then don't send anything
@@ -202,7 +227,8 @@ public class PluginUtils {
         Logger.logInfo(LOG_TAG, "Sending immediate result to plugin host app. " + PLUGIN_VARIABLE_ERR + ": " + ((err == TaskerPlugin.Setting.RESULT_CODE_OK) ? "success" : "failed") + " (" + err +  ")");
 
         if (TaskerPlugin.Setting.hostSupportsVariableReturn(originalIntent.getExtras())) {
-            final Bundle varsBundle = createVariablesBundle(stdout, stderr, exitCode, err, errmsg);
+            final Bundle varsBundle = createVariablesBundle(stdout, stdoutOriginalLength,
+                    stderr, stderrOriginalLength, exitCode, err, errmsg);
             TaskerPlugin.addVariableBundle(receiver.getResultExtras(true), varsBundle);
         }
 
@@ -248,7 +274,9 @@ public class PluginUtils {
 
         final Bundle varsBundle = createVariablesBundle(
                 resultBundle.getString(TERMUX_SERVICE.EXTRA_PLUGIN_RESULT_BUNDLE_STDOUT, ""),
+                resultBundle.getString(TERMUX_SERVICE.EXTRA_PLUGIN_RESULT_BUNDLE_STDOUT_ORIGINAL_LENGTH, ""),
                 resultBundle.getString(TERMUX_SERVICE.EXTRA_PLUGIN_RESULT_BUNDLE_STDERR, ""),
+                resultBundle.getString(TERMUX_SERVICE.EXTRA_PLUGIN_RESULT_BUNDLE_STDERR_ORIGINAL_LENGTH, ""),
                 exitCode, err, resultBundle.getString(TERMUX_SERVICE.EXTRA_PLUGIN_RESULT_BUNDLE_ERRMSG, ""));
 
         if(context != null)
@@ -287,8 +315,7 @@ public class PluginUtils {
                 true, isExecutionCommandLoggingEnabled));
 
         PluginUtils.sendImmediateResultToPluginHostApp(receiver, originalIntent,
-                null, null, null, errCode,
-                ResultData.getErrorsListMinimalString(executionCommand.resultData));
+                errCode, ResultData.getErrorsListMinimalString(executionCommand.resultData));
     }
 
 
@@ -297,17 +324,25 @@ public class PluginUtils {
      * Create variables bundle to send back to plugin host app.
      *
      * @param stdout The value for {@link #PLUGIN_VARIABLE_STDOUT} variable of plugin action.
+     * @param stdoutOriginalLength The value for {@link #PLUGIN_VARIABLE_STDOUT_ORIGINAL_LENGTH}
+     *                             variable of plugin action.
      * @param stderr The value for {@link #PLUGIN_VARIABLE_STDERR} variable of plugin action.
+     * @param stderrOriginalLength The value for {@link #PLUGIN_VARIABLE_STDERR_ORIGINAL_LENGTH}
+     *                             variable of plugin action.
      * @param exitCode The value for {@link #PLUGIN_VARIABLE_EXIT_CODE} variable of plugin action.
      * @param errCode The value for {@link #PLUGIN_VARIABLE_ERR} variable of plugin action.
      * @param errmsg The value for {@link #PLUGIN_VARIABLE_ERRMSG} variable of plugin action.
      * @return Returns the variables {@code Bundle}.
      */
-    public static Bundle createVariablesBundle(String stdout, String stderr, String exitCode, int errCode, String errmsg) {
+    public static Bundle createVariablesBundle(String stdout, String stdoutOriginalLength,
+                                               String stderr, String stderrOriginalLength,
+                                               String exitCode, int errCode, String errmsg) {
 
         Logger.logDebugExtended(LOG_TAG, "Variables bundle for plugin host app:\n" +
                 PLUGIN_VARIABLE_STDOUT + ": `" + stdout + "`\n" +
+                PLUGIN_VARIABLE_STDOUT_ORIGINAL_LENGTH + ": `" + stdoutOriginalLength + "`\n" +
                 PLUGIN_VARIABLE_STDERR + ": `" + stderr + "`\n" +
+                PLUGIN_VARIABLE_STDERR_ORIGINAL_LENGTH + ": `" + stderrOriginalLength + "`\n" +
                 PLUGIN_VARIABLE_EXIT_CODE + ": `" + exitCode + "`\n" +
                 PLUGIN_VARIABLE_ERR + ": `" + errCode + "`\n" +
                 PLUGIN_VARIABLE_ERRMSG + ": `" + errmsg + "`");
@@ -322,7 +357,9 @@ public class PluginUtils {
         // since if multiple actions are run in the same task, some variables from previous actions
         // may still be set and get mixed in with current ones.
         if (stdout == null) stdout = "";
+        if (stdoutOriginalLength == null) stdoutOriginalLength = "";
         if (stderr == null) stderr = "";
+        if (stderrOriginalLength == null) stderrOriginalLength = "";
         if (exitCode == null) exitCode = "";
         if (errmsg == null) errmsg = "";
 
@@ -330,8 +367,12 @@ public class PluginUtils {
 
         if (isPluginHostAppVariableNameValid(PLUGIN_VARIABLE_STDOUT))
             variablesBundle.putString(PLUGIN_VARIABLE_STDOUT, stdout);
+        if (isPluginHostAppVariableNameValid(PLUGIN_VARIABLE_STDOUT_ORIGINAL_LENGTH))
+            variablesBundle.putString(PLUGIN_VARIABLE_STDOUT_ORIGINAL_LENGTH, stdoutOriginalLength);
         if (isPluginHostAppVariableNameValid(PLUGIN_VARIABLE_STDERR))
             variablesBundle.putString(PLUGIN_VARIABLE_STDERR, stderr);
+        if (isPluginHostAppVariableNameValid(PLUGIN_VARIABLE_STDERR_ORIGINAL_LENGTH))
+            variablesBundle.putString(PLUGIN_VARIABLE_STDERR_ORIGINAL_LENGTH, stderrOriginalLength);
         if (isPluginHostAppVariableNameValid(PLUGIN_VARIABLE_EXIT_CODE))
             variablesBundle.putString(PLUGIN_VARIABLE_EXIT_CODE, exitCode);
         if (isPluginHostAppVariableNameValid(PLUGIN_VARIABLE_ERRMSG))

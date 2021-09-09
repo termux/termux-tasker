@@ -61,7 +61,7 @@ public final class FireReceiver extends BroadcastReceiver {
         errmsg = PluginBundleManager.isBundleValid(context, bundle);
         if (errmsg != null) {
             Logger.logError(LOG_TAG, errmsg);
-            PluginUtils.sendImmediateResultToPluginHostApp(this, intent, null, null, null, TaskerPlugin.Setting.RESULT_CODE_FAILED, errmsg);
+            PluginUtils.sendImmediateResultToPluginHostApp(this, intent, TaskerPlugin.Setting.RESULT_CODE_FAILED, errmsg);
             return;
         }
 
@@ -79,7 +79,7 @@ public final class FireReceiver extends BroadcastReceiver {
         errmsg = TermuxUtils.isTermuxAppAccessible(context);
         if (errmsg != null) {
             Logger.logError(LOG_TAG, errmsg);
-            PluginUtils.sendImmediateResultToPluginHostApp(this, intent, null, null, null, TaskerPlugin.Setting.RESULT_CODE_FAILED, errmsg);
+            PluginUtils.sendImmediateResultToPluginHostApp(this, intent, TaskerPlugin.Setting.RESULT_CODE_FAILED, errmsg);
             return;
         }
 
@@ -88,7 +88,7 @@ public final class FireReceiver extends BroadcastReceiver {
         if (executionCommand.executable == null || executionCommand.executable.isEmpty()) {
             errmsg  = context.getString(R.string.error_null_or_empty_executable);
             Logger.logError(LOG_TAG, errmsg);
-            PluginUtils.sendImmediateResultToPluginHostApp(this, intent, null, null, null, TaskerPlugin.Setting.RESULT_CODE_FAILED, errmsg);
+            PluginUtils.sendImmediateResultToPluginHostApp(this, intent, TaskerPlugin.Setting.RESULT_CODE_FAILED, errmsg);
             return;
         }
 

@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.termux.tasker.utils.TaskerPlugin.Setting.RESULT_CODE_FAILED;
+
 /**
  * This is the "Edit" activity for a Locale Plug-in.
  * <p>
@@ -190,6 +192,12 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                  */
                 final Bundle resultBundle = PluginBundleManager.generateBundle(getApplicationContext(),
                         executable, arguments, workingDirectory, inTerminal, waitForResult);
+                if (resultBundle == null) {
+                    Logger.showToast(this, getString(R.string.error_generate_plugin_bundle_failed), true);
+                    setResult(RESULT_CODE_FAILED, resultIntent);
+                    super.finish();
+                    return;
+                }
 
                 // The blurb is a concise status text to be displayed in the host's UI.
                 final String blurb = generateBlurb(executable, arguments, inTerminal, waitForResult);

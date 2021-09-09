@@ -5,6 +5,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
+
+import com.termux.shared.logger.Logger;
 import com.termux.shared.packages.PackageUtils;
 import com.termux.shared.termux.TermuxConstants;
 
@@ -105,6 +108,7 @@ public class PluginBundleManager {
         return null;
     }
 
+    @Nullable
     public static Bundle generateBundle(final Context context, final String executable,
                                         final String arguments, final String workingDirectory,
                                         final boolean inTerminal, final boolean waitForResult) {
@@ -114,7 +118,14 @@ public class PluginBundleManager {
         result.putString(EXTRA_WORKDIR, workingDirectory);
         result.putBoolean(EXTRA_TERMINAL, inTerminal);
         result.putBoolean(EXTRA_WAIT_FOR_RESULT, waitForResult);
-        result.putInt(BUNDLE_EXTRA_INT_VERSION_CODE, PackageUtils.getVersionCodeForPackage(context));
+
+        Integer versionCode = PackageUtils.getVersionCodeForPackage(context);
+        if (versionCode == null) {
+            Logger.showToast(context, context.getString(R.string.error_get_version_code_failed, context.getPackageName()), true);
+            return null;
+        }
+
+        result.putInt(BUNDLE_EXTRA_INT_VERSION_CODE, versionCode);
         return result;
     }
 }

@@ -36,6 +36,8 @@
 
     <string name="error_plugin_permission_ungranted_warning">The %1$s App (%2$s) has not been granted the \"%3$s\" permission which is required to run the plugin action."</string>
     <string name="error_allow_external_apps_ungranted_warning">Absolute paths for executables outside &TERMUX_TASKER_SCRIPTS_DIR_PATH_SHORT; directory require allow-external-apps property to be set to \"true\" in &TERMUX_PROPERTIES_PRIMARY_PATH_SHORT; file.</string>
+    <string name="error_generate_plugin_bundle_failed">Failed to generate plugin bundle</string>
+    <string name="error_get_version_code_failed">Failed to get version code for %1$s</string>
 
     <string name="blurb_executable_and_arguments">%1$s %2$s</string>
     <string name="blurb_in_terminal">\u2713 Terminal Session</string>

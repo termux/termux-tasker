@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.termux.shared.crash.TermuxCrashUtils;
+import com.termux.shared.data.DataUtils;
 import com.termux.shared.data.IntentUtils;
 import com.termux.shared.file.TermuxFileUtils;
 import com.termux.shared.file.filesystem.FileType;
@@ -21,6 +22,7 @@ import com.termux.shared.termux.TermuxUtils;
 import com.termux.tasker.utils.PluginUtils;
 import com.termux.tasker.utils.TaskerPlugin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -165,8 +167,10 @@ public final class FireReceiver extends BroadcastReceiver {
         // Arguments are split on whitespaces unless quoted with single or double quotes
         // Double quotes and backslashes can be escaped with backslashes in arguments surrounded
         // with double quotes
-        List<String> arguments_list = ArgumentTokenizer.tokenize(arguments_string);
-        executionCommand.arguments = arguments_list.toArray(new String[arguments_list.size()]);
+        List<String> arguments_list = new ArrayList<>();
+        if (!DataUtils.isNullOrEmpty(arguments_string))
+            arguments_list = ArgumentTokenizer.tokenize(arguments_string);
+        executionCommand.arguments = arguments_list.toArray(new String[0]);
 
 
         Logger.logVerboseExtended(LOG_TAG, executionCommand.toString());

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.termux.tasker"
     android:sharedUserId="${TERMUX_PACKAGE_NAME}"
-    android:sharedUserLabel="@string/shared_user_label" >
+    android:sharedUserLabel="@string/shared_user_label">
 
     <application
         android:name=".TermuxTaskerApplication"
         android:label="@string/application_name"
         android:icon="@drawable/ic_launcher"
         android:theme="@style/AppTheme"
-
         android:allowBackup="true"
         android:fullBackupOnly="false"
-        android:supportsRtl="true" >
+        android:supportsRtl="true">
 
         <!--
         This is the "edit" Activity. Note that Locale will reject plug-in Activities for the following reasons:·
@@ -34,6 +34,13 @@
             </intent-filter>
         </activity>
 
+        <!-- If you see "Unresolved package" errors for TextIOActivity with manifest placeholder, ignore it.
+        Android Studio linter is broken and correct package name will be used at build time." -->
+        <activity
+            android:name="${TERMUX_PACKAGE_NAME}.shared.activities.TextIOActivity"
+            android:theme="@style/Theme.AppCompat.TermuxTextIOActivity"
+            tools:ignore="MissingClass" />
+
         <!--
          This is the "fire" BroadcastReceiver. Note that Locale will reject plug-in BroadcastReceivers
          for the following reasons:
@@ -53,9 +60,7 @@
             </intent-filter>
         </receiver>
 
-        <!--
-         This is service that will receive execution result from the execution service via a PendingIntent
-        -->
+        <!-- This is service that will receive execution result from the execution service via a PendingIntent -->
         <service android:name=".PluginResultsService" />
     </application>
 

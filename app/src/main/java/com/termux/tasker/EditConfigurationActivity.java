@@ -1,10 +1,16 @@
 package com.termux.tasker;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import com.termux.shared.activities.TextIOActivity;
+import com.termux.shared.data.DataUtils;
 import com.termux.shared.file.TermuxFileUtils;
 import com.termux.shared.logger.Logger;
+import com.termux.shared.models.TextIOInfo;
 import com.termux.shared.models.errors.Error;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.file.FileUtils;
@@ -13,6 +19,10 @@ import com.termux.tasker.utils.LoggerUtils;
 import com.termux.tasker.utils.PluginUtils;
 import com.termux.tasker.utils.TaskerPlugin;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBar;
 
 import android.text.Editable;
@@ -23,6 +33,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.io.File;
@@ -44,9 +55,12 @@ import static com.termux.tasker.utils.TaskerPlugin.Setting.RESULT_CODE_FAILED;
  */
 public final class EditConfigurationActivity extends AbstractPluginActivity {
 
+    private TextInputLayout mExecutablePathTextLayout;
     private AutoCompleteTextView mExecutablePathText;
     private TextInputEditText mArgumentsText;
+    private TextInputLayout mWorkingDirectoryPathTextLayout;
     private AutoCompleteTextView mWorkingDirectoryPathText;
+    private TextView mStdinView;
     private CheckBox mInTerminalCheckbox;
     private CheckBox mWaitForResult;
     private TextView mExecutableAbsolutePathText;
@@ -55,10 +69,16 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     private TextView mPluginPermissionUngrantedWarning;
     private TextView mAllowExternalAppsUngrantedWarning;
 
+    private ActivityResultLauncher<Intent> mStartTextIOActivityForResult;
+
+    private String mStdin;
+
     private String[] executableFileNamesList = new String[0];
     ArrayAdapter<String> executableFileNamesAdaptor;
     private String[] workingDirectoriesNamesList = new String[0];
     ArrayAdapter<String> workingDirectoriesNamesAdaptor;
+
+    public static final String ACTION_GET_STDIN = "ACTION_GET_STDIN";
 
     private static final String LOG_TAG = "EditConfigurationActivity";
 
@@ -73,6 +93,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         }
 
         setContentView(R.layout.edit_activity);
+        setStartTextIOActivityForResult();
 
         final Intent intent = getIntent();
         BundleScrubber.scrub(intent);
@@ -82,9 +103,12 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         TextView mHelp = findViewById(R.id.textview_help);
         mHelp.setText(this.getString(R.string.help, TermuxConstants.TERMUX_TASKER_GITHUB_REPO_URL));
 
+        mExecutablePathTextLayout = findViewById(R.id.layout_executable_path);
         mExecutablePathText = findViewById(R.id.executable_path);
         mArgumentsText = findViewById(R.id.arguments);
+        mWorkingDirectoryPathTextLayout = findViewById(R.id.layout_working_directory_path);
         mWorkingDirectoryPathText = findViewById(R.id.working_directory_path);
+        mStdinView = findViewById(R.id.view_stdin);
         mInTerminalCheckbox = findViewById(R.id.in_terminal);
         mWaitForResult = findViewById(R.id.wait_for_result);
         mExecutableAbsolutePathText = findViewById(R.id.executable_absolute_path);
@@ -94,61 +118,54 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         mAllowExternalAppsUngrantedWarning = findViewById(R.id.allow_external_apps_ungranted_warning);
 
 
-        mExecutablePathText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+        setExecutionPathViews();
+        setWorkingDirectoryPathViews();
+        setStdinView();
+        setInTerminalView();
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+        // Currently savedInstanceState bundle is not supported
+        if (savedInstanceState != null || localeBundle == null)
+            return;
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-                processExecutablePath(editable == null ? null : editable.toString());
-            }
-        });
-
-        executableFileNamesAdaptor = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new ArrayList<>(Arrays.asList(executableFileNamesList)));
-        mExecutablePathText.setAdapter(executableFileNamesAdaptor);
-
-
-        mWorkingDirectoryPathText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                processWorkingDirectoryPath(editable == null ? null : editable.toString());
-            }
-        });
-
-        workingDirectoriesNamesAdaptor = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new ArrayList<>(Arrays.asList(workingDirectoriesNamesList)));
-        mWorkingDirectoryPathText.setAdapter(workingDirectoriesNamesAdaptor);
-
-
-        if (savedInstanceState == null) {
-            if (localeBundle != null) {
-                String errmsg;
-                // If bundle is valid, then load values from bundle
-                errmsg = PluginBundleManager.parseBundle(this, localeBundle);
-                if (errmsg == null) {
-                    final String selectedExecutable = localeBundle.getString(PluginBundleManager.EXTRA_EXECUTABLE);
-                    mExecutablePathText.setText(selectedExecutable);
-                    final String selectedArguments = localeBundle.getString(PluginBundleManager.EXTRA_ARGUMENTS);
-                    mArgumentsText.setText(selectedArguments);
-                    final String selectedWorkingDirectory = localeBundle.getString(PluginBundleManager.EXTRA_WORKDIR);
-                    mWorkingDirectoryPathText.setText(selectedWorkingDirectory);
-                    final boolean inTerminal = localeBundle.getBoolean(PluginBundleManager.EXTRA_TERMINAL);
-                    mInTerminalCheckbox.setChecked(inTerminal);
-                    final boolean waitForResult = localeBundle.getBoolean(PluginBundleManager.EXTRA_WAIT_FOR_RESULT);
-                    mWaitForResult.setChecked(waitForResult);
-                } else {
-                    Logger.logError(LOG_TAG, errmsg);
-                }
-            }
+        String errmsg;
+        // If bundle is valid, then load values from bundle
+        errmsg = PluginBundleManager.parseBundle(this, localeBundle);
+        if (errmsg != null) {
+            Logger.logError(LOG_TAG, errmsg);
+            return;
         }
+
+        final String selectedExecutable = localeBundle.getString(PluginBundleManager.EXTRA_EXECUTABLE);
+        mExecutablePathText.setText(selectedExecutable);
+        processExecutablePath(selectedExecutable);
+
+        final String selectedArguments = localeBundle.getString(PluginBundleManager.EXTRA_ARGUMENTS);
+        mArgumentsText.setText(selectedArguments);
+
+        final String selectedWorkingDirectory = localeBundle.getString(PluginBundleManager.EXTRA_WORKDIR);
+        mWorkingDirectoryPathText.setText(selectedWorkingDirectory);
+        processWorkingDirectoryPath(selectedWorkingDirectory);
+
+        final boolean inTerminal = localeBundle.getBoolean(PluginBundleManager.EXTRA_TERMINAL);
+        mInTerminalCheckbox.setChecked(inTerminal);
+
+        mStdin = DataUtils.getTruncatedCommandOutput(localeBundle.getString(PluginBundleManager.EXTRA_STDIN),
+                DataUtils.TRANSACTION_SIZE_LIMIT_IN_BYTES, true, false, false);
+        updateStdinViewText();
+        updateStdinViewVisibility(inTerminal);
+
+        final boolean waitForResult = localeBundle.getBoolean(PluginBundleManager.EXTRA_WAIT_FOR_RESULT);
+        mWaitForResult.setChecked(waitForResult);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        checkIfPluginCanAccessTermuxApp();
+        checkIfPluginHostHasPermissionRunCommand();
+        processExecutablePath(mExecutablePathText == null ? null : mExecutablePathText.getText().toString());
+        processWorkingDirectoryPath(mWorkingDirectoryPathText == null ? null : mWorkingDirectoryPathText.getText().toString());
     }
 
     @Override
@@ -170,117 +187,99 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void finish() {
-        if (!isCanceled()) {
-            final String executable = mExecutablePathText.getText() == null ? null : mExecutablePathText.getText().toString();
-            final String arguments =  mArgumentsText.getText() == null ? null : mArgumentsText.getText().toString();
-            final String workingDirectory = mWorkingDirectoryPathText.getText() == null ? null : mWorkingDirectoryPathText.getText().toString();
-            final boolean inTerminal = mInTerminalCheckbox.isChecked();
-            final boolean waitForResult = mWaitForResult.isChecked();
 
-            if (executable != null && executable.length() > 0) {
-                final Intent resultIntent = new Intent();
 
-                /*
-                 * This extra is the data to ourselves: either for the Activity or the BroadcastReceiver. Note
-                 * that anything placed in this Bundle must be available to Locale's class loader. So storing
-                 * String, int, and other standard objects will work just fine. Parcelable objects are not
-                 * acceptable, unless they also implement Serializable. Serializable objects must be standard
-                 * Android platform objects (A Serializable class private to this plug-in's APK cannot be
-                 * stored in the Bundle, as Locale's classloader will not recognize it).
-                 */
-                final Bundle resultBundle = PluginBundleManager.generateBundle(getApplicationContext(),
-                        executable, arguments, workingDirectory, inTerminal, waitForResult);
-                if (resultBundle == null) {
-                    Logger.showToast(this, getString(R.string.error_generate_plugin_bundle_failed), true);
-                    setResult(RESULT_CODE_FAILED, resultIntent);
-                    super.finish();
-                    return;
-                }
 
-                // The blurb is a concise status text to be displayed in the host's UI.
-                final String blurb = generateBlurb(executable, arguments, inTerminal, waitForResult);
 
-                // If host supports variable replacement when running plugin action, then
-                // request it to replace variables in following fields
-                if (TaskerPlugin.Setting.hostSupportsOnFireVariableReplacement(this)){
-                    TaskerPlugin.Setting.setVariableReplaceKeys(resultBundle,new String[] {
-                            PluginBundleManager.EXTRA_EXECUTABLE,
-                            PluginBundleManager.EXTRA_ARGUMENTS,
-                            PluginBundleManager.EXTRA_WORKDIR
-                    });
-                }
+    private void setExecutionPathViews() {
+        mExecutablePathText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
-                resultIntent.putExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE, resultBundle);
-                resultIntent.putExtra(com.twofortyfouram.locale.Intent.EXTRA_STRING_BLURB, blurb);
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
-                // Configuration information for Tasker variables returned from the executed task
-                if(waitForResult) {
-                    List<String> relevantVariableList = new ArrayList<>();
-                    relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_STDOUT + "\nStandard Output\nThe <B>stdout</B> of the command.");
-                    relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_STDOUT_ORIGINAL_LENGTH + "\nStandard Output Original Length\nThe original length of <B>stdout</B>.");
-
-                    // For foreground commands, the session transcript is returned which will contain
-                    // both stdout and stderr combined, basically anything sent to the the pseudo
-                    // terminal /dev/pts, including PS1 prefixes for interactive sessions.
-                    if (!inTerminal) {
-                        relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_STDERR + "\nStandard Error\nThe <B>stderr</B> of the command.");
-                        relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_STDERR_ORIGINAL_LENGTH + "\nStandard Error Original Length\nThe original length of <B>stderr</B>.");
-                    }
-
-                    relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_EXIT_CODE + "\nExit Code\nThe <B>exit code</B> of the command." +
-                            "0 often means success and anything else is usually a failure of some sort.");
-
-                    if (TaskerPlugin.hostSupportsRelevantVariables(getIntent().getExtras())) {
-                        TaskerPlugin.addRelevantVariableList(resultIntent, relevantVariableList.toArray(new String[0]));
-                    }
-                }
-
-                // To use variables, we can't have a timeout of 0, but if someone doesn't pay
-                // attention to this and runs a task that never ends, 10 seconds seems like a
-                // reasonable timeout. If they need more time, or want this to run entirely
-                // asynchronously, that can be set
-                if (TaskerPlugin.Setting.hostSupportsSynchronousExecution(getIntent().getExtras())) {
-                    TaskerPlugin.Setting.requestTimeoutMS(resultIntent, 10000);
-                }
-
-                setResult(RESULT_OK, resultIntent);
+            @Override
+            public void afterTextChanged(Editable editable) {
+                processExecutablePath(editable == null ? null : editable.toString());
             }
-        }
+        });
 
-        super.finish();
+        executableFileNamesAdaptor = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new ArrayList<>(Arrays.asList(executableFileNamesList)));
+        mExecutablePathText.setAdapter(executableFileNamesAdaptor);
     }
 
-    /**
-     * The message that will be displayed by the plugin host app for the action configuration.
-     * Blurb length can be a maximum of 60 characters as defined by locale lib.
-     * @param executable value set for the action.
-     * @param arguments value set for the action.
-     * @param inTerminal value set for the action.
-     * @param waitForResult value set for the action.
-     * @return A blurb for the plug-in.
-     */
-    String generateBlurb(final String executable, final String arguments, boolean inTerminal, boolean waitForResult) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(getString(R.string.blurb_executable_and_arguments, executable, arguments));
-        builder.append("\n\n").append(getString(inTerminal ? R.string.blurb_in_terminal : R.string.blurb_not_in_terminal));
-        builder.append("\n").append(getString(waitForResult ? R.string.blurb_wait_for_result : R.string.blurb_no_wait_for_result));
 
-        String blurb = builder.toString();
-        final int maxBlurbLength = 120; // R.integer.twofortyfouram_locale_maximum_blurb_length is set to 60 but we are ignoring that since Tasker doesn't have that limit.
-        return (blurb.length() > maxBlurbLength) ? blurb.substring(0, maxBlurbLength) : blurb;
+    private void setWorkingDirectoryPathViews() {
+        mWorkingDirectoryPathText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                processWorkingDirectoryPath(editable == null ? null : editable.toString());
+            }
+        });
+
+        workingDirectoriesNamesAdaptor = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new ArrayList<>(Arrays.asList(workingDirectoriesNamesList)));
+        mWorkingDirectoryPathText.setAdapter(workingDirectoriesNamesAdaptor);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
 
-        checkIfPluginCanAccessTermuxApp();
-        checkIfPluginHostHasPermissionRunCommand();
-        processExecutablePath(mExecutablePathText == null ? null : mExecutablePathText.getText().toString());
-        processWorkingDirectoryPath(mWorkingDirectoryPathText == null ? null : mWorkingDirectoryPathText.getText().toString());
+    private void setStdinView() {
+        mStdinView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mStartTextIOActivityForResult == null) return;
+
+                // Tasker has a Bundle size limit check:
+                // Parcel obtain = Parcel.obtain(); bundle.writeToParcel(obtain, 0); if (obtain.dataSize() < 100000);
+                // And will throw `plugin data too large` if it exceeds.
+                // Note that on Android 7-11, String characters are stored in Parcel as UTF-16, i.e 2 bytes
+                // https://cs.android.com/android/platform/superproject/+/android-11.0.0_r40:frameworks/base/core/java/android/os/Parcel.java;l=773
+                TextIOInfo textIOInfo = new TextIOInfo(ACTION_GET_STDIN, EditConfigurationActivity.this.getClass().getCanonicalName());
+                textIOInfo.setTitle(getString(R.string.title_stdin));
+                textIOInfo.setText(mStdin);
+                textIOInfo.setTextSize(12);
+                textIOInfo.setTextLengthLimit(90000/2); // Leave some for other data in result bundle. Limit is 45K characters.
+                textIOInfo.setTextTypeFaceFamily("monospace");
+                textIOInfo.setTextTypeFaceStyle(Typeface.NORMAL);
+                textIOInfo.setTextHorizontallyScrolling(true);
+                textIOInfo.setShowTextCharacterUsage(true);
+                textIOInfo.setShowBackButtonInActionBar(true);
+
+                mStartTextIOActivityForResult.launch(TextIOActivity.newInstance(EditConfigurationActivity.this, textIOInfo));
+            }
+        });
     }
+
+    private void updateStdinViewText() {
+        if (mStdinView == null) return;
+        mStdinView.setText(DataUtils.getTruncatedCommandOutput(mStdin, 200, true, false, false));
+    }
+
+    private void updateStdinViewVisibility(boolean inTerminal) {
+        if (mStdinView == null) return;
+        if (inTerminal)
+            mStdinView.setVisibility(View.GONE);
+        else
+            mStdinView.setVisibility(View.VISIBLE);
+    }
+
+
+    private void setInTerminalView() {
+        mInTerminalCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateStdinViewVisibility(isChecked);
+            }
+        });
+    }
+
+
 
     private void checkIfPluginCanAccessTermuxApp() {
         if (mTermuxAppFilesPathInaccessibleWarning == null) return;
@@ -318,18 +317,18 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     }
 
     private void processExecutablePath(String executable) {
-        if (mExecutablePathText == null || mExecutablePathText.getWindowToken() == null) return;
+        if (mExecutablePathText == null) return;
 
         boolean validate = true;
         boolean executableDefined = true;
 
-        mExecutablePathText.setError(null);
+        mExecutablePathTextLayout.setError(null);
         mExecutableAbsolutePathText.setText(null);
         mAllowExternalAppsUngrantedWarning.setVisibility(View.GONE);
         mAllowExternalAppsUngrantedWarning.setText(null);
 
         if (executable == null || executable.isEmpty()) {
-            mExecutablePathText.setError(this.getString(R.string.error_executable_required));
+            mExecutablePathTextLayout.setError(this.getString(R.string.error_executable_required));
             validate = false;
             executableDefined = false;
         }
@@ -338,11 +337,11 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
         // If executable text contains a variable, then no need to set absolute path or validate the path
         if (PluginUtils.isPluginHostAppVariableContainingString(executable)) {
-            mExecutableAbsolutePathText.setText(this.getString(R.string.msg_executable_absolute_path, this.getString(R.string.msg_variable_in_string)));
+            mExecutableAbsolutePathText.setText(this.getString(R.string.msg_absolute_path, this.getString(R.string.msg_variable_in_string)));
             executable = null;
             validate = false;
         } else if (executableDefined) {
-            mExecutableAbsolutePathText.setText(this.getString(R.string.msg_executable_absolute_path, executable));
+            mExecutableAbsolutePathText.setText(this.getString(R.string.msg_absolute_path, executable));
         }
 
         if (validate) {
@@ -356,7 +355,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                     true);
             if (error != null) {
                 Error shortError = FileUtils.getShortFileUtilsError(error);
-                mExecutablePathText.setError(shortError.getMessage());
+                mExecutablePathTextLayout.setError(shortError.getMessage());
             }
 
             // If executable is not in TermuxConstants#TERMUX_TASKER_SCRIPTS_DIR_PATH and
@@ -448,12 +447,12 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     }
 
     private void processWorkingDirectoryPath(String workingDirectory) {
-        if (mWorkingDirectoryPathText == null || mWorkingDirectoryPathText.getWindowToken() == null) return;
+        if (mWorkingDirectoryPathText == null) return;
 
         boolean validate = true;
         boolean workingDirectoryDefined = true;
 
-        mWorkingDirectoryPathText.setError(null);
+        mWorkingDirectoryPathTextLayout.setError(null);
         mWorkingDirectoryAbsolutePathText.setVisibility(View.GONE);
         mWorkingDirectoryAbsolutePathText.setText(null);
 
@@ -466,12 +465,12 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
         // If workingDirectory text contains a variable, then no need to set absolute path or validate the path
         if (PluginUtils.isPluginHostAppVariableContainingString(workingDirectory)) {
-            mWorkingDirectoryAbsolutePathText.setText(this.getString(R.string.msg_working_directory_absolute_path, this.getString(R.string.msg_variable_in_string)));
+            mWorkingDirectoryAbsolutePathText.setText(this.getString(R.string.msg_absolute_path, this.getString(R.string.msg_variable_in_string)));
             mWorkingDirectoryAbsolutePathText.setVisibility(View.VISIBLE);
             workingDirectory = null;
             validate = false;
         } else if (workingDirectoryDefined) {
-            mWorkingDirectoryAbsolutePathText.setText(this.getString(R.string.msg_working_directory_absolute_path, workingDirectory));
+            mWorkingDirectoryAbsolutePathText.setText(this.getString(R.string.msg_absolute_path, workingDirectory));
             mWorkingDirectoryAbsolutePathText.setVisibility(View.VISIBLE);
         }
 
@@ -485,7 +484,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                     false, true);
             if (error != null) {
                 Error shortError = FileUtils.getShortFileUtilsError(error);
-                mWorkingDirectoryPathText.setError(shortError.getMessage());
+                mWorkingDirectoryPathTextLayout.setError(shortError.getMessage());
             }
         }
 
@@ -565,6 +564,129 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         workingDirectoriesNamesAdaptor.notifyDataSetChanged();
         if (mWorkingDirectoryPathText.isFocused() && mWorkingDirectoryPathText.getWindowToken() != null)
             mWorkingDirectoryPathText.showDropDown();
+    }
+
+
+
+
+
+    @Override
+    public void finish() {
+        if (isCanceled()) {
+            super.finish();
+            return;
+        }
+
+        final String executable = mExecutablePathText.getText() == null ? null : mExecutablePathText.getText().toString();
+        final String arguments =  mArgumentsText.getText() == null ? null : mArgumentsText.getText().toString();
+        final String workingDirectory = mWorkingDirectoryPathText.getText() == null ? null : mWorkingDirectoryPathText.getText().toString();
+        final boolean inTerminal = mInTerminalCheckbox.isChecked();
+        final boolean waitForResult = mWaitForResult.isChecked();
+
+        if (executable == null || executable.length() <= 0) {
+            super.finish();
+            return;
+        }
+
+        final Intent resultIntent = new Intent();
+
+        /*
+         * This extra is the data to ourselves: either for the Activity or the BroadcastReceiver. Note
+         * that anything placed in this Bundle must be available to Locale's class loader. So storing
+         * String, int, and other standard objects will work just fine. Parcelable objects are not
+         * acceptable, unless they also implement Serializable. Serializable objects must be standard
+         * Android platform objects (A Serializable class private to this plug-in's APK cannot be
+         * stored in the Bundle, as Locale's classloader will not recognize it).
+         */
+        final Bundle resultBundle = PluginBundleManager.generateBundle(getApplicationContext(),
+                executable, arguments, workingDirectory, mStdin, inTerminal, waitForResult);
+        if (resultBundle == null) {
+            Logger.showToast(this, getString(R.string.error_generate_plugin_bundle_failed), true);
+            setResult(RESULT_CODE_FAILED, resultIntent);
+            super.finish();
+            return;
+        }
+
+        Logger.logDebug(LOG_TAG, "Result bundle size: " + PluginBundleManager.getBundleSize(resultBundle));
+
+        // The blurb is a concise status text to be displayed in the host's UI.
+        final String blurb = PluginBundleManager.generateBlurb(this, executable, arguments, workingDirectory, mStdin, inTerminal, waitForResult);
+
+        // If host supports variable replacement when running plugin action, then
+        // request it to replace variables in following fields
+        if (TaskerPlugin.Setting.hostSupportsOnFireVariableReplacement(this)){
+            TaskerPlugin.Setting.setVariableReplaceKeys(resultBundle,new String[] {
+                    PluginBundleManager.EXTRA_EXECUTABLE,
+                    PluginBundleManager.EXTRA_ARGUMENTS,
+                    PluginBundleManager.EXTRA_WORKDIR,
+                    PluginBundleManager.EXTRA_STDIN
+            });
+        }
+
+        resultIntent.putExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE, resultBundle);
+        resultIntent.putExtra(com.twofortyfouram.locale.Intent.EXTRA_STRING_BLURB, blurb);
+
+        // Configuration information for Tasker variables returned from the executed task
+        if(waitForResult) {
+            List<String> relevantVariableList = new ArrayList<>();
+            relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_STDOUT + "\nStandard Output\nThe <B>stdout</B> of the command.");
+            relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_STDOUT_ORIGINAL_LENGTH + "\nStandard Output Original Length\nThe original length of <B>stdout</B>.");
+
+            // For foreground commands, the session transcript is returned which will contain
+            // both stdout and stderr combined, basically anything sent to the the pseudo
+            // terminal /dev/pts, including PS1 prefixes for interactive sessions.
+            if (!inTerminal) {
+                relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_STDERR + "\nStandard Error\nThe <B>stderr</B> of the command.");
+                relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_STDERR_ORIGINAL_LENGTH + "\nStandard Error Original Length\nThe original length of <B>stderr</B>.");
+            }
+
+            relevantVariableList.add(PluginUtils.PLUGIN_VARIABLE_EXIT_CODE + "\nExit Code\nThe <B>exit code</B> of the command." +
+                    "0 often means success and anything else is usually a failure of some sort.");
+
+            if (TaskerPlugin.hostSupportsRelevantVariables(getIntent().getExtras())) {
+                TaskerPlugin.addRelevantVariableList(resultIntent, relevantVariableList.toArray(new String[0]));
+            }
+        }
+
+        // To use variables, we can't have a timeout of 0, but if someone doesn't pay
+        // attention to this and runs a task that never ends, 10 seconds seems like a
+        // reasonable timeout. If they need more time, or want this to run entirely
+        // asynchronously, that can be set
+        if (TaskerPlugin.Setting.hostSupportsSynchronousExecution(getIntent().getExtras())) {
+            TaskerPlugin.Setting.requestTimeoutMS(resultIntent, 10000);
+        }
+
+        setResult(RESULT_OK, resultIntent);
+        super.finish();
+    }
+
+
+
+
+
+    private void setStartTextIOActivityForResult() {
+        mStartTextIOActivityForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent intent = result.getData();
+                        if (intent == null) return;
+
+                        Bundle bundle = intent.getExtras();
+                        if (bundle == null) return;
+
+                        TextIOInfo textIOInfo = (TextIOInfo) bundle.getSerializable(TextIOActivity.EXTRA_TEXT_IO_INFO_OBJECT);
+                        if (textIOInfo == null) return;
+
+                        switch (textIOInfo.getAction()) {
+                            case ACTION_GET_STDIN:
+                                mStdin = textIOInfo.getText();
+                                updateStdinViewText();
+                        }
+                    }
+                }
+            });
     }
 
 }

@@ -16,14 +16,15 @@
     <string name="shared_user_label">&TERMUX_APP_NAME; user</string>
     <!-- The plugin name as shown in plugin caller app in the Task Edit activity.-->
     <string name="plugin_name">&TERMUX_APP_NAME;</string>
-    <string name="executable_path_hint">Executable (file in &TERMUX_TASKER_SCRIPTS_DIR_PATH_SHORT; or absolute path)</string>
-    <string name="arguments_hint">Arguments</string>
-    <string name="working_directory_path_hint">Working directory path</string>
-    <string name="execute_in_terminal">Execute in a terminal session</string>
-    <string name="wait_for_result">Wait for result for commands (Requires timeout > 0)</string>
+    <string name="title_executable_path">Executable (file in &TERMUX_TASKER_SCRIPTS_DIR_PATH_SHORT; or absolute path to executable)</string>
+    <string name="title_arguments">Arguments</string>
+    <string name="title_working_directory_path">Working directory path</string>
+    <string name="title_stdin">Stdin</string>
+    <string name="title_execute_in_terminal">Execute in a terminal session</string>
+    <string name="title_wait_for_result">Wait for result for commands (Requires timeout > 0)</string>
 
-    <string name="msg_executable_absolute_path">Executable Absolute Path: \"%1$s\"</string>
-    <string name="msg_working_directory_absolute_path">Working Directory Absolute Path: \"%1$s\"</string>
+    <string name="msg_executable_absolute_path">Executable Absolute Path:\n\"%1$s\"</string>
+    <string name="msg_absolute_path">Absolute Path:\n\"%1$s\"</string>
 
     <string name="error_executable_required">Executable required.</string>
     <string name="error_null_or_empty_executable">The executable is null or empty.</string>
@@ -40,10 +41,10 @@
     <string name="error_get_version_code_failed">Failed to get version code for %1$s</string>
 
     <string name="blurb_executable_and_arguments">%1$s %2$s</string>
-    <string name="blurb_in_terminal">\u2713 Terminal Session</string>
-    <string name="blurb_not_in_terminal">\u2715 Terminal Session</string>
-    <string name="blurb_wait_for_result">\u2713 Wait For Result</string>
-    <string name="blurb_no_wait_for_result">\u2715 Wait For Result</string>
+    <string name="blurb_working_directory">%1$s Working Directory</string>
+    <string name="blurb_stdin">%1$s Stdin</string>
+    <string name="blurb_in_terminal">%1$s Terminal Session</string>
+    <string name="blurb_wait_for_result">%1$s Wait For Result</string>
 
     <!-- From Locale API: -->
     <string name="twofortyfouram_locale_breadcrumb_format" tools:ignore="UnusedResources">%1$s%2$s%3$s</string>

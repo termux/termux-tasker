@@ -3,10 +3,13 @@ package com.termux.tasker;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.termux.shared.data.DataUtils;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.packages.PackageUtils;
 import com.termux.shared.termux.TermuxConstants;
@@ -25,11 +28,16 @@ public class PluginBundleManager {
     /** The {@code String} extra for path to current working directory for execution. */
     public static final String EXTRA_WORKDIR = TermuxConstants.TERMUX_TASKER_PACKAGE_NAME + ".extra.WORKDIR"; // Default: "com.termux.tasker.extra.WORKDIR"
 
+    /** The {@code String} extra for stdin for background commands. */
+    public static final String EXTRA_STDIN = TermuxConstants.TERMUX_TASKER_PACKAGE_NAME + ".extra.STDIN"; // Default: "com.termux.tasker.extra.STDIN"
+
     /** The {@code boolean} extra for whether the executable should be run inside a terminal. */
     public static final String EXTRA_TERMINAL = TermuxConstants.TERMUX_TASKER_PACKAGE_NAME + ".extra.TERMINAL"; // Default: "com.termux.tasker.extra.TERMINAL"
 
     /** The {@code boolean} extra for whether plugin action should wait for result of commands or not. */
     public static final String EXTRA_WAIT_FOR_RESULT = TermuxConstants.TERMUX_TASKER_PACKAGE_NAME + ".extra.WAIT_FOR_RESULT"; // Default: "com.termux.tasker.extra.WAIT_FOR_RESULT"
+
+
 
     /**
      * The {@code int} extra for the versionCode of the plugin app that saved the Bundle.
@@ -39,6 +47,9 @@ public class PluginBundleManager {
      * having the version, the plug-in can better detect when such bugs occur.
      */
     public static final String BUNDLE_EXTRA_INT_VERSION_CODE = TermuxConstants.TERMUX_TASKER_PACKAGE_NAME + ".extra.VERSION_CODE"; // Default: "com.termux.tasker.extra.VERSION_CODE"
+
+    public static final String UNICODE_CHECK = "\u2713";
+    public static final String UNICODE_UNCHECK = "\u2715";
 
     /**
      * Method to verify the content of the bundle are correct.
@@ -50,7 +61,7 @@ public class PluginBundleManager {
      * @return Returns the {@code errmsg} if Bundle is not valid, otherwise {@code null}.
      */
     @SuppressLint("DefaultLocale")
-    public static String parseBundle(final Context context, final Bundle bundle) {
+    public static String parseBundle(@NonNull final Context context, final Bundle bundle) {
         if (bundle == null) return context.getString(R.string.error_null_or_empty_executable);
 
         /*
@@ -61,6 +72,7 @@ public class PluginBundleManager {
          * - BUNDLE_EXTRA_INT_VERSION_CODE
          * The bundle may optionally contain:
          * - EXTRA_WORKDIR
+         * - EXTRA_STDIN
          * - EXTRA_TERMINAL
          * - EXTRA_WAIT_FOR_RESULT
          * - VARIABLE_REPLACE_KEYS
@@ -79,13 +91,13 @@ public class PluginBundleManager {
         }
 
         /*
-         * Check if bundle contains at least 3 keys but no more than 7.
+         * Check if bundle contains at least 3 keys but no more than 8.
          * Run this test after checking for required Bundle extras above so that the error message
          * is more useful. (E.g. the caller will see what extras are missing, rather than just a
          * message that there is the wrong number).
          */
-        if (bundle.keySet().size() < 3 || bundle.keySet().size() > 7) {
-            return String.format("The bundle must contain 3-7 keys, but currently contains %d keys.", bundle.keySet().size());
+        if (bundle.keySet().size() < 3 || bundle.keySet().size() > 8) {
+            return String.format("The bundle must contain 3-8 keys, but currently contains %d keys.", bundle.keySet().size());
         }
 
         if (TextUtils.isEmpty(bundle.getString(EXTRA_EXECUTABLE))) {
@@ -109,8 +121,9 @@ public class PluginBundleManager {
     }
 
     @Nullable
-    public static Bundle generateBundle(final Context context, final String executable,
+    public static Bundle generateBundle(@NonNull final Context context, final String executable,
                                         final String arguments, final String workingDirectory,
+                                        final String stdin,
                                         final boolean inTerminal, final boolean waitForResult) {
         final Bundle result = new Bundle();
         result.putString(EXTRA_EXECUTABLE, executable);
@@ -118,6 +131,9 @@ public class PluginBundleManager {
         result.putString(EXTRA_WORKDIR, workingDirectory);
         result.putBoolean(EXTRA_TERMINAL, inTerminal);
         result.putBoolean(EXTRA_WAIT_FOR_RESULT, waitForResult);
+
+        if (!inTerminal)
+            result.putString(EXTRA_STDIN, stdin);
 
         Integer versionCode = PackageUtils.getVersionCodeForPackage(context);
         if (versionCode == null) {
@@ -128,4 +144,37 @@ public class PluginBundleManager {
         result.putInt(BUNDLE_EXTRA_INT_VERSION_CODE, versionCode);
         return result;
     }
+
+    /**
+     * The message that will be displayed by the plugin host app for the action configuration.
+     * Blurb length can be a maximum of 60 characters as defined by locale lib.
+     * @return A blurb for the plug-in.
+     */
+    public static String generateBlurb(@NonNull final Context context, final String executable,
+                         final String arguments, final String workingDirectory, final String stdin,
+                         final boolean inTerminal, final boolean waitForResult) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(context.getString(R.string.blurb_executable_and_arguments, executable, arguments));
+        builder.append("\n\n").append(context.getString(R.string.blurb_working_directory, (!DataUtils.isNullOrEmpty(workingDirectory) ? UNICODE_CHECK : UNICODE_UNCHECK)));
+
+        if (!inTerminal)
+            builder.append("\n").append(context.getString(R.string.blurb_stdin, (!DataUtils.isNullOrEmpty(stdin) ? UNICODE_CHECK : UNICODE_UNCHECK)));
+
+        builder.append("\n").append(context.getString(R.string.blurb_in_terminal, (inTerminal ? UNICODE_CHECK : UNICODE_UNCHECK)));
+        builder.append("\n").append(context.getString(R.string.blurb_wait_for_result, (waitForResult ? UNICODE_CHECK : UNICODE_UNCHECK)));
+
+        String blurb = builder.toString();
+        final int maxBlurbLength = 120; // R.integer.twofortyfouram_locale_maximum_blurb_length is set to 60 but we are ignoring that since Tasker doesn't have that limit.
+        return (blurb.length() > maxBlurbLength) ? blurb.substring(0, maxBlurbLength) : blurb;
+    }
+
+    /** Get size of {@link Bundle} when stored as a {@link Parcel}. */
+    public static int getBundleSize(@NonNull Bundle bundle) {
+        Parcel parcel = Parcel.obtain();
+        bundle.writeToParcel(parcel, 0);
+        int size = parcel.dataSize();
+        parcel.recycle();
+        return size;
+    }
+
 }

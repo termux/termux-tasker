@@ -73,6 +73,8 @@ public final class FireReceiver extends BroadcastReceiver {
         executionCommand.inBackground = !(intent.getBooleanExtra(PluginBundleManager.EXTRA_TERMINAL, false));
         final boolean waitForResult = bundle.getBoolean(PluginBundleManager.EXTRA_WAIT_FOR_RESULT, true);
 
+        if (executionCommand.inBackground)
+            executionCommand.stdin = IntentUtils.getStringExtraIfSet(intent, PluginBundleManager.EXTRA_STDIN, null);
 
 
         // If Termux app is not installed, enabled or accessible with current context or if
@@ -177,6 +179,7 @@ public final class FireReceiver extends BroadcastReceiver {
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_ARGUMENTS, executionCommand.arguments);
         if (executionCommand.workingDirectory != null && !executionCommand.workingDirectory.isEmpty())
             executionIntent.putExtra(TERMUX_SERVICE.EXTRA_WORKDIR, executionCommand.workingDirectory);
+        executionIntent.putExtra(TERMUX_SERVICE.EXTRA_STDIN, executionCommand.stdin);
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_BACKGROUND, executionCommand.inBackground);
 
         // Send execution intent to TERMUX_SERVICE

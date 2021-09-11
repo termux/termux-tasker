@@ -27,6 +27,7 @@
             android:exported="true"
             android:icon="@drawable/ic_launcher"
             android:label="@string/plugin_name"
+            android:windowSoftInputMode="stateHidden"
             android:uiOptions="splitActionBarWhenNarrow">
             <!-- this Intent filter allows the plug-in to be discovered by Locale -->
             <intent-filter>

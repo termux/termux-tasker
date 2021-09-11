@@ -4,8 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.termux.tasker.utils.Logger;
-
 /**
  * Superclass for plug-in Activities. This class takes care of initializing aspects of the plug-in's UI to
  * look more integrated with the plug-in host.
@@ -51,7 +49,8 @@ public abstract class AbstractPluginActivity extends AppCompatActivity {
      * During {@link #finish()}, subclasses can call this method to determine whether the Activity was
      * canceled.
      *
-     * @return True if the Activity was canceled. False if the Activity was not canceled.
+     * @return Returns {@code true} if the Activity was canceled, otherwise returns {@code false}
+     * if the Activity was not canceled.
      */
     protected boolean isCanceled() {
         return mIsCancelled;

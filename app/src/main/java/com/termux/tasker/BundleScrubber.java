@@ -14,9 +14,10 @@ public final class BundleScrubber {
      * Bundle is null, has no extras, or the extras do not contain a private serializable subclass, the Bundle
      * is not mutated.
      *
-     * @param intent {@code Intent} to scrub. This parameter may be mutated if scrubbing is necessary. This
-     *               parameter may be null.
-     * @return true if the Intent was scrubbed, false if the Intent was not modified.
+     * @param intent The {@link Intent} to scrub. This parameter may be mutated if scrubbing is
+     *               necessary. This parameter may be {@code null}.
+     * @return Returns {@code true} if the Intent was scrubbed, otherwise returns {@code false} if
+     * the {@link Intent} was not modified.
      */
     public static boolean scrub(final Intent intent) {
         return null != intent && scrub(intent.getExtras());
@@ -27,9 +28,10 @@ public final class BundleScrubber {
      * private serializable subclass, the Bundle is cleared. If the Bundle is null, has no extras, or the
      * extras do not contain a private serializable subclass, the Bundle is not mutated.
      *
-     * @param bundle {@code Bundle} to scrub. This parameter may be mutated if scrubbing is necessary. This
-     *               parameter may be null.
-     * @return true if the Bundle was scrubbed, false if the Bundle was not modified.
+     * @param bundle The {@link Bundle} to scrub. This parameter may be mutated if scrubbing is necessary.
+     *               This parameter may be {@code null}.
+     * @return Returns {@code true} if the Bundle was scrubbed, otheriwse {@code false} if the
+     * {@link Bundle} was not modified.
      */
     public static boolean scrub(final Bundle bundle) {
         if (null == bundle) return false;

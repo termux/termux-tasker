@@ -31,6 +31,12 @@ public class PluginBundleManager {
     /** The {@code String} extra for stdin for background commands. */
     public static final String EXTRA_STDIN = TermuxConstants.TERMUX_TASKER_PACKAGE_NAME + ".extra.STDIN"; // Default: "com.termux.tasker.extra.STDIN"
 
+    /** The {@code String} extra for terminal session action defined by
+     * {@link com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE}
+     * `VALUE_EXTRA_SESSION_ACTION_*` values.
+     */
+    public static final String EXTRA_SESSION_ACTION = TermuxConstants.TERMUX_TASKER_PACKAGE_NAME + ".extra.SESSION_ACTION"; // Default: "com.termux.tasker.extra.SESSION_ACTION"
+
     /** The {@code boolean} extra for whether the executable should be run inside a terminal. */
     public static final String EXTRA_TERMINAL = TermuxConstants.TERMUX_TASKER_PACKAGE_NAME + ".extra.TERMINAL"; // Default: "com.termux.tasker.extra.TERMINAL"
 
@@ -73,6 +79,7 @@ public class PluginBundleManager {
          * The bundle may optionally contain:
          * - EXTRA_WORKDIR
          * - EXTRA_STDIN
+         * - EXTRA_SESSION_ACTION
          * - EXTRA_TERMINAL
          * - EXTRA_WAIT_FOR_RESULT
          * - VARIABLE_REPLACE_KEYS
@@ -91,13 +98,13 @@ public class PluginBundleManager {
         }
 
         /*
-         * Check if bundle contains at least 3 keys but no more than 8.
+         * Check if bundle contains at least 3 keys but no more than 9.
          * Run this test after checking for required Bundle extras above so that the error message
          * is more useful. (E.g. the caller will see what extras are missing, rather than just a
          * message that there is the wrong number).
          */
-        if (bundle.keySet().size() < 3 || bundle.keySet().size() > 8) {
-            return String.format("The bundle must contain 3-8 keys, but currently contains %d keys.", bundle.keySet().size());
+        if (bundle.keySet().size() < 3 || bundle.keySet().size() > 9) {
+            return String.format("The bundle must contain 3-9 keys, but currently contains %d keys.", bundle.keySet().size());
         }
 
         if (TextUtils.isEmpty(bundle.getString(EXTRA_EXECUTABLE))) {
@@ -123,7 +130,7 @@ public class PluginBundleManager {
     @Nullable
     public static Bundle generateBundle(@NonNull final Context context, final String executable,
                                         final String arguments, final String workingDirectory,
-                                        final String stdin,
+                                        final String stdin, final String sessionAction,
                                         final boolean inTerminal, final boolean waitForResult) {
         final Bundle result = new Bundle();
         result.putString(EXTRA_EXECUTABLE, executable);
@@ -132,8 +139,11 @@ public class PluginBundleManager {
         result.putBoolean(EXTRA_TERMINAL, inTerminal);
         result.putBoolean(EXTRA_WAIT_FOR_RESULT, waitForResult);
 
-        if (!inTerminal)
+        if (!inTerminal) {
             result.putString(EXTRA_STDIN, stdin);
+        } else {
+            result.putString(EXTRA_SESSION_ACTION, sessionAction);
+        }
 
         Integer versionCode = PackageUtils.getVersionCodeForPackage(context);
         if (versionCode == null) {
@@ -151,14 +161,19 @@ public class PluginBundleManager {
      * @return A blurb for the plug-in.
      */
     public static String generateBlurb(@NonNull final Context context, final String executable,
-                         final String arguments, final String workingDirectory, final String stdin,
-                         final boolean inTerminal, final boolean waitForResult) {
+                                       final String arguments, final String workingDirectory,
+                                       final String stdin, final String sessionAction,
+                                       final boolean inTerminal, final boolean waitForResult) {
         StringBuilder builder = new StringBuilder();
-        builder.append(context.getString(R.string.blurb_executable_and_arguments, executable, arguments));
+        builder.append(context.getString(R.string.blurb_executable_and_arguments, executable, arguments == null  ? "" : " " + arguments));
         builder.append("\n\n").append(context.getString(R.string.blurb_working_directory, (!DataUtils.isNullOrEmpty(workingDirectory) ? UNICODE_CHECK : UNICODE_UNCHECK)));
 
-        if (!inTerminal)
+        if (!inTerminal) {
             builder.append("\n").append(context.getString(R.string.blurb_stdin, (!DataUtils.isNullOrEmpty(stdin) ? UNICODE_CHECK : UNICODE_UNCHECK)));
+        } else {
+            if (!DataUtils.isNullOrEmpty(sessionAction))
+                builder.append("\n").append(context.getString(R.string.blurb_session_action, sessionAction));
+        }
 
         builder.append("\n").append(context.getString(R.string.blurb_in_terminal, (inTerminal ? UNICODE_CHECK : UNICODE_UNCHECK)));
         builder.append("\n").append(context.getString(R.string.blurb_wait_for_result, (waitForResult ? UNICODE_CHECK : UNICODE_UNCHECK)));

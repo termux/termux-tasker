@@ -13,6 +13,7 @@ import com.termux.shared.logger.Logger;
 import com.termux.shared.models.TextIOInfo;
 import com.termux.shared.models.errors.Error;
 import com.termux.shared.termux.TermuxConstants;
+import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
 import com.termux.shared.file.FileUtils;
 import com.termux.shared.termux.TermuxUtils;
 import com.termux.tasker.utils.LoggerUtils;
@@ -34,6 +35,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.File;
@@ -61,6 +63,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     private TextInputLayout mWorkingDirectoryPathTextLayout;
     private AutoCompleteTextView mWorkingDirectoryPathText;
     private TextView mStdinView;
+    private EditText mSessionAction;
     private CheckBox mInTerminalCheckbox;
     private CheckBox mWaitForResult;
     private TextView mExecutableAbsolutePathText;
@@ -109,6 +112,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         mWorkingDirectoryPathTextLayout = findViewById(R.id.layout_working_directory_path);
         mWorkingDirectoryPathText = findViewById(R.id.working_directory_path);
         mStdinView = findViewById(R.id.view_stdin);
+        mSessionAction = findViewById(R.id.session_action);
         mInTerminalCheckbox = findViewById(R.id.in_terminal);
         mWaitForResult = findViewById(R.id.wait_for_result);
         mExecutableAbsolutePathText = findViewById(R.id.executable_absolute_path);
@@ -121,6 +125,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         setExecutionPathViews();
         setWorkingDirectoryPathViews();
         setStdinView();
+        setSessionActionViews();
         setInTerminalView();
 
         // Currently savedInstanceState bundle is not supported
@@ -153,6 +158,11 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                 DataUtils.TRANSACTION_SIZE_LIMIT_IN_BYTES, true, false, false);
         updateStdinViewText();
         updateStdinViewVisibility(inTerminal);
+
+        final String sessionAction = localeBundle.getString(PluginBundleManager.EXTRA_SESSION_ACTION);
+        mSessionAction.setText(sessionAction);
+        processSessionAction(sessionAction);
+        updateSessionActionViewVisibility(inTerminal);
 
         final boolean waitForResult = localeBundle.getBoolean(PluginBundleManager.EXTRA_WAIT_FOR_RESULT);
         mWaitForResult.setChecked(waitForResult);
@@ -192,13 +202,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
 
     private void setExecutionPathViews() {
-        mExecutablePathText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
+        mExecutablePathText.addTextChangedListener(new AfterTextChangedWatcher() {
             @Override
             public void afterTextChanged(Editable editable) {
                 processExecutablePath(editable == null ? null : editable.toString());
@@ -211,13 +215,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
 
     private void setWorkingDirectoryPathViews() {
-        mWorkingDirectoryPathText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
+        mWorkingDirectoryPathText.addTextChangedListener(new AfterTextChangedWatcher() {
             @Override
             public void afterTextChanged(Editable editable) {
                 processWorkingDirectoryPath(editable == null ? null : editable.toString());
@@ -263,10 +261,22 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
     private void updateStdinViewVisibility(boolean inTerminal) {
         if (mStdinView == null) return;
-        if (inTerminal)
-            mStdinView.setVisibility(View.GONE);
-        else
-            mStdinView.setVisibility(View.VISIBLE);
+        mStdinView.setVisibility(inTerminal ? View.GONE : View.VISIBLE);
+    }
+
+
+    private void setSessionActionViews() {
+        mSessionAction.addTextChangedListener(new AfterTextChangedWatcher() {
+            @Override
+            public void afterTextChanged(Editable editable) {
+                processSessionAction(editable == null ? null : editable.toString());
+            }
+        });
+    }
+
+    private void updateSessionActionViewVisibility(boolean inTerminal) {
+        if (mSessionAction == null) return;
+        mSessionAction.setVisibility(inTerminal ? View.VISIBLE : View.GONE);
     }
 
 
@@ -275,6 +285,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateStdinViewVisibility(isChecked);
+                updateSessionActionViewVisibility(isChecked);
             }
         });
     }
@@ -566,6 +577,32 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             mWorkingDirectoryPathText.showDropDown();
     }
 
+    private void processSessionAction(String sessionActionString) {
+        processIntFieldValue(mSessionAction, sessionActionString,
+                TERMUX_SERVICE.MIN_VALUE_EXTRA_SESSION_ACTION, TERMUX_SERVICE.MAX_VALUE_EXTRA_SESSION_ACTION);
+    }
+
+    private void processIntFieldValue(EditText editText, String stringValue, int min, int max) {
+        if (editText == null) return;
+        editText.setError(null);
+        if (DataUtils.isNullOrEmpty(stringValue)) return;
+        if (PluginUtils.isPluginHostAppVariableContainingString(stringValue)) return;
+
+        Integer value = null;
+        boolean invalid = false;
+
+        try {
+            value = Integer.parseInt(stringValue);
+        }
+        catch (Exception e) {
+            invalid = true;
+        }
+
+        if (invalid || value < min || value > max) {
+            editText.setError(getString(R.string.error_int_not_in_range, min, max));
+        }
+    }
+
 
 
 
@@ -577,9 +614,10 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             return;
         }
 
-        final String executable = mExecutablePathText.getText() == null ? null : mExecutablePathText.getText().toString();
-        final String arguments =  mArgumentsText.getText() == null ? null : mArgumentsText.getText().toString();
-        final String workingDirectory = mWorkingDirectoryPathText.getText() == null ? null : mWorkingDirectoryPathText.getText().toString();
+        final String executable = DataUtils.getDefaultIfUnset(mExecutablePathText.getText() == null ? null : mExecutablePathText.getText().toString(), null);
+        final String arguments =  DataUtils.getDefaultIfUnset(mArgumentsText.getText() == null ? null : mArgumentsText.getText().toString(), null);
+        final String workingDirectory = DataUtils.getDefaultIfUnset(mWorkingDirectoryPathText.getText() == null ? null : mWorkingDirectoryPathText.getText().toString(), null);
+        final String sessionAction = DataUtils.getDefaultIfUnset(mSessionAction.getText() == null ? null : mSessionAction.getText().toString(), null);
         final boolean inTerminal = mInTerminalCheckbox.isChecked();
         final boolean waitForResult = mWaitForResult.isChecked();
 
@@ -599,7 +637,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
          * stored in the Bundle, as Locale's classloader will not recognize it).
          */
         final Bundle resultBundle = PluginBundleManager.generateBundle(getApplicationContext(),
-                executable, arguments, workingDirectory, mStdin, inTerminal, waitForResult);
+                executable, arguments, workingDirectory, mStdin, sessionAction, inTerminal, waitForResult);
         if (resultBundle == null) {
             Logger.showToast(this, getString(R.string.error_generate_plugin_bundle_failed), true);
             setResult(RESULT_CODE_FAILED, resultIntent);
@@ -610,7 +648,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         Logger.logDebug(LOG_TAG, "Result bundle size: " + PluginBundleManager.getBundleSize(resultBundle));
 
         // The blurb is a concise status text to be displayed in the host's UI.
-        final String blurb = PluginBundleManager.generateBlurb(this, executable, arguments, workingDirectory, mStdin, inTerminal, waitForResult);
+        final String blurb = PluginBundleManager.generateBlurb(this, executable, arguments,
+                workingDirectory, mStdin, sessionAction, inTerminal, waitForResult);
 
         // If host supports variable replacement when running plugin action, then
         // request it to replace variables in following fields
@@ -619,7 +658,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                     PluginBundleManager.EXTRA_EXECUTABLE,
                     PluginBundleManager.EXTRA_ARGUMENTS,
                     PluginBundleManager.EXTRA_WORKDIR,
-                    PluginBundleManager.EXTRA_STDIN
+                    PluginBundleManager.EXTRA_STDIN,
+                    PluginBundleManager.EXTRA_SESSION_ACTION
             });
         }
 
@@ -687,6 +727,19 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                     }
                 }
             });
+    }
+
+
+    static class AfterTextChangedWatcher implements TextWatcher {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+        }
     }
 
 }

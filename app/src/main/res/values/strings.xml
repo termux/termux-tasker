@@ -20,6 +20,7 @@
     <string name="title_arguments">Arguments</string>
     <string name="title_working_directory_path">Working directory path</string>
     <string name="title_stdin">Stdin</string>
+    <string name="title_session_action">Terminal Session Action</string>
     <string name="title_execute_in_terminal">Execute in a terminal session</string>
     <string name="title_wait_for_result">Wait for result for commands (Requires timeout > 0)</string>
 
@@ -28,6 +29,7 @@
 
     <string name="error_executable_required">Executable required.</string>
     <string name="error_null_or_empty_executable">The executable is null or empty.</string>
+    <string name="error_int_not_in_range">Value must be in between %1$d and %2$d.</string>
 
     <string name="help">Visit %1$s for more info on plugin usage.</string>
 
@@ -40,11 +42,12 @@
     <string name="error_generate_plugin_bundle_failed">Failed to generate plugin bundle</string>
     <string name="error_get_version_code_failed">Failed to get version code for %1$s</string>
 
-    <string name="blurb_executable_and_arguments">%1$s %2$s</string>
-    <string name="blurb_working_directory">%1$s Working Directory</string>
-    <string name="blurb_stdin">%1$s Stdin</string>
-    <string name="blurb_in_terminal">%1$s Terminal Session</string>
-    <string name="blurb_wait_for_result">%1$s Wait For Result</string>
+    <string name="blurb_executable_and_arguments">%1$s%2$s</string>
+    <string name="blurb_working_directory">Working Directory %1$s</string>
+    <string name="blurb_stdin">Stdin %1$s</string>
+    <string name="blurb_session_action">Session Action %1$s</string>
+    <string name="blurb_in_terminal">Terminal Session %1$s</string>
+    <string name="blurb_wait_for_result">Wait For Result %1$s</string>
 
     <!-- From Locale API: -->
     <string name="twofortyfouram_locale_breadcrumb_format" tools:ignore="UnusedResources">%1$s%2$s%3$s</string>

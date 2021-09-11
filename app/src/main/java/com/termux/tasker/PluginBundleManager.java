@@ -37,6 +37,12 @@ public class PluginBundleManager {
      */
     public static final String EXTRA_SESSION_ACTION = TermuxConstants.TERMUX_TASKER_PACKAGE_NAME + ".extra.SESSION_ACTION"; // Default: "com.termux.tasker.extra.SESSION_ACTION"
 
+    /** The {@code String} extra for custom log levels for background commands between
+     * {@link Logger#LOG_LEVEL_OFF} and {@link Logger#MAX_LOG_LEVEL} as per
+     * https://github.com/termux/termux-app/commit/60f37bde.
+     */
+    public static final String EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL = TermuxConstants.TERMUX_TASKER_PACKAGE_NAME + ".extra.BACKGROUND_CUSTOM_LOG_LEVEL"; // Default: "com.termux.tasker.extra.BACKGROUND_CUSTOM_LOG_LEVEL"
+
     /** The {@code boolean} extra for whether the executable should be run inside a terminal. */
     public static final String EXTRA_TERMINAL = TermuxConstants.TERMUX_TASKER_PACKAGE_NAME + ".extra.TERMINAL"; // Default: "com.termux.tasker.extra.TERMINAL"
 
@@ -80,6 +86,7 @@ public class PluginBundleManager {
          * - EXTRA_WORKDIR
          * - EXTRA_STDIN
          * - EXTRA_SESSION_ACTION
+         * - EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL
          * - EXTRA_TERMINAL
          * - EXTRA_WAIT_FOR_RESULT
          * - VARIABLE_REPLACE_KEYS
@@ -98,13 +105,13 @@ public class PluginBundleManager {
         }
 
         /*
-         * Check if bundle contains at least 3 keys but no more than 9.
+         * Check if bundle contains at least 3 keys but no more than 10.
          * Run this test after checking for required Bundle extras above so that the error message
          * is more useful. (E.g. the caller will see what extras are missing, rather than just a
          * message that there is the wrong number).
          */
-        if (bundle.keySet().size() < 3 || bundle.keySet().size() > 9) {
-            return String.format("The bundle must contain 3-9 keys, but currently contains %d keys.", bundle.keySet().size());
+        if (bundle.keySet().size() < 3 || bundle.keySet().size() > 10) {
+            return String.format("The bundle must contain 3-10 keys, but currently contains %d keys.", bundle.keySet().size());
         }
 
         if (TextUtils.isEmpty(bundle.getString(EXTRA_EXECUTABLE))) {
@@ -131,6 +138,7 @@ public class PluginBundleManager {
     public static Bundle generateBundle(@NonNull final Context context, final String executable,
                                         final String arguments, final String workingDirectory,
                                         final String stdin, final String sessionAction,
+                                        final String backgroundCustomLogLevel,
                                         final boolean inTerminal, final boolean waitForResult) {
         final Bundle result = new Bundle();
         result.putString(EXTRA_EXECUTABLE, executable);
@@ -141,6 +149,7 @@ public class PluginBundleManager {
 
         if (!inTerminal) {
             result.putString(EXTRA_STDIN, stdin);
+            result.putString(EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL, backgroundCustomLogLevel);
         } else {
             result.putString(EXTRA_SESSION_ACTION, sessionAction);
         }
@@ -163,6 +172,7 @@ public class PluginBundleManager {
     public static String generateBlurb(@NonNull final Context context, final String executable,
                                        final String arguments, final String workingDirectory,
                                        final String stdin, final String sessionAction,
+                                       final String backgroundCustomLogLevel,
                                        final boolean inTerminal, final boolean waitForResult) {
         StringBuilder builder = new StringBuilder();
         builder.append(context.getString(R.string.blurb_executable_and_arguments, executable, arguments == null  ? "" : " " + arguments));
@@ -170,6 +180,7 @@ public class PluginBundleManager {
 
         if (!inTerminal) {
             builder.append("\n").append(context.getString(R.string.blurb_stdin, (!DataUtils.isNullOrEmpty(stdin) ? UNICODE_CHECK : UNICODE_UNCHECK)));
+            builder.append("\n").append(context.getString(R.string.blurb_custom_log_level, backgroundCustomLogLevel));
         } else {
             if (!DataUtils.isNullOrEmpty(sessionAction))
                 builder.append("\n").append(context.getString(R.string.blurb_session_action, sessionAction));

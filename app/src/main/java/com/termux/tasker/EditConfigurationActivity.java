@@ -64,6 +64,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     private AutoCompleteTextView mWorkingDirectoryPathText;
     private TextView mStdinView;
     private EditText mSessionAction;
+    private EditText mBackgroundCustomLogLevel;
     private CheckBox mInTerminalCheckbox;
     private CheckBox mWaitForResult;
     private TextView mExecutableAbsolutePathText;
@@ -113,6 +114,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         mWorkingDirectoryPathText = findViewById(R.id.working_directory_path);
         mStdinView = findViewById(R.id.view_stdin);
         mSessionAction = findViewById(R.id.session_action);
+        mBackgroundCustomLogLevel = findViewById(R.id.background_custom_log_level);
         mInTerminalCheckbox = findViewById(R.id.in_terminal);
         mWaitForResult = findViewById(R.id.wait_for_result);
         mExecutableAbsolutePathText = findViewById(R.id.executable_absolute_path);
@@ -126,6 +128,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         setWorkingDirectoryPathViews();
         setStdinView();
         setSessionActionViews();
+        setBackgroundCustomLogLevelViews();
         setInTerminalView();
 
         // Currently savedInstanceState bundle is not supported
@@ -163,6 +166,11 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         mSessionAction.setText(sessionAction);
         processSessionAction(sessionAction);
         updateSessionActionViewVisibility(inTerminal);
+
+        final String backgroundCustomLogLevel = localeBundle.getString(PluginBundleManager.EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL);
+        mBackgroundCustomLogLevel.setText(backgroundCustomLogLevel);
+        processBackgroundCustomLogLevel(backgroundCustomLogLevel);
+        updateBackgroundCustomLogLevelViewVisibility(inTerminal);
 
         final boolean waitForResult = localeBundle.getBoolean(PluginBundleManager.EXTRA_WAIT_FOR_RESULT);
         mWaitForResult.setChecked(waitForResult);
@@ -280,12 +288,28 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     }
 
 
+    private void setBackgroundCustomLogLevelViews() {
+        mBackgroundCustomLogLevel.addTextChangedListener(new AfterTextChangedWatcher() {
+            @Override
+            public void afterTextChanged(Editable editable) {
+                processBackgroundCustomLogLevel(editable == null ? null : editable.toString());
+            }
+        });
+    }
+
+    private void updateBackgroundCustomLogLevelViewVisibility(boolean inTerminal) {
+        if (mBackgroundCustomLogLevel == null) return;
+        mBackgroundCustomLogLevel.setVisibility(inTerminal ? View.GONE : View.VISIBLE);
+    }
+
+
     private void setInTerminalView() {
         mInTerminalCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateStdinViewVisibility(isChecked);
                 updateSessionActionViewVisibility(isChecked);
+                updateBackgroundCustomLogLevelViewVisibility(isChecked);
             }
         });
     }
@@ -582,6 +606,11 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                 TERMUX_SERVICE.MIN_VALUE_EXTRA_SESSION_ACTION, TERMUX_SERVICE.MAX_VALUE_EXTRA_SESSION_ACTION);
     }
 
+    private void processBackgroundCustomLogLevel(String backgroundCustomLogLevelString) {
+        processIntFieldValue(mBackgroundCustomLogLevel, backgroundCustomLogLevelString,
+                Logger.LOG_LEVEL_OFF, Logger.MAX_LOG_LEVEL);
+    }
+
     private void processIntFieldValue(EditText editText, String stringValue, int min, int max) {
         if (editText == null) return;
         editText.setError(null);
@@ -618,6 +647,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         final String arguments =  DataUtils.getDefaultIfUnset(mArgumentsText.getText() == null ? null : mArgumentsText.getText().toString(), null);
         final String workingDirectory = DataUtils.getDefaultIfUnset(mWorkingDirectoryPathText.getText() == null ? null : mWorkingDirectoryPathText.getText().toString(), null);
         final String sessionAction = DataUtils.getDefaultIfUnset(mSessionAction.getText() == null ? null : mSessionAction.getText().toString(), null);
+        final String backgroundCustomLogLevel = DataUtils.getDefaultIfUnset(mBackgroundCustomLogLevel.getText() == null ? null : mBackgroundCustomLogLevel.getText().toString(), null);
         final boolean inTerminal = mInTerminalCheckbox.isChecked();
         final boolean waitForResult = mWaitForResult.isChecked();
 
@@ -637,7 +667,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
          * stored in the Bundle, as Locale's classloader will not recognize it).
          */
         final Bundle resultBundle = PluginBundleManager.generateBundle(getApplicationContext(),
-                executable, arguments, workingDirectory, mStdin, sessionAction, inTerminal, waitForResult);
+                executable, arguments, workingDirectory, mStdin, sessionAction, backgroundCustomLogLevel, inTerminal, waitForResult);
         if (resultBundle == null) {
             Logger.showToast(this, getString(R.string.error_generate_plugin_bundle_failed), true);
             setResult(RESULT_CODE_FAILED, resultIntent);
@@ -649,7 +679,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
         // The blurb is a concise status text to be displayed in the host's UI.
         final String blurb = PluginBundleManager.generateBlurb(this, executable, arguments,
-                workingDirectory, mStdin, sessionAction, inTerminal, waitForResult);
+                workingDirectory, mStdin, sessionAction, backgroundCustomLogLevel, inTerminal, waitForResult);
 
         // If host supports variable replacement when running plugin action, then
         // request it to replace variables in following fields
@@ -659,7 +689,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                     PluginBundleManager.EXTRA_ARGUMENTS,
                     PluginBundleManager.EXTRA_WORKDIR,
                     PluginBundleManager.EXTRA_STDIN,
-                    PluginBundleManager.EXTRA_SESSION_ACTION
+                    PluginBundleManager.EXTRA_SESSION_ACTION,
+                    PluginBundleManager.EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL
             });
         }
 

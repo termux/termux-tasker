@@ -260,6 +260,46 @@
 
 
 
+
+
+        <!-- Background Custom Log Level -->
+        <androidx.cardview.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:padding="@dimen/activity_view_padding_mini"
+            card_view:cardCornerRadius="4dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center_vertical"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    android:text="@string/title_background_custom_log_level"
+                    tools:labelFor="@id/background_custom_log_level" />
+
+                <EditText
+                    android:id="@+id/background_custom_log_level"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center_vertical"
+                    android:importantForAutofill="no" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+
+
+
         <CheckBox
             android:id="@+id/in_terminal"
             android:layout_width="match_parent"

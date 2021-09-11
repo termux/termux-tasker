@@ -77,6 +77,7 @@ public final class FireReceiver extends BroadcastReceiver {
 
         if (executionCommand.inBackground) {
             executionCommand.stdin = IntentUtils.getStringExtraIfSet(intent, PluginBundleManager.EXTRA_STDIN, null);
+            executionCommand.backgroundCustomLogLevel = IntentUtils.getIntegerExtraIfSet(intent, PluginBundleManager.EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL, null);
         } else {
             executionCommand.sessionAction = IntentUtils.getStringExtraIfSet(intent, PluginBundleManager.EXTRA_SESSION_ACTION, null);
         }
@@ -187,6 +188,7 @@ public final class FireReceiver extends BroadcastReceiver {
             executionIntent.putExtra(TERMUX_SERVICE.EXTRA_WORKDIR, executionCommand.workingDirectory);
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_STDIN, executionCommand.stdin);
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_SESSION_ACTION, executionCommand.sessionAction);
+        executionIntent.putExtra(TERMUX_SERVICE.EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL, DataUtils.getStringFromInteger(executionCommand.backgroundCustomLogLevel, null));
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_BACKGROUND, executionCommand.inBackground);
 
         // Send execution intent to TERMUX_SERVICE

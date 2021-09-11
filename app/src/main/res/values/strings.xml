@@ -21,6 +21,7 @@
     <string name="title_working_directory_path">Working directory path</string>
     <string name="title_stdin">Stdin</string>
     <string name="title_session_action">Terminal Session Action</string>
+    <string name="title_background_custom_log_level">Custom Log Level</string>
     <string name="title_execute_in_terminal">Execute in a terminal session</string>
     <string name="title_wait_for_result">Wait for result for commands (Requires timeout > 0)</string>
 
@@ -45,6 +46,7 @@
     <string name="blurb_executable_and_arguments">%1$s%2$s</string>
     <string name="blurb_working_directory">Working Directory %1$s</string>
     <string name="blurb_stdin">Stdin %1$s</string>
+    <string name="blurb_custom_log_level">Custom Log Level %1$s</string>
     <string name="blurb_session_action">Session Action %1$s</string>
     <string name="blurb_in_terminal">Terminal Session %1$s</string>
     <string name="blurb_wait_for_result">Wait For Result %1$s</string>

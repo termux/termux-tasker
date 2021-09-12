@@ -29,13 +29,13 @@ Check [`termux-app` Installation](https://github.com/termux/termux-app#Installat
 
 ### F-Droid
 
-Termux application can be obtained from `F-Droid` from [here](https://f-droid.org/en/packages/com.termux.tasker/).
+Termux:Tasker application can be obtained from `F-Droid` from [here](https://f-droid.org/en/packages/com.termux.tasker/).
 
-You **do not** need to download the `F-Droid` app (via the `Download F-Droid` link) to install Termux. You can download the Termux APK directly from the site by clicking the `Download APK` link at the bottom of each version section.
+You **do not** need to download the `F-Droid` app (via the `Download F-Droid` link) to install Termux:Tasker. You can download the Termux:Tasker APK directly from the site by clicking the `Download APK` link at the bottom of each version section.
 
 ### Github
 
-Termux application can be obtained on `Github` either from [`Github Releases`](https://github.com/termux/termux-tasker/releases) for `>= v0.6` or from [`Github Build`](https://github.com/termux/termux-tasker/actions/workflows/debug_build.yml) action workflows.
+Termux:Tasker application can be obtained on `Github` either from [`Github Releases`](https://github.com/termux/termux-tasker/releases) for `>= v0.6` or from [`Github Build`](https://github.com/termux/termux-tasker/actions/workflows/debug_build.yml) action workflows.
 
 The APKs for `Github Releases` will be listed under `Assets` drop-down of a release. These are automatically attached when a new version is released.
 
@@ -120,18 +120,20 @@ For android `>= 10` there are new [restrictions](https://developer.android.com/g
 
 ### Plugin Configuration
 
-The plugin configuration activity can be started by plugin host apps to configure the plugin to define what commands should be run and in which mode. Currently, there are 3 text fields, the `Executable`, `Arguments` and `Working directory path` fields and a `Execute in a terminal session` toggle. The text fields support plugin host app local variables (all lowercase) like `%executable`, `%arguments` or `%workdir`, you may use multiple variables in a single field.
+The plugin configuration activity can be started by plugin host apps to configure the plugin to define what commands should be run and in which mode.
+
+The text fields support plugin host app local variables (all lowercase) like `%executable`, `%arguments`, `%workdir`, `%stdin`, etc and you may use multiple variables in a single field.
 
 #### `Executable`
 
-The `Executable` field defines the executable that needs to be run. It can either be set to a file in `~/.termux/tasker/` directory or to an absolute path if `allow-external-apps` property is set to `true` (check [Setup Instructions](#Setup-Instructions)). Absolute paths can be like `/data/data/com.termux/files/usr/bin/bash`. The `$PREFIX/` and `~/` prefixes are also supported, like `$PREFIX/bin/bash` or `~/some-script`.
+The `Executable` text field defines the executable that needs to be run. It can either be set to a file in `~/.termux/tasker/` directory or to an absolute path if `allow-external-apps` property is set to `true` (check [Setup Instructions](#Setup-Instructions)). Absolute paths can be like `/data/data/com.termux/files/usr/bin/bash`. The `$PREFIX/` and `~/` prefixes are also supported, like `$PREFIX/bin/bash` or `~/some-script`.
 
 Execute permissions will automatically be set for the executable file if it exists inside the `~/.termux/tasker/` directory when the plugin action is run. It is the user's responsibility to set read and execute permissions for the executable file if it exists outside the `~/.termux/tasker/` directory. That can be done by running the command `chmod 700 "/path/to/executable"` from a terminal session before running the plugin action.
 
 
 #### `Arguments`
 
-The `Arguments` field defines the argument that will be passed to the executable. For `Termux:Tasker` version `>= 0.5`, arguments will be processed just like there are if commands are run in a shell like bourne shell. It uses [ArgumentTokenizer](https://sourceforge.net/p/drjava/git_repo/ci/master/tree/drjava/src/edu/rice/cs/util/ArgumentTokenizer.java) to parse the arguments string.
+The `Arguments` text field defines the argument that will be passed to the executable. For `Termux:Tasker` version `>= 0.5`, arguments will be processed just like there are if commands are run in a shell like bourne shell. It uses [ArgumentTokenizer](https://sourceforge.net/p/drjava/git_repo/ci/master/tree/drjava/src/edu/rice/cs/util/ArgumentTokenizer.java) to parse the arguments string.
 
 Arguemnts are split on whitespaces unless quoted with single or double quotes. Double quotes and backslashes can be escaped with backslashes in arguments surrounded with double quotes.
 
@@ -142,12 +144,12 @@ For `Tasker`, you can use the `Variable Search Replace` action on an `%argument`
 
 #### `Working directory path`
 
-The `Working directory path` field for `Termux:Tasker` version `>= 0.5` defines the working directory that should be used while running the command. The directory must be readable by the termux app. It is the user's responsibility to create the directory if its outside the `~/` directory for version `< 0.6` and `/data/data/com.termux/files` directory for version `>= 0.6`. That can be done by running the command `mkdir -p "/path/to/workdir"` from a terminal session before running the plugin action. The `$PREFIX/` and `~/` prefixes are also supported, like `$PREFIX/some-directory` or `~/some-directory`.
+The `Working directory path` text field for `Termux:Tasker` version `>= 0.5` defines the working directory that should be used while running the command. The directory must be readable by the termux app. It is the user's responsibility to create the directory if its outside the `~/` directory for version `< 0.6` and `/data/data/com.termux/files` directory for version `>= 0.6`. That can be done by running the command `mkdir -p "/path/to/workdir"` from a terminal session before running the plugin action. The `$PREFIX/` and `~/` prefixes are also supported, like `$PREFIX/some-directory` or `~/some-directory`.
 
 
 #### `Stdin`
 
-The `Stdin` field for `Termux:Tasker` version `>= 0.6` can be used to pass scripts via standard input (`stdin`), like a `bash` script to the `$PREFIX/bin/bash` shell and a `python` script to the `$PREFIX/bin/python` shell or any other commands. This allows scripts to be defined in the plugin host app instead of defining physical script files in `~/.termux/tasker/` directory. Check [Defining Scripts In Plugin Host App](#defining-scripts-in-plugin-host-app) for details.
+The `Stdin` text field for `Termux:Tasker` version `>= 0.6` can be used to pass scripts via standard input (`stdin`), like a `bash` script to the `$PREFIX/bin/bash` shell and a `python` script to the `$PREFIX/bin/python` shell or any other commands. This allows scripts to be defined in the plugin host app instead of defining physical script files in `~/.termux/tasker/` directory. Check [Defining Scripts In Plugin Host App](#defining-scripts-in-plugin-host-app) for details.
 
 Note that if passing script via `stdin`, do not pass arguments, since it will fail depending on shell, at least will for `bash`.
 
@@ -156,12 +158,12 @@ The max supported length of a script is `45K` characters taking into considerati
 
 #### `Terminal Session Action`
 
-The `Terminal Session Action` field for `Termux:Tasker` version `>= 0.6` defines what should happen when a foreground session command is received for the `Termux`. The user can define whether the new session should be automatically switched to or if existing session should remain as the current session. The user can also define if foreground session commands should open the `TermuxActivity` or if they should run in the *"background"* in the Termux notification. The user can click the notification to open the sessions. The valid values are defined by [`TermuxConstants.TERMUX_APP.TERMUX_SERVICE.VALUE_EXTRA_SESSION_ACTION_*`](https://github.com/termux/termux-app/blob/v0.117/termux-shared/src/main/java/com/termux/shared/termux/TermuxConstants.java#L856), currently, between `0` and `3`.
+The `Terminal Session Action` text field for `Termux:Tasker` version `>= 0.6` defines what should happen when a foreground session command is received for the `Termux`. The user can define whether the new session should be automatically switched to or if existing session should remain as the current session. The user can also define if foreground session commands should open the `TermuxActivity` or if they should run in the *"background"* in the Termux notification. The user can click the notification to open the sessions. The valid values are defined by [`TermuxConstants.TERMUX_APP.TERMUX_SERVICE.VALUE_EXTRA_SESSION_ACTION_*`](https://github.com/termux/termux-app/blob/v0.117/termux-shared/src/main/java/com/termux/shared/termux/TermuxConstants.java#L856), currently, between `0` and `3`.
 
 
 #### `Custom Log Level`
 
-The `Custom Log Level` field for `Termux:Tasker` version `>= 0.6` defines the log level for background commands that should be used by `Termux`. 
+The `Custom Log Level` text field for `Termux:Tasker` version `>= 0.6` defines the log level for background commands that should be used by `Termux`.
 
 By default Termux only logs command `stdout` and `stderr` to `logcat` if user has set log level to `VERBOSE` in Termux app settings (not `Termux:Tasker`). However, if command outputted too much data to `logcat`, then `logcat` clients like in Android Studio would crash.
 

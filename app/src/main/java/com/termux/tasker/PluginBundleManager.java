@@ -175,7 +175,8 @@ public class PluginBundleManager {
                                        final String backgroundCustomLogLevel,
                                        final boolean inTerminal, final boolean waitForResult) {
         StringBuilder builder = new StringBuilder();
-        builder.append(context.getString(R.string.blurb_executable_and_arguments, executable, arguments == null  ? "" : " " + arguments));
+        builder.append(context.getString(R.string.blurb_executable_and_arguments, executable,
+                arguments == null  ? "" : " " + (arguments.length() > 20 ? arguments.substring(0, 20) : arguments)));
         builder.append("\n\n").append(context.getString(R.string.blurb_working_directory, (!DataUtils.isNullOrEmpty(workingDirectory) ? UNICODE_CHECK : UNICODE_UNCHECK)));
 
         if (!inTerminal) {

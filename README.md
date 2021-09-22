@@ -18,7 +18,6 @@ A [Termux] add-on app allowing `Termux` commands to be executed from [Tasker] an
 - [Creating And Modifying Scripts](#Creating-And-Modifying-Scripts)
 - [Debugging](#Debugging)
 - [Worthy Of Note](#Worthy-Of-Note)
-- [License](#License)
 ##
 
 
@@ -355,12 +354,6 @@ To solve such issues and to dynamically define scripts of different interpreted 
 The [tudo](https://github.com/agnostic-apollo/tudo) script can be used for running commands in termux user context and the [sudo](https://github.com/agnostic-apollo/sudo) script for running commands with super user (root) context, check their `script` command type. These scripts will also load the termux environment properly like setting `LD_PRELOAD` etc before running the commands. There are much more customizable then using `Stdin` and support things that aren't possible to be provided via the plugin.
 ##
 
-
-
-### License
-
-Released under [the GPLv3 license](https://www.gnu.org/licenses/gpl.html).
-##
 
 
 [Termux]: https://termux.com

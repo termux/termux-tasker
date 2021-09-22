@@ -14,6 +14,8 @@
          It's also used by plugin caller app as plugin name like in Tasker in "Select Action Category" > "Plugin" dialog, so keep this one short -->
     <string name="application_name">&TERMUX_TASKER_APP_NAME;</string>
     <string name="shared_user_label">&TERMUX_APP_NAME; user</string>
+    <string name="help">Visit %1$s for more info on plugin usage.</string>
+
     <!-- The plugin name as shown in plugin caller app in the Task Edit activity.-->
     <string name="plugin_name">&TERMUX_APP_NAME;</string>
     <string name="title_executable_path">Executable (file in &TERMUX_TASKER_SCRIPTS_DIR_PATH_SHORT; or absolute path to executable)</string>
@@ -31,8 +33,6 @@
     <string name="error_executable_required">Executable required.</string>
     <string name="error_null_or_empty_executable">The executable is null or empty.</string>
     <string name="error_int_not_in_range">Value must be in between %1$d and %2$d.</string>
-
-    <string name="help">Visit %1$s for more info on plugin usage.</string>
 
     <string name="error_unknown_app">(unknown)</string>
     <string name="error_null_bundle">The bundle is null.</string>

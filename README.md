@@ -320,15 +320,18 @@ Note that the android default `SAF` `Document` file picker may not support hidde
 
 ### Debugging
 
-You can help debug problems like how arguments are being parsed by the plugin or if the plugin is even firing etc by setting appropriate `logcat` `Log Level` in options menu (3 dots) in the plugin configuration screen or in Termux app settings -> `Termux:Tasker` -> `Debugging` -> `Log Level`. Note that whatever log level is set will affect the entire plugin app and all plugin actions and not just for the action whose configuration you used to set it. The setting only exists inside the configuration activity of actions because creating a separate launcher activity that would be shown in the list of apps in the launcher just for this setting doesn't seem worth it. `Log Level` defaults to`Normal` and log level `Debug` currently logs additional information. Its best to revert log level to `Normal` after you have finished debugging since private data may otherwise be passed to `logcat` during normal operation and moreover, additional logging increases execution time.
+You can help debug problems like how arguments are being parsed by the plugin or if the plugin is even firing etc by setting appropriate `logcat` `Log Level` in options menu (3 dots) in the plugin configuration screen or in `Termux` app settings -> `Termux:Tasker` -> `Debugging` -> `Log Level` (Requires `Termux` app version `>= 0.113`). Note that whatever log level is set will affect the entire plugin app and all plugin actions and not just for the action whose configuration you used to set it. The setting only exists inside the configuration activity of actions because creating a separate launcher activity that would be shown in the list of apps in the launcher just for this setting doesn't seem worth it. The `Log Level` defaults to `Normal` and log level `Verbose` currently logs additional information. Its best to revert log level to `Normal` after you have finished debugging since private data may otherwise be passed to `logcat` during normal operation and moreover, additional logging increases execution time.
 
-For information on how to view the `logcat` logs, check official android guide [here](https://developer.android.com/studio/command-line/logcat).
+The plugin **does not execute the commands itself** but sends an execution intent to `Termux` app, which has its own log level which can be set in `Termux` app settings -> `Termux` -> `Debugging` -> `Log Level`. So you must set log level for both `Termux` and `Termux:Tasker` app settings to get all the info.
+
+Once log levels have been set, you can run the `logcat` command in `Termux` app terminal to view the logs in realtime (`Ctrl+c` to stop) or use `logcat -d > logcat.txt` to take a dump of the log. You can also view the logs from a PC over `ADB`. For more information, check official android `logcat` guide [here](https://developer.android.com/studio/command-line/logcat).
 
 ##### Log Levels
-- `Off` - Log nothing
-- `Normal` - Start logging error, warn and info messages and stacktraces
-- `Debug` - Start logging debug messages
-- `Verbose` - Start logging verbose messages
+
+- `Off` - Log nothing.
+- `Normal` - Start logging error, warn and info messages and stacktraces.
+- `Debug` - Start logging debug messages.
+- `Verbose` - Start logging verbose messages.
 ##
 
 

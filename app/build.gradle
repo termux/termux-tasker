@@ -2,13 +2,18 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion project.properties.compileSdkVersion.toInteger()
+    def appVersionName = System.getenv("TERMUX_TASKER_APP_VERSION_NAME") ?: ""
+    def apkVersionTag = System.getenv("TERMUX_TASKER_APK_VERSION_TAG") ?: ""
+
     defaultConfig {
         applicationId "com.termux.tasker"
         minSdkVersion project.properties.minSdkVersion.toInteger()
         targetSdkVersion project.properties.targetSdkVersion.toInteger()
         versionCode 5
-        versionName "0.5"
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        versionName "0.5.0"
+
+        if (appVersionName) versionName = appVersionName
+        validateVersionName(versionName)
 
         manifestPlaceholders.TERMUX_PACKAGE_NAME = "com.termux"
         manifestPlaceholders.TERMUX_APP_NAME = "Termux"
@@ -45,8 +50,9 @@ android {
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
             if (variant.buildType.name == "debug") {
-                def releaseTag = System.getenv("RELEASE_TAG")
-                outputFileName = new File("termux-tasker" + (releaseTag ? "-" + releaseTag : "") + "-debug.apk")
+                outputFileName = new File("termux-tasker_" + (apkVersionTag ? apkVersionTag : "debug") + ".apk")
+            } else if (variant.buildType.name == "release") {
+                outputFileName = new File("termux-tasker_" + (apkVersionTag ? apkVersionTag : "release") + ".apk")
             }
         }
     }
@@ -69,11 +75,18 @@ dependencies {
     // Use if below libraries are published locally by termux-app with `./gradlew publishReleasePublicationToMavenLocal` and used with `mavenLocal()`.
     // If updates are done, republish there and sync project with gradle files here
     // https://github.com/termux/termux-app/wiki/Termux-Libraries
-    //implementation 'com.termux:termux-shared:0.117'
+    // implementation 'com.termux:termux-shared:0.117'
 }
 
 task versionName {
-  doLast {
-    print android.defaultConfig.versionName
-  }
+    doLast {
+        print android.defaultConfig.versionName
+    }
+}
+
+def validateVersionName(String versionName) {
+    // https://semver.org/spec/v2.0.0.html#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+    // ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+    if (!java.util.regex.Pattern.matches("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?\$", versionName))
+        throw new GradleException("The versionName '" + versionName + "' is not a valid version as per semantic version '2.0.0' spec in the format 'major.minor.patch(-prerelease)(+buildmetadata)'. https://semver.org/spec/v2.0.0.html.")
 }

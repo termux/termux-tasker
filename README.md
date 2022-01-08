@@ -53,8 +53,8 @@ The APKs for both of these are [`debuggable`](https://developer.android.com/stud
 
 ### Setup Instructions
 
-#### Install Termux app (Mandatory)
-The `Termux:Tasker` plugin requires [Termux] app to run the actual commands. You need to install it and start it at least once and have it install the required files for the plugin to start working. The Termux prefix directory `/data/data/com.termux/files/usr/` and Termux home directory `/data/data/com.termux/files/home/` must also exist and must have read, write and execute permissions `(0700)` for the plugin to work. The `$PREFIX/` is shortcut for the Termux prefix directory. The `~/` is a shortcut for the Termux home directory. Permissions and ownerships can be checked with the `stat <path>` command.
+#### Install `Termux` app (Mandatory)
+The `Termux:Tasker` plugin requires [Termux] app to run the actual commands. You need to install it and start it at least once and have it install the bootstrap files for the plugin to start working. The Termux prefix directory `/data/data/com.termux/files/usr/` and Termux home directory `/data/data/com.termux/files/home/` must also exist and must have read, write and execute permissions `(0700)` for the plugin to work. The `$PREFIX/` is shortcut for the Termux [prefix directory](https://github.com/termux/termux-packages/wiki/Termux-file-system-layout) and can also be referred by the `$PREFIX` shell environment variable. The `~/` is a shortcut for the Termux home directory and can also be referred by the `$HOME` shell environment variable. Note that `~/` will not expand inside single or double quotes when running commands. Permissions and ownerships can be checked with the `stat <path>` command.
 
 
 #### `com.termux.permission.RUN_COMMAND` permission (Mandatory)
@@ -149,12 +149,12 @@ For `Tasker`, you can use the `Variable Search Replace` action on an `%argument`
 
 #### `Working directory path`
 
-The `Working directory path` text field for `Termux:Tasker` version `>= 0.5` defines the working directory that should be used while running the command. The directory must be readable by the termux app. It is the user's responsibility to create the directory if its outside the `~/` directory for version `< 0.6` and `/data/data/com.termux/files` directory for version `>= 0.6`. That can be done by running the command `mkdir -p "/path/to/workdir"` from a terminal session before running the plugin action. The `$PREFIX/` and `~/` prefixes are also supported, like `$PREFIX/some-directory` or `~/some-directory`.
+The `Working directory path` text field for `Termux:Tasker` version `>= 0.5` defines the working directory that should be used while running the command. The directory must be readable by the termux app. It is the user's responsibility to create the directory if its outside the `~/` directory for version `< 0.6.0` and `/data/data/com.termux/files` directory for version `>= 0.6.0`. That can be done by running the command `mkdir -p "/path/to/workdir"` from a terminal session before running the plugin action. The `$PREFIX/` and `~/` prefixes are also supported, like `$PREFIX/some-directory` or `~/some-directory`.
 
 
 #### `Stdin`
 
-The `Stdin` text field for `Termux:Tasker` version `>= 0.6` can be used to pass scripts via standard input (`stdin`), like a `bash` script to the `$PREFIX/bin/bash` shell and a `python` script to the `$PREFIX/bin/python` shell or any other commands. This allows scripts to be defined in the plugin host app instead of defining physical script files in `~/.termux/tasker/` directory. Check [Defining Scripts In Plugin Host App](#defining-scripts-in-plugin-host-app) for details.
+The `Stdin` text field for `Termux:Tasker` version `>= 0.6.0` can be used to pass scripts via standard input (`stdin`), like a `bash` script to the `$PREFIX/bin/bash` shell and a `python` script to the `$PREFIX/bin/python` shell or any other commands. This allows scripts to be defined in the plugin host app instead of defining physical script files in `~/.termux/tasker/` directory. Check [Defining Scripts In Plugin Host App](#defining-scripts-in-plugin-host-app) for details.
 
 Note that if passing script via `stdin`, do not pass arguments, since it will fail depending on shell, at least will for `bash`.
 
@@ -163,16 +163,16 @@ The max supported length of a script is `45K` characters taking into considerati
 
 #### `Terminal Session Action`
 
-The `Terminal Session Action` text field for `Termux:Tasker` version `>= 0.6` defines what should happen when a foreground session command is received for the `Termux`. The user can define whether the new session should be automatically switched to or if existing session should remain as the current session. The user can also define if foreground session commands should open the `TermuxActivity` or if they should run in the *"background"* in the Termux notification. The user can click the notification to open the sessions. The valid values are defined by [`TermuxConstants.TERMUX_APP.TERMUX_SERVICE.VALUE_EXTRA_SESSION_ACTION_*`](https://github.com/termux/termux-app/blob/v0.117/termux-shared/src/main/java/com/termux/shared/termux/TermuxConstants.java#L856), currently, between `0` and `3`.
+The `Terminal Session Action` text field for `Termux:Tasker` version `>= 0.6.0` defines what should happen when a foreground session command is received for the `Termux`. The user can define whether the new session should be automatically switched to or if existing session should remain as the current session. The user can also define if foreground session commands should open the `TermuxActivity` or if they should run in the *"background"* in the Termux notification. The user can click the notification to open the sessions. The valid values are defined by [`TermuxConstants.TERMUX_APP.TERMUX_SERVICE.VALUE_EXTRA_SESSION_ACTION_*`](https://github.com/termux/termux-app/blob/v0.117/termux-shared/src/main/java/com/termux/shared/termux/TermuxConstants.java#L856), currently, between `0` and `3`.
 
 
 #### `Custom Log Level`
 
-The `Custom Log Level` text field for `Termux:Tasker` version `>= 0.6` defines the log level for background commands that should be used by `Termux`.
+The `Custom Log Level` text field for `Termux:Tasker` version `>= 0.6.0` defines the log level for background commands that should be used by `Termux`.
 
-By default Termux only logs command `stdout` and `stderr` to `logcat` if user has set log level to `VERBOSE` in Termux app settings (not `Termux:Tasker`). However, if command outputted too much data to `logcat`, then `logcat` clients like in Android Studio would crash.
+By default Termux only logs command `stdout` and `stderr` to `logcat` if user has set log level to `VERBOSE` in `Termux` app settings (not `Termux:Tasker`). However, if command outputted too much data to `logcat`, then `logcat` clients like in Android Studio would crash.
 
-So one can pass a custom log level that is `>=` to the log level set it Termux app settings where (`OFF=0`, `NORMAL=1`, `DEBUG=2`, `VERBOSE=3`) for custom behaviour. If you pass `0`, it will completely disable logging. If you pass `1`, logging will only be enabled if log level in termux settings is `NORMAL` or higher. If custom log level is not passed, then default behaviour will remain and log level in Termux app settings must be `VERBOSE` or higher for logging to be enabled. Note that the log entries will still be logged with priority `Log.VERBOSE` regardless of log level, i.e `logcat` will have `V/`.
+So one can pass a custom log level that is `>=` to the log level set it `Termux` app settings where (`OFF=0`, `NORMAL=1`, `DEBUG=2`, `VERBOSE=3`) for custom behaviour. If you pass `0`, it will completely disable logging. If you pass `1`, logging will only be enabled if log level in termux settings is `NORMAL` or higher. If custom log level is not passed, then default behaviour will remain and log level in `Termux` app settings must be `VERBOSE` or higher for logging to be enabled. Note that the log entries will still be logged with priority `Log.VERBOSE` regardless of log level, i.e `logcat` will have `V/`.
 
 The entries `logcat` component will be `TermuxCommand`. For output at `stdout`, the entry format is `[<pid>-stdout] ...` and for the output at `stderr`, the entry format is `[<pid>-stderr] ...`. The `<pid>` will be the process id (`pid`) as an integer that was started by Termux for the executable. For example: `V/TermuxCommand: [66666-stdout] ...`.
 
@@ -196,7 +196,7 @@ Then start a `Termux:Tasker` plugin action with custom log level `1` (assuming c
 
 The `Execute in a terminal session` toggle defines whether the commands will be run in the background or in a foreground terminal session.
 
-If the toggle is **enabled**, a new terminal session will open up automatically in the foreground and commands will be run inside it. Result of commands is **not returned** to the plugin host app for version `< 0.6`. For version `>= 0.6`, result will be returned in `%stdout` and `%result` variables. The `%stdout` variable will only contain the session transcript and will contain both `stdout` and `stderr` combined, basically anything sent to the the pseudo terminal `/dev/pts`, including `PS1` prefixes for interactive sessions. For foreground commands that exited with failure will require Termux app version `>= 0.118` for sessions to automatically close without waiting for user to press enter.
+If the toggle is **enabled**, a new terminal session will open up automatically in the foreground and commands will be run inside it. Result of commands is **not returned** to the plugin host app for version `< 0.6.0`. For version `>= 0.6.0`, result will be returned in `%stdout` and `%result` variables. The `%stdout` variable will only contain the session transcript and will contain both `stdout` and `stderr` combined, basically anything sent to the the pseudo terminal `/dev/pts`, including `PS1` prefixes for interactive sessions. For foreground commands that exited with failure will require `Termux` app version `>= 0.118.0` for sessions to automatically close without waiting for user to press enter.
 
 If the toggle is **not enabled**, then commands are run in the background and result of commands **is returned** to the plugin host app in `%stdout`, `%stderr` and `%result` variables.
 
@@ -205,7 +205,7 @@ Check [Setup Instructions](#Setup-Instructions) for android `>= 10` restrictions
 
 #### `Wait for result for commands`
 
-The `Wait for result for commands` toggle for `Termux:Tasker` version `>= 0.6` defines whether the plugin action should wait for result of commands. It will apply to both foreground session and background commands. Check [Plugin Variables](#plugin-variables) for details.
+The `Wait for result for commands` toggle for `Termux:Tasker` version `>= 0.6.0` defines whether the plugin action should wait for result of commands. It will apply to both foreground session and background commands. Check [Plugin Variables](#plugin-variables) for details.
 
 
 Check [Templates](#Templates) section for templates that can be used for various configurations.
@@ -244,7 +244,7 @@ The `%err` and `%errmsg` variables must be stored in another variable with the `
 &nbsp;
 
 
-The `%stdout_original_length` and `%stderr_original_length` can be used to check if `%stdout` and `%stderr` were truncated by Termux app before sending them back to plugin host app in case they were too large and would have triggered `TransactionTooLargeException`. The `stdout` and `stderr` sent back will be truncated from the start to max `100KB` combined. The `errmsg` will also be truncated from end to max `25KB`. Check [here](https://github.com/termux/termux-app/commit/f62febbf) and [here](https://github.com/termux/termux-app/commit/a2209ddd) for details.
+The `%stdout_original_length` and `%stderr_original_length` can be used to check if `%stdout` and `%stderr` were truncated by `Termux` app before sending them back to plugin host app in case they were too large and would have triggered `TransactionTooLargeException`. The `stdout` and `stderr` sent back will be truncated from the start to max `100KB` combined. The `errmsg` will also be truncated from end to max `25KB`. Check [here](https://github.com/termux/termux-app/commit/f62febbf) and [here](https://github.com/termux/termux-app/commit/a2209ddd) for details.
 
 Check [Templates](#Templates) section for templates on how error and result variables should be handled for various configurations.
 ##
@@ -253,7 +253,7 @@ Check [Templates](#Templates) section for templates on how error and result vari
 
 ### Templates
 
-The templates were written for version `< 0.6` and currently have not been updated for version `>= 0.6`.
+The templates were written for version `< 0.6.0` and currently have not been updated for version `>= 0.6.0`.
 
 #### Tasker
 
@@ -309,7 +309,7 @@ You can create scripts in `~/.termux/tasker/` directory after following its [Set
 
 You can use `shell` based text editors like `nano`, `vim` or `emacs` to create and modify scripts.
 
-`nano "/data/data/com.termux/files/home/.termux/tasker/some_script"`
+`nano ~/.termux/tasker/some_script`
 
 You can also use `GUI` based text editor android apps that support `SAF`. Termux provides a [Storage Access Framework (SAF)](https://wiki.termux.com/wiki/Internal_and_external_storage) file provider to allow other apps to access its `~/` home directory. However, the `$PREFIX/` directory is not accessible to other apps. The [QuickEdit] or [QuickEdit Pro] app does support `SAF` and can handle large files without crashing, however, it is closed source and its pro version without ads is paid. You can also use [Acode editor] or [Turbo Editor] if you want an open source app.
 
@@ -357,7 +357,7 @@ Any script files that need to be run need to be created in `~/.termux/tasker/` d
 
 To solve such issues and to dynamically define scripts of different interpreted languages inside your plugin host app like `Tasker` and to pass them to `Termux` as arguments instead of creating script files, you can either use [`Stdin`](#stdin) plugin configuration field or use `tudo` or `sudo`.
 
-The [tudo](https://github.com/agnostic-apollo/tudo) script can be used for running commands in termux user context and the [sudo](https://github.com/agnostic-apollo/sudo) script for running commands with super user (root) context, check their `script` command type. These scripts will also load the termux environment properly like setting `LD_PRELOAD` etc before running the commands. There are much more customizable then using `Stdin` and support things that aren't possible to be provided via the plugin.
+The [`tudo`](https://github.com/agnostic-apollo/tudo) script can be used for running commands in termux user context and the [`sudo`](https://github.com/agnostic-apollo/sudo) script for running commands with super user (root) context, check their `script` command type. These scripts will also load the termux environment properly like setting `LD_PRELOAD` etc before running the commands. There are much more customizable then using `Stdin` and support things that aren't possible to be provided via the plugin.
 ##
 
 

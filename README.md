@@ -3,7 +3,7 @@
 [![Build status](https://github.com/termux/termux-tasker/workflows/Build/badge.svg)](https://github.com/termux/termux-tasker/actions)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
-A [Termux] add-on app allowing `Termux` commands to be executed from [Tasker] and other plugin apps.
+A [Termux] plugin app allowing `Termux` commands to be executed from [Tasker] and other plugin apps.
 ##
 
 
@@ -24,21 +24,27 @@ A [Termux] add-on app allowing `Termux` commands to be executed from [Tasker] an
 
 ### Installation
 
+Latest version is `v0.5`.
+
 Check [`termux-app` Installation](https://github.com/termux/termux-app#Installation) for details before reading forward.
 
 ### F-Droid
 
-Termux:Tasker application can be obtained from `F-Droid` from [here](https://f-droid.org/en/packages/com.termux.tasker/).
+`Termux:Tasker` application can be obtained from `F-Droid` from [here](https://f-droid.org/en/packages/com.termux.tasker/).
 
-You **do not** need to download the `F-Droid` app (via the `Download F-Droid` link) to install Termux:Tasker. You can download the Termux:Tasker APK directly from the site by clicking the `Download APK` link at the bottom of each version section.
+You **do not** need to download the `F-Droid` app (via the `Download F-Droid` link) to install `Termux:Tasker`. You can download the `Termux:Tasker` APK directly from the site by clicking the `Download APK` link at the bottom of each version section.
+
+It usually takes a few days (or even a week or more) for updates to be available on `F-Droid` once an update has been released on `Github`. The `F-Droid` releases are built and published by `F-Droid` once they [detect](https://gitlab.com/fdroid/fdroiddata/-/blob/master/metadata/com.termux.tasker.yml) a new `Github` release. The Termux maintainers **do not** have any control over the building and publishing of the Termux apps on `F-Droid`. Moreover, the Termux maintainers also do not have access to the APK signing keys of `F-Droid` releases, so we cannot release an APK ourselves on `Github` that would be compatible with `F-Droid` releases.
+
+The `F-Droid` app often may not notify you of updates and you will manually have to do a pull down swipe action in the `Updates` tab of the app for it to check updates. Make sure battery optimizations are disabled for the app, check https://dontkillmyapp.com/ for details on how to do that.
 
 ### Github
 
-Termux:Tasker application can be obtained on `Github` either from [`Github Releases`](https://github.com/termux/termux-tasker/releases) for `>= v0.6` or from [`Github Build`](https://github.com/termux/termux-tasker/actions/workflows/debug_build.yml) action workflows.
+`Termux:Tasker` application can be obtained on `Github` either from [`Github Releases`](https://github.com/termux/termux-tasker/releases) for version `>= 0.6.0` or from [`Github Build`](https://github.com/termux/termux-tasker/actions/workflows/debug_build.yml) action workflows.
 
 The APKs for `Github Releases` will be listed under `Assets` drop-down of a release. These are automatically attached when a new version is released.
 
-The APKs for `Github Build` action workflows will be listed under `Artifacts` section of a workflow run. These are created for each commit/push done to the repository and can be used by users who don't want to wait for releases and want to try out the latest features immediately or want to test their pull requests.
+The APKs for `Github Build` action workflows will be listed under `Artifacts` section of a workflow run. These are created for each commit/push done to the repository and can be used by users who don't want to wait for releases and want to try out the latest features immediately or want to test their pull requests. Note that for action workflows, you need to be [**logged into a `Github` account**](https://github.com/login) for the `Artifacts` links to be enabled/clickable. If you are using the [`Github` app](https://github.com/mobile), then make sure to open workflow link in a browser like Chrome or Firefox that has your Github account logged in since the in-app browser may not be logged in.
 
 The APKs for both of these are [`debuggable`](https://developer.android.com/studio/debug) and are compatible with each other but they are not compatible with other sources.
 ##

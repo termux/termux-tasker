@@ -18,6 +18,8 @@ A [Termux] plugin app allowing `Termux` commands to be executed from [Tasker] an
 - [Creating And Modifying Scripts](#Creating-And-Modifying-Scripts)
 - [Debugging](#Debugging)
 - [Worthy Of Note](#Worthy-Of-Note)
+- [For Maintainers and Contributors](#For-Maintainers-and-Contributors)
+- [Forking](#Forking)
 ##
 
 
@@ -361,6 +363,20 @@ Any script files that need to be run need to be created in `~/.termux/tasker/` d
 To solve such issues and to dynamically define scripts of different interpreted languages inside your plugin host app like `Tasker` and to pass them to `Termux` as arguments instead of creating script files, you can either use [`Stdin`](#stdin) plugin configuration field or use `tudo` or `sudo`.
 
 The [`tudo`](https://github.com/agnostic-apollo/tudo) script can be used for running commands in termux user context and the [`sudo`](https://github.com/agnostic-apollo/sudo) script for running commands with super user (root) context, check their `script` command type. These scripts will also load the termux environment properly like setting `LD_PRELOAD` etc before running the commands. There are much more customizable then using `Stdin` and support things that aren't possible to be provided via the plugin.
+##
+
+
+
+## For Maintainers and Contributors
+
+Check [For Maintainers and Contributors](https://github.com/termux/termux-app#For-Maintainers-and-Contributors) section of `termux/termux-app` `README` for details.
+##
+
+
+
+## Forking
+
+Check [Forking](https://github.com/termux/termux-app#Forking) section of `termux/termux-app` `README` for details.
 ##
 
 

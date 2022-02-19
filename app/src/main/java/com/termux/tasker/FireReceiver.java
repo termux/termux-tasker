@@ -36,13 +36,13 @@ public final class FireReceiver extends BroadcastReceiver {
         // Set crash handler for the receiver
         TermuxCrashUtils.setCrashHandler(context);
 
-        // Load the log level from shared preferences and set it to the Loggger.CURRENT_LOG_LEVEL
+        // Load the log level from shared preferences and set it to the Logger.CURRENT_LOG_LEVEL
         // Till the onReceive() function is called again, any changes to log level will not be considered
         // since log level will be stored in the Loggger.CURRENT_LOG_LEVEL static variable.
         // The FireReceiver is started in a separate process than the main app process since
         // it has the tag android:process=":background" and so it maintains separate Logger and
         // shared preference instances.
-        TermuxTaskerApplication.setLogLevel(context, false);
+        TermuxTaskerApplication.setLogConfig(context, false);
 
         // If wrong action passed, then just return
         if (!com.twofortyfouram.locale.Intent.ACTION_FIRE_SETTING.equals(intent.getAction())) {

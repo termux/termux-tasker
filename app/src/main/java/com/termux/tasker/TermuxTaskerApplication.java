@@ -13,16 +13,20 @@ public class TermuxTaskerApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        Context context = getApplicationContext();
+
         // Set crash handler for the app
         TermuxCrashUtils.setCrashHandler(this);
 
-        // Set log level for the app
-        setLogLevel(getApplicationContext(), true);
+        // Set log config for the app
+        setLogConfig(context, true);
 
         Logger.logDebug("Starting Application");
     }
 
-    public static void setLogLevel(Context context, boolean commitToFile) {
+    public static void setLogConfig(Context context, boolean commitToFile) {
+        Logger.setDefaultLogTag(TermuxConstants.TERMUX_TASKER_APP_NAME);
+
         // Load the log level from shared preferences and set it to the Logger.CURRENT_LOG_LEVEL
         TermuxTaskerAppSharedPreferences preferences = TermuxTaskerAppSharedPreferences.build(context);
         if (preferences == null) return;

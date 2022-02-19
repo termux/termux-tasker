@@ -2,11 +2,11 @@ package com.termux.tasker;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Log;
 
-import com.termux.shared.crash.TermuxCrashUtils;
 import com.termux.shared.logger.Logger;
-import com.termux.shared.settings.preferences.TermuxTaskerAppSharedPreferences;
+import com.termux.shared.termux.TermuxConstants;
+import com.termux.shared.termux.crash.TermuxCrashUtils;
+import com.termux.shared.termux.settings.preferences.TermuxTaskerAppSharedPreferences;
 
 public class TermuxTaskerApplication extends Application {
 

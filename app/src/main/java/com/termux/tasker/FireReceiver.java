@@ -6,19 +6,19 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.termux.shared.crash.TermuxCrashUtils;
 import com.termux.shared.data.DataUtils;
 import com.termux.shared.data.IntentUtils;
-import com.termux.shared.file.TermuxFileUtils;
+import com.termux.shared.errors.Errno;
+import com.termux.shared.errors.Error;
 import com.termux.shared.file.filesystem.FileType;
 import com.termux.shared.logger.Logger;
-import com.termux.shared.models.ExecutionCommand;
-import com.termux.shared.models.errors.Errno;
-import com.termux.shared.models.errors.Error;
+import com.termux.shared.shell.command.ExecutionCommand;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
 import com.termux.shared.file.FileUtils;
 import com.termux.shared.termux.TermuxUtils;
+import com.termux.shared.termux.crash.TermuxCrashUtils;
+import com.termux.shared.termux.file.TermuxFileUtils;
 import com.termux.tasker.utils.PluginUtils;
 import com.termux.tasker.utils.TaskerPlugin;
 

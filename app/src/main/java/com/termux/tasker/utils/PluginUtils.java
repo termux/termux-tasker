@@ -11,21 +11,23 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.termux.shared.data.DataUtils;
+import com.termux.shared.errors.Errno;
 import com.termux.shared.file.FileUtils;
 import com.termux.shared.logger.Logger;
-import com.termux.shared.models.ExecutionCommand;
-import com.termux.shared.models.ResultConfig;
-import com.termux.shared.models.ResultData;
-import com.termux.shared.models.errors.Errno;
-import com.termux.shared.settings.preferences.TermuxPreferenceConstants.TERMUX_TASKER_APP;
-import com.termux.shared.settings.preferences.TermuxTaskerAppSharedPreferences;
-import com.termux.shared.shell.ResultSender;
+import com.termux.shared.shell.command.ExecutionCommand;
+import com.termux.shared.shell.command.result.ResultConfig;
+import com.termux.shared.shell.command.result.ResultData;
+import com.termux.shared.shell.command.result.ResultSender;
+import com.termux.shared.shell.command.runner.app.AppShell;
+import com.termux.shared.termux.settings.preferences.TermuxPreferenceConstants.TERMUX_TASKER_APP;
+import com.termux.shared.termux.settings.preferences.TermuxTaskerAppSharedPreferences;
+import com.termux.shared.termux.settings.properties.TermuxPropertyConstants;
+import com.termux.shared.termux.shell.command.runner.terminal.TermuxSession;
 import com.termux.tasker.FireReceiver;
 import com.termux.tasker.PluginResultsService;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
 import com.termux.shared.settings.properties.SharedProperties;
-import com.termux.shared.settings.properties.TermuxPropertyConstants;
 import com.termux.tasker.R;
 
 import java.util.regex.Pattern;
@@ -39,8 +41,8 @@ import java.util.regex.Pattern;
  * {@link TermuxConstants.TERMUX_APP.TERMUX_SERVICE} as the execution service of plugin
  * commands but should work with other plugin host apps.
  * The {@link TermuxConstants.TERMUX_APP.TERMUX_SERVICE} will run the commands with the
- * {@link com.termux.shared.shell.TermuxTask} class if background mode is enabled and
- * {@link com.termux.shared.shell.TermuxSession} if foreground terminal mode is enabled. The
+ * {@link AppShell} class if background mode is enabled and
+ * {@link TermuxSession} if foreground terminal mode is enabled. The
  * result of commands is only returned if the plugin action bundle has
  * {@link com.termux.tasker.PluginBundleManager#EXTRA_WAIT_FOR_RESULT} set to true.
  *

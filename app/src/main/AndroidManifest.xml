@@ -39,7 +39,7 @@
         Android Studio linter is broken and correct package name will be used at build time." -->
         <activity
             android:name="${TERMUX_PACKAGE_NAME}.shared.activities.TextIOActivity"
-            android:theme="@style/Theme.AppCompat.TermuxTextIOActivity"
+            android:theme="@style/Theme.MediaViewActivity.DayNight"
             tools:ignore="MissingClass" />
 
         <!--

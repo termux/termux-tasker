@@ -4,9 +4,9 @@ import android.content.Context;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.termux.shared.termux.settings.preferences.TermuxTaskerAppSharedPreferences;
 import com.termux.tasker.R;
 import com.termux.shared.logger.Logger;
-import com.termux.shared.settings.preferences.TermuxTaskerAppSharedPreferences;
 
 import static com.termux.shared.logger.Logger.getLogLevelLabel;
 

@@ -455,8 +455,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
                 // parent directory in the drop down list
                 if (executablePathText.startsWith("/"))
                     executableFileNamesPrefix = executableParentPath + "/";
-                // If executable path in text field starts with "$PREFIX/" or "~/", then prefix file names
-                // with the unexpanded path in the drop down list
+                    // If executable path in text field starts with "$PREFIX/" or "~/", then prefix file names
+                    // with the unexpanded path in the drop down list
                 else if (executablePathText.startsWith("$PREFIX/") || executablePathText.startsWith("~/")) {
                     executableFileNamesPrefix = TermuxFileUtils.getUnExpandedTermuxPath(executableParentPath + "/");
                 }
@@ -576,8 +576,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             // parent directory in the drop down list
             if (workingDirectoryPathText.startsWith("/"))
                 workingDirectoryFileNamesPrefix = workingDirectoryParentPath + "/";
-            // If workingDirectory path in text field starts with "$PREFIX/" or "~/", then prefix
-            // file names with the unexpanded path in the drop down list
+                // If workingDirectory path in text field starts with "$PREFIX/" or "~/", then prefix
+                // file names with the unexpanded path in the drop down list
             else if (workingDirectoryPathText.startsWith("$PREFIX/") || workingDirectoryPathText.startsWith("~/")) {
                 workingDirectoryFileNamesPrefix = TermuxFileUtils.getUnExpandedTermuxPath(workingDirectoryParentPath + "/");
             }
@@ -736,30 +736,25 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
 
     private void setStartTextIOActivityForResult() {
-        mStartTextIOActivityForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent intent = result.getData();
-                        if (intent == null) return;
+        mStartTextIOActivityForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                Intent intent = result.getData();
+                if (intent == null) return;
 
-                        Bundle bundle = intent.getExtras();
-                        if (bundle == null) return;
+                Bundle bundle = intent.getExtras();
+                if (bundle == null) return;
 
-                        TextIOInfo textIOInfo = (TextIOInfo) bundle.getSerializable(TextIOActivity.EXTRA_TEXT_IO_INFO_OBJECT);
-                        if (textIOInfo == null) return;
+                TextIOInfo textIOInfo = (TextIOInfo) bundle.getSerializable(TextIOActivity.EXTRA_TEXT_IO_INFO_OBJECT);
+                if (textIOInfo == null) return;
 
-                        switch (textIOInfo.getAction()) {
-                            case ACTION_GET_STDIN:
-                                mStdin = textIOInfo.getText();
-                                updateStdinViewText();
-                        }
-                    }
+                switch (textIOInfo.getAction()) {
+                    case ACTION_GET_STDIN:
+                        mStdin = textIOInfo.getText();
+                        updateStdinViewText();
                 }
-            });
+            }
+        });
     }
-
 
     static class AfterTextChangedWatcher implements TextWatcher {
         @Override

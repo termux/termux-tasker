@@ -74,7 +74,7 @@ public class PluginBundleManager {
      */
     @SuppressLint("DefaultLocale")
     public static String parseBundle(@NonNull final Context context, final Bundle bundle) {
-        if (bundle == null) return context.getString(R.string.error_null_or_empty_executable);
+        if (bundle == null) return context.getString(R.string.error_null_bundle);
 
         /*
          * Make sure the correct number of extras exist.

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.termux.shared.activities.TextIOActivity;
+import com.termux.shared.activity.media.AppCompatActivityUtils;
 import com.termux.shared.data.DataUtils;
 import com.termux.shared.errors.Error;
 import com.termux.shared.logger.Logger;
@@ -16,15 +17,14 @@ import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
 import com.termux.shared.file.FileUtils;
 import com.termux.shared.termux.TermuxUtils;
 import com.termux.shared.termux.file.TermuxFileUtils;
+import com.termux.shared.termux.theme.TermuxThemeUtils;
+import com.termux.shared.theme.NightMode;
 import com.termux.tasker.utils.LoggerUtils;
 import com.termux.tasker.utils.PluginUtils;
 import com.termux.tasker.utils.TaskerPlugin;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.ActionBar;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -90,13 +90,16 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(R.string.application_name);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        // Set NightMode.APP_NIGHT_MODE
+        TermuxThemeUtils.setAppNightMode(this);
+        AppCompatActivityUtils.setNightMode(this, NightMode.getAppNightMode().getName(), true);
 
-        setContentView(R.layout.edit_activity);
+        setContentView(R.layout.activity_edit_configuration);
+
+        AppCompatActivityUtils.setToolbar(this, R.id.toolbar);
+        AppCompatActivityUtils.setToolbarTitle(this, R.id.toolbar, TermuxConstants.TERMUX_TASKER_APP_NAME, 0);
+        AppCompatActivityUtils.setShowBackButtonInActionBar(this, true);
+
         setStartTextIOActivityForResult();
 
         final Intent intent = getIntent();
@@ -189,7 +192,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.edit_activity, menu);
+        getMenuInflater().inflate(R.menu.activity_edit_configuration, menu);
         return true;
     }
 

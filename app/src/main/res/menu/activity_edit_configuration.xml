@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:ignore="UnusedResources" >
+
+    <!-- Menu item to set log level for termux-tasker app. -->
+    <item
+        android:id="@+id/menu_log_level"
+        app:showAsAction="never"
+        android:title="@string/log_level_title"/>
+
+</menu>

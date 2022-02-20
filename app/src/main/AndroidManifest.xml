@@ -9,7 +9,6 @@
         android:name=".TermuxTaskerApplication"
         android:label="@string/application_name"
         android:icon="@drawable/ic_launcher"
-        android:theme="@style/AppTheme"
         android:allowBackup="true"
         android:fullBackupOnly="false"
         android:supportsRtl="true">
@@ -27,6 +26,7 @@
             android:exported="true"
             android:icon="@drawable/ic_launcher"
             android:label="@string/plugin_name"
+            android:theme="@style/Theme.BaseActivity.DayNight.NoActionBar"
             android:windowSoftInputMode="stateHidden"
             android:uiOptions="splitActionBarWhenNarrow">
             <!-- this Intent filter allows the plug-in to be discovered by Locale -->
@@ -39,7 +39,8 @@
         Android Studio linter is broken and correct package name will be used at build time." -->
         <activity
             android:name="${TERMUX_PACKAGE_NAME}.shared.activities.TextIOActivity"
-            android:theme="@style/Theme.MediaViewActivity.DayNight"
+            android:exported="false"
+            android:theme="@style/Theme.BaseActivity.Light.NoActionBar"
             tools:ignore="MissingClass" />
 
         <!--

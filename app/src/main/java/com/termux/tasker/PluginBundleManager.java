@@ -147,12 +147,9 @@ public class PluginBundleManager {
         result.putBoolean(EXTRA_TERMINAL, inTerminal);
         result.putBoolean(EXTRA_WAIT_FOR_RESULT, waitForResult);
 
-        if (!inTerminal) {
-            result.putString(EXTRA_STDIN, stdin);
-            result.putString(EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL, backgroundCustomLogLevel);
-        } else {
-            result.putString(EXTRA_SESSION_ACTION, sessionAction);
-        }
+        result.putString(EXTRA_STDIN, stdin);
+        result.putString(EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL, backgroundCustomLogLevel);
+        result.putString(EXTRA_SESSION_ACTION, sessionAction);
 
         Integer versionCode = PackageUtils.getVersionCodeForPackage(context);
         if (versionCode == null) {

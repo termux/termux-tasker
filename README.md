@@ -3,7 +3,7 @@
 [![Build status](https://github.com/termux/termux-tasker/workflows/Build/badge.svg)](https://github.com/termux/termux-tasker/actions)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
-A [Termux] plugin app allowing `Termux` commands to be executed from [Tasker] and other plugin apps.
+A [Termux] plugin app allowing `Termux` commands to be executed from [Tasker] and other plugin host apps.
 ##
 
 

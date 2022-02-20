@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -82,7 +83,12 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/layout_executable_path"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        app:boxBackgroundColor="@android:color/transparent"
+                        app:errorTextColor="@color/red_error"
+                        app:errorIconTint="@color/red_error"
+                        app:boxStrokeErrorColor="@color/red_error">
                         <AutoCompleteTextView
                             android:id="@+id/executable_path"
                             android:layout_width="match_parent"
@@ -128,9 +134,14 @@
                         tools:labelFor="@id/arguments" />
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/argument_label"
+                        android:id="@+id/layout_arguments"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        app:boxBackgroundColor="@android:color/transparent"
+                        app:errorTextColor="@color/red_error"
+                        app:errorIconTint="@color/red_error"
+                        app:boxStrokeErrorColor="@color/red_error">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/arguments"
                             android:layout_width="match_parent"
@@ -171,7 +182,12 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/layout_working_directory_path"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        app:boxBackgroundColor="@android:color/transparent"
+                        app:errorTextColor="@color/red_error"
+                        app:errorIconTint="@color/red_error"
+                        app:boxStrokeErrorColor="@color/red_error">
                         <AutoCompleteTextView
                             android:id="@+id/working_directory_path"
                             android:layout_width="match_parent"

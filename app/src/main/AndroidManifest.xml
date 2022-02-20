@@ -63,7 +63,9 @@
         </receiver>
 
         <!-- This is service that will receive execution result from the execution service via a PendingIntent -->
-        <service android:name=".PluginResultsService" />
+        <service
+            android:name=".PluginResultsService"
+            android:exported="false" />
     </application>
 
 </manifest>

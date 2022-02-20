@@ -9,6 +9,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.termux.shared.activities.TextIOActivity;
 import com.termux.shared.activity.media.AppCompatActivityUtils;
 import com.termux.shared.data.DataUtils;
+import com.termux.shared.data.IntentUtils;
 import com.termux.shared.errors.Error;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.models.TextIOInfo;
@@ -107,6 +108,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         final Bundle localeBundle = intent.getBundleExtra(com.twofortyfouram.locale.Intent.EXTRA_BUNDLE);
         BundleScrubber.scrub(localeBundle);
 
+        Logger.logInfo(LOG_TAG, "Bundle Received: " + IntentUtils.getBundleString(localeBundle));
+
         TextView mHelp = findViewById(R.id.textview_help);
         mHelp.setText(this.getString(R.string.help, TermuxConstants.TERMUX_TASKER_GITHUB_REPO_URL));
 
@@ -135,8 +138,16 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         setInTerminalView();
 
         // Currently savedInstanceState bundle is not supported
-        if (savedInstanceState != null || localeBundle == null)
+        if (savedInstanceState != null || localeBundle == null) {
+            Logger.logInfo(LOG_TAG, "Not loading values from null bundle");
+            // Enable by default
+            mInTerminalCheckbox.setChecked(false);
+            mWaitForResult.setChecked(true);
+            updateStdinViewVisibility(false);
+            updateSessionActionViewVisibility(false);
+            updateBackgroundCustomLogLevelViewVisibility(false);
             return;
+        }
 
         String errmsg;
         // If bundle is valid, then load values from bundle
@@ -175,7 +186,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         processBackgroundCustomLogLevel(backgroundCustomLogLevel);
         updateBackgroundCustomLogLevelViewVisibility(inTerminal);
 
-        final boolean waitForResult = localeBundle.getBoolean(PluginBundleManager.EXTRA_WAIT_FOR_RESULT);
+        final boolean waitForResult = localeBundle.getBoolean(PluginBundleManager.EXTRA_WAIT_FOR_RESULT, true);
         mWaitForResult.setChecked(waitForResult);
     }
 

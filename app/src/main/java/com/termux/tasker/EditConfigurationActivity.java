@@ -64,8 +64,10 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     private TextInputLayout mWorkingDirectoryPathTextLayout;
     private AutoCompleteTextView mWorkingDirectoryPathText;
     private TextView mStdinView;
-    private EditText mSessionAction;
-    private EditText mBackgroundCustomLogLevel;
+    private TextInputLayout mSessionActionLayout;
+    private TextInputEditText mSessionAction;
+    private TextInputLayout mBackgroundCustomLogLevelLayout;
+    private TextInputEditText mBackgroundCustomLogLevel;
     private CheckBox mInTerminalCheckbox;
     private CheckBox mWaitForResult;
     private TextView mExecutableAbsolutePathText;
@@ -119,7 +121,9 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         mWorkingDirectoryPathTextLayout = findViewById(R.id.layout_working_directory_path);
         mWorkingDirectoryPathText = findViewById(R.id.working_directory_path);
         mStdinView = findViewById(R.id.view_stdin);
+        mSessionActionLayout = findViewById(R.id.layout_session_action);
         mSessionAction = findViewById(R.id.session_action);
+        mBackgroundCustomLogLevelLayout = findViewById(R.id.layout_background_custom_log_level);
         mBackgroundCustomLogLevel = findViewById(R.id.background_custom_log_level);
         mInTerminalCheckbox = findViewById(R.id.in_terminal);
         mWaitForResult = findViewById(R.id.wait_for_result);
@@ -616,16 +620,16 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
     }
 
     private void processSessionAction(String sessionActionString) {
-        processIntFieldValue(mSessionAction, sessionActionString,
+        processIntFieldValue(mSessionActionLayout, sessionActionString,
                 TERMUX_SERVICE.MIN_VALUE_EXTRA_SESSION_ACTION, TERMUX_SERVICE.MAX_VALUE_EXTRA_SESSION_ACTION);
     }
 
     private void processBackgroundCustomLogLevel(String backgroundCustomLogLevelString) {
-        processIntFieldValue(mBackgroundCustomLogLevel, backgroundCustomLogLevelString,
+        processIntFieldValue(mBackgroundCustomLogLevelLayout, backgroundCustomLogLevelString,
                 Logger.LOG_LEVEL_OFF, Logger.MAX_LOG_LEVEL);
     }
 
-    private void processIntFieldValue(EditText editText, String stringValue, int min, int max) {
+    private void processIntFieldValue(TextInputLayout editText, String stringValue, int min, int max) {
         if (editText == null) return;
         editText.setError(null);
         if (DataUtils.isNullOrEmpty(stringValue)) return;

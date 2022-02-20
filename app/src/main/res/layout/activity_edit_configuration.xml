@@ -268,13 +268,23 @@
                         android:text="@string/title_session_action"
                         tools:labelFor="@id/session_action" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/session_action"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layout_session_action"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="start|center_vertical"
-                        android:importantForAutofill="no"
-                        android:inputType="text" />
+                        android:background="@android:color/transparent"
+                        app:boxBackgroundColor="@android:color/transparent"
+                        app:errorTextColor="@color/red_error"
+                        app:errorIconTint="@color/red_error"
+                        app:boxStrokeErrorColor="@color/red_error">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/session_action"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="start|center_vertical"
+                            android:inputType="text"
+                            android:importantForAutofill="no" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -306,13 +316,23 @@
                         android:text="@string/title_background_custom_log_level"
                         tools:labelFor="@id/background_custom_log_level" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/background_custom_log_level"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layout_background_custom_log_level"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="start|center_vertical"
-                        android:importantForAutofill="no"
-                        android:inputType="text" />
+                        android:background="@android:color/transparent"
+                        app:boxBackgroundColor="@android:color/transparent"
+                        app:errorTextColor="@color/red_error"
+                        app:errorIconTint="@color/red_error"
+                        app:boxStrokeErrorColor="@color/red_error">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/background_custom_log_level"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="start|center_vertical"
+                            android:inputType="text"
+                            android:importantForAutofill="no" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

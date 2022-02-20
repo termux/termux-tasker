@@ -111,7 +111,7 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
         Logger.logInfo(LOG_TAG, "Bundle Received: " + IntentUtils.getBundleString(localeBundle));
 
         TextView mHelp = findViewById(R.id.textview_help);
-        mHelp.setText(this.getString(R.string.help, TermuxConstants.TERMUX_TASKER_GITHUB_REPO_URL));
+        mHelp.setText(this.getString(R.string.plugin_api_help, TermuxConstants.TERMUX_TASKER_GITHUB_REPO_URL));
 
         mExecutablePathTextLayout = findViewById(R.id.layout_executable_path);
         mExecutablePathText = findViewById(R.id.executable_path);

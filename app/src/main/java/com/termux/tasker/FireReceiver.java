@@ -110,7 +110,7 @@ public final class FireReceiver extends BroadcastReceiver {
         errmsg = PluginUtils.checkIfTermuxTaskerAllowExternalAppsPolicyIsViolated(context, executionCommand.executable);
         if (errmsg != null) {
             errmsg  += "\n" + context.getString(R.string.msg_executable_absolute_path, executionCommand.executable) +
-                       "\n" + context.getString(R.string.help, TermuxConstants.TERMUX_TASKER_GITHUB_REPO_URL);
+                    "\n" + context.getString(R.string.plugin_api_help, TermuxConstants.TERMUX_TASKER_GITHUB_REPO_URL);
             executionCommand.setStateFailed(Errno.ERRNO_FAILED.getCode(), errmsg);
             PluginUtils.processPluginExecutionCommandError(context, this, intent, LOG_TAG, executionCommand, TaskerPlugin.Setting.RESULT_CODE_FAILED);
             return;
@@ -190,7 +190,7 @@ public final class FireReceiver extends BroadcastReceiver {
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_SESSION_ACTION, executionCommand.sessionAction);
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL, DataUtils.getStringFromInteger(executionCommand.backgroundCustomLogLevel, null));
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_BACKGROUND, executionCommand.inBackground);
-        executionIntent.putExtra(TERMUX_SERVICE.EXTRA_PLUGIN_API_HELP, context.getString(R.string.help, TermuxConstants.TERMUX_TASKER_GITHUB_REPO_URL));
+        executionIntent.putExtra(TERMUX_SERVICE.EXTRA_PLUGIN_API_HELP, context.getString(R.string.plugin_api_help, TermuxConstants.TERMUX_TASKER_GITHUB_REPO_URL));
 
         // Send execution intent to TERMUX_SERVICE
         PluginUtils.sendExecuteIntentToExecuteService(context, this, intent, executionIntent, waitForResult);

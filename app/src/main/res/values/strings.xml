@@ -14,7 +14,18 @@
          It's also used by plugin caller app as plugin name like in Tasker in "Select Action Category" > "Plugin" dialog, so keep this one short -->
     <string name="application_name">&TERMUX_TASKER_APP_NAME;</string>
     <string name="shared_user_label">&TERMUX_APP_NAME; user</string>
-    <string name="help">Visit %1$s for more info on plugin usage.</string>
+    <string name="plugin_info">&TERMUX_TASKER_APP_NAME; is a plugin app for the &TERMUX_APP_NAME; app
+        that allows &TERMUX_APP_NAME; commands to be executed from Tasker and other plugin host apps.
+        Check &TERMUX_APP_NAME; app github %1$s and &TERMUX_TASKER_APP_NAME; app github %2$s for more info.</string>
+    <string name="plugin_api_help">Visit %1$s for more info on plugin usage.</string>
+
+    <!-- TermuxTaskerActivity -->
+    <string name="msg_disable_launcher_icon_details">The &TERMUX_TASKER_APP_NAME; app does not require
+        a require launcher icon/activity to function. You can optionally disable it if you want and
+        can enabled in again either by reinstalling the app or from the &TERMUX_APP_NAME; app settings
+        if the option has been implemented in your installed version."</string>
+
+
 
     <!-- The plugin name as shown in plugin caller app in the Task Edit activity.-->
     <string name="plugin_name">&TERMUX_APP_NAME;</string>

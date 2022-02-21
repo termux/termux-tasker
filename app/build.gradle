@@ -9,8 +9,8 @@ android {
         applicationId "com.termux.tasker"
         minSdkVersion project.properties.minSdkVersion.toInteger()
         targetSdkVersion project.properties.targetSdkVersion.toInteger()
-        versionCode 5
-        versionName "0.5.0"
+        versionCode 6
+        versionName "0.6.0"
 
         if (appVersionName) versionName = appVersionName
         validateVersionName(versionName)

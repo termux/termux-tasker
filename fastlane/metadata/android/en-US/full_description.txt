@@ -1,0 +1,6 @@
+This plugin for https://f-droid.org/packages/com.termux provides a way to run Termux commands from Tasker and other plugin host apps. Check https://github.com/termux/termux-tasker for usage details.
+
+* Supports running commands in background and in termux terminal session.
+* Supports getting back result of commands like stdout, stderr and exit code in Tasker.
+* Supports calling scripts/executables defined in ~/.termux/tasker or other directories like in $PREFIX.
+* Supports defining limited size scripts inside the plugin configuration and passing them as stdin to shells like bash and python instead of having to create physical files.

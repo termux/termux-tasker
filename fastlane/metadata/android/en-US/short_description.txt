@@ -1,0 +1,1 @@
+A Termux plugin app allowing Termux commands to be executed from Tasker and other plugin host apps.

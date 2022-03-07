@@ -21,7 +21,7 @@
 
     <!-- TermuxTaskerActivity -->
     <string name="msg_disable_launcher_icon_details">The &TERMUX_TASKER_APP_NAME; app does not require
-        a require launcher icon/activity to function. You can optionally disable it if you want and
+        a launcher icon/activity to function. You can optionally disable it if you want and
         can enabled in again either by reinstalling the app or from the &TERMUX_APP_NAME; app settings
         if the option has been implemented in your installed version."</string>
 

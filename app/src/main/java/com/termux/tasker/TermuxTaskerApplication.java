@@ -25,7 +25,7 @@ public class TermuxTaskerApplication extends Application {
     }
 
     public static void setLogConfig(Context context, boolean commitToFile) {
-        Logger.setDefaultLogTag(TermuxConstants.TERMUX_TASKER_APP_NAME);
+        Logger.setDefaultLogTag(TermuxConstants.TERMUX_TASKER_APP_NAME.replaceAll(":", ""));
 
         // Load the log level from shared preferences and set it to the Logger.CURRENT_LOG_LEVEL
         TermuxTaskerAppSharedPreferences preferences = TermuxTaskerAppSharedPreferences.build(context);

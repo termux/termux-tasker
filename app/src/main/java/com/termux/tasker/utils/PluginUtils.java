@@ -21,7 +21,6 @@ import com.termux.shared.shell.command.result.ResultSender;
 import com.termux.shared.shell.command.runner.app.AppShell;
 import com.termux.shared.termux.settings.preferences.TermuxPreferenceConstants.TERMUX_TASKER_APP;
 import com.termux.shared.termux.settings.preferences.TermuxTaskerAppSharedPreferences;
-import com.termux.shared.termux.settings.properties.TermuxPropertyConstants;
 import com.termux.shared.termux.shell.command.runner.terminal.TermuxSession;
 import com.termux.tasker.FireReceiver;
 import com.termux.tasker.PluginResultsService;
@@ -509,8 +508,11 @@ public class PluginUtils {
         if (executable == null || executable.isEmpty()) return context.getString(R.string.error_null_or_empty_executable);
 
         String errmsg = null;
+
         if (!FileUtils.isPathInDirPath(executable, TermuxConstants.TERMUX_TASKER_SCRIPTS_DIR_PATH, true) &&
-                !SharedProperties.isPropertyValueTrue(context, TermuxPropertyConstants.getTermuxPropertiesFile(), TermuxConstants.PROP_ALLOW_EXTERNAL_APPS, true)) {
+                !SharedProperties.isPropertyValueTrue(context,
+                        SharedProperties.getPropertiesFileFromList(TermuxConstants.TERMUX_PROPERTIES_FILE_PATHS_LIST, LOG_TAG),
+                        TermuxConstants.PROP_ALLOW_EXTERNAL_APPS, true)) {
             errmsg = context.getString(R.string.error_allow_external_apps_ungranted_warning);
         }
 

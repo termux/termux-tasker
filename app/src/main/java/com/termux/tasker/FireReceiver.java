@@ -72,10 +72,11 @@ public final class FireReceiver extends BroadcastReceiver {
         String executableExtra = executionCommand.executable = IntentUtils.getStringExtraIfSet(intent, PluginBundleManager.EXTRA_EXECUTABLE, null);
         final String arguments_string = bundle.getString(PluginBundleManager.EXTRA_ARGUMENTS);
         executionCommand.workingDirectory = IntentUtils.getStringExtraIfSet(intent, PluginBundleManager.EXTRA_WORKDIR, null);
-        executionCommand.inBackground = !(intent.getBooleanExtra(PluginBundleManager.EXTRA_TERMINAL, false));
+        executionCommand.runner = intent.getBooleanExtra(PluginBundleManager.EXTRA_TERMINAL, false) ?
+                ExecutionCommand.Runner.TERMINAL_SESSION.getName() : ExecutionCommand.Runner.APP_SHELL.getName();
         final boolean waitForResult = bundle.getBoolean(PluginBundleManager.EXTRA_WAIT_FOR_RESULT, true);
 
-        if (executionCommand.inBackground) {
+        if (ExecutionCommand.Runner.APP_SHELL.equalsRunner(executionCommand.runner)) {
             executionCommand.stdin = IntentUtils.getStringExtraIfSet(intent, PluginBundleManager.EXTRA_STDIN, null);
             executionCommand.backgroundCustomLogLevel = IntentUtils.getIntegerExtraIfSet(intent, PluginBundleManager.EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL, null);
         } else {
@@ -189,7 +190,7 @@ public final class FireReceiver extends BroadcastReceiver {
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_STDIN, executionCommand.stdin);
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_SESSION_ACTION, executionCommand.sessionAction);
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_BACKGROUND_CUSTOM_LOG_LEVEL, DataUtils.getStringFromInteger(executionCommand.backgroundCustomLogLevel, null));
-        executionIntent.putExtra(TERMUX_SERVICE.EXTRA_BACKGROUND, executionCommand.inBackground);
+        executionIntent.putExtra(TERMUX_SERVICE.EXTRA_RUNNER, executionCommand.runner);
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_PLUGIN_API_HELP, context.getString(R.string.plugin_api_help, TermuxConstants.TERMUX_TASKER_GITHUB_REPO_URL));
 
         // Send execution intent to TERMUX_SERVICE

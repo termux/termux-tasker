@@ -70,12 +70,11 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.4.0'
 
     implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation "androidx.annotation:annotation:1.2.0"
+    implementation "androidx.annotation:annotation:1.3.0"
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'com.google.guava:guava:24.1-jre'
 
-    implementation 'com.termux.termux-app:termux-shared:68cdbd6ff4'
-
+    implementation 'com.termux.termux-app:termux-shared:211340781b'
     // Use if below libraries are published locally by termux-app with `./gradlew publishReleasePublicationToMavenLocal` and used with `mavenLocal()`.
     // If updates are done, republish there and sync project with gradle files here
     // https://github.com/termux/termux-app/wiki/Termux-Libraries

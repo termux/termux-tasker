@@ -65,7 +65,7 @@ The `Termux:Tasker` plugin requires [Termux] app to run the actual commands. You
 
 #### `com.termux.permission.RUN_COMMAND` permission (Mandatory)
 
-For `Termux:Tasker` version `>= 0.5`, the plugin host app will need to be granted the `com.termux.permission.RUN_COMMAND` permission to run **ANY** plugin commands. This is a security measure to prevent any other apps from running commands in `Termux` context which do not have the required permission granted to them. This is also required for the [RUN_COMMAND Intent] intent.
+For `Termux:Tasker` version `>= 0.5`, the plugin host app will need to be granted the `com.termux.permission.RUN_COMMAND` permission to run **ANY** plugin commands. This is a security measure to prevent any other apps from running commands in `Termux` context which do not have the required permission granted to them. This is also required for the [RUN_COMMAND Intent].
 
 The [Tasker] app has requested the permission since `v5.9.3`, so you will need to update the app if you are using an older version. You can grant the permission using the `Permissions` activity in the `App Info` activity of your plugin host app. For `Tasker` you can grant it with: `Android Settings` -> `Apps` -> `Tasker` -> `Permissions` -> `Additional permissions` -> `Run commands in Termux environment`.
 
@@ -352,7 +352,7 @@ Moreover, exchanging data between `Tasker` and `Termux:Tasker` is done using [In
 
 Basically, make sure any data/arguments you send to `Termux:Tasker` is less than `120KB` (or whatever you found) and any expected result sent back is less than `100KB`, but best keep it as low as possible for greater portability. If you want to exchange an even larger data between tasker and termux, use physical files instead.
 
-The argument data limits also apply for the [RUN_COMMAND Intent] intent.
+The argument data limits also apply for the [RUN_COMMAND Intent].
 
 
 ##### Termux Environment

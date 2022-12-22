@@ -352,7 +352,7 @@ Moreover, exchanging data between `Tasker` and `Termux:Tasker` is done using [In
 
 Basically, make sure any data/arguments you send to `Termux:Tasker` is less than `120KB` (or whatever you found) and any expected result sent back is less than `100KB`, but best keep it as low as possible for greater portability. If you want to exchange an even larger data between tasker and termux, use physical files instead.
 
-The argument data limits also apply for the [RUN_COMMAND Intent] intent.
+The argument data limits also apply for the [RUN_COMMAND Intent].
 
 
 ##### Termux Environment

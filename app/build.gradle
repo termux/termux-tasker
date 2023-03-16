@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace "com.termux.tasker"
+
     compileSdkVersion project.properties.compileSdkVersion.toInteger()
     def appVersionName = System.getenv("TERMUX_TASKER_APP_VERSION_NAME") ?: ""
     def apkVersionTag = System.getenv("TERMUX_TASKER_APK_VERSION_TAG") ?: ""

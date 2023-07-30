@@ -9,17 +9,17 @@ A [Termux] plugin app allowing `Termux` commands to be executed from [Tasker] an
 
 
 ### Contents
-- [Installation](#Installation)
-- [Setup Instructions](#Setup-Instructions)
-- [Usage](#Usage)
-- [Plugin Configuration](#Plugin-Configuration)
-- [Plugin Variables](#Plugin-Variables)
-- [Templates](#Templates)
-- [Creating And Modifying Scripts](#Creating-And-Modifying-Scripts)
-- [Debugging](#Debugging)
-- [Worthy Of Note](#Worthy-Of-Note)
-- [For Maintainers and Contributors](#For-Maintainers-and-Contributors)
-- [Forking](#Forking)
+- [Installation](#installation)
+- [Setup Instructions](#setup-instructions)
+- [Usage](#usage)
+- [Plugin Configuration](#plugin-configuration)
+- [Plugin Variables](#plugin-variables)
+- [Templates](#templates)
+- [Creating And Modifying Scripts](#creating-and-modifying-scripts)
+- [Debugging](#debugging)
+- [Worthy Of Note](#worthy-of-note)
+- [For Maintainers and Contributors](#for-maintainers-and-contributors)
+- [Forking](#forking)
 ##
 
 

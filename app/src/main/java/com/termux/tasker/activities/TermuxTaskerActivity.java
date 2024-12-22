@@ -27,8 +27,8 @@ public class TermuxTaskerActivity extends AppCompatActivity {
         TermuxThemeUtils.setAppNightMode(this);
         AppCompatActivityUtils.setNightMode(this, NightMode.getAppNightMode().getName(), true);
 
-        AppCompatActivityUtils.setToolbar(this, R.id.toolbar);
-        AppCompatActivityUtils.setToolbarTitle(this, R.id.toolbar, TermuxConstants.TERMUX_TASKER_APP_NAME, 0);
+        AppCompatActivityUtils.setToolbar(this, com.termux.shared.R.id.toolbar);
+        AppCompatActivityUtils.setToolbarTitle(this, com.termux.shared.R.id.toolbar, TermuxConstants.TERMUX_TASKER_APP_NAME, 0);
 
         TextView pluginInfo = findViewById(R.id.textview_plugin_info);
         pluginInfo.setText(getString(R.string.plugin_info, TermuxConstants.TERMUX_GITHUB_REPO_URL,
@@ -36,7 +36,7 @@ public class TermuxTaskerActivity extends AppCompatActivity {
 
         Button disableLauncherIconButton = findViewById(R.id.btn_disable_launcher_icon);
         disableLauncherIconButton.setOnClickListener(v -> {
-            String message = getString(R.string.msg_disabling_launcher_icon, TermuxConstants.TERMUX_TASKER_APP_NAME);
+            String message = getString(com.termux.shared.R.string.msg_disabling_launcher_icon, TermuxConstants.TERMUX_TASKER_APP_NAME);
             Logger.logInfo(LOG_TAG, message);
             PackageUtils.setComponentState(TermuxTaskerActivity.this,
                     TermuxConstants.TERMUX_TASKER_PACKAGE_NAME, TermuxConstants.TERMUX_TASKER.TERMUX_TASKER_ACTIVITY_NAME,

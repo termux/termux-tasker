@@ -99,8 +99,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
         setContentView(R.layout.activity_edit_configuration);
 
-        AppCompatActivityUtils.setToolbar(this, R.id.toolbar);
-        AppCompatActivityUtils.setToolbarTitle(this, R.id.toolbar, TermuxConstants.TERMUX_TASKER_APP_NAME, 0);
+        AppCompatActivityUtils.setToolbar(this, com.termux.shared.R.id.toolbar);
+        AppCompatActivityUtils.setToolbarTitle(this, com.termux.shared.R.id.toolbar, TermuxConstants.TERMUX_TASKER_APP_NAME, 0);
         AppCompatActivityUtils.setShowBackButtonInActionBar(this, true);
 
         setStartTextIOActivityForResult();

@@ -16,7 +16,7 @@ public class LoggerUtils {
         if (context == null) return;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(context.getString(R.string.log_level_title));
+        builder.setTitle(context.getString(com.termux.shared.R.string.log_level_title));
 
         String[] logLevels = {
                 getLogLevelLabel(context, Logger.LOG_LEVEL_OFF, true),

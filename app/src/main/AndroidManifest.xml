@@ -13,15 +13,20 @@
         android:supportsRtl="true">
 
         <activity
-            android:name=".activities.TermuxTaskerActivity"
+            android:name=".activities.TermuxTaskerMainActivity"
             android:exported="true"
-            android:theme="@style/Theme.BaseActivity.DayNight.NoActionBar"
-            >
+            android:theme="@style/Theme.BaseActivity.DayNight.NoActionBar">
+        </activity>
+
+        <activity-alias
+            android:name=".activities.TermuxTaskerLauncherActivity"
+            android:exported="true"
+            android:targetActivity=".activities.TermuxTaskerMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>
+        </activity-alias>
 
         <!--
         This is the "edit" Activity. Note that Locale will reject plug-in Activities for the following reasons:·

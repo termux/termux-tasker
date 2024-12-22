@@ -80,10 +80,10 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
 
     private String mStdin;
 
-    private String[] executableFileNamesList = new String[0];
-    ArrayAdapter<String> executableFileNamesAdaptor;
-    private String[] workingDirectoriesNamesList = new String[0];
-    ArrayAdapter<String> workingDirectoriesNamesAdaptor;
+    private String[] mExecutableFileNamesList = new String[0];
+    ArrayAdapter<String> mExecutableFileNamesAdaptor;
+    private String[] mWorkingDirectoriesNamesList = new String[0];
+    ArrayAdapter<String> mWorkingDirectoriesNamesAdaptor;
 
     public static final String ACTION_GET_STDIN = "ACTION_GET_STDIN";
 
@@ -235,8 +235,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             }
         });
 
-        executableFileNamesAdaptor = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new ArrayList<>(Arrays.asList(executableFileNamesList)));
-        mExecutablePathText.setAdapter(executableFileNamesAdaptor);
+        mExecutableFileNamesAdaptor = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new ArrayList<>(Arrays.asList(mExecutableFileNamesList)));
+        mExecutablePathText.setAdapter(mExecutableFileNamesAdaptor);
     }
 
 
@@ -248,8 +248,8 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             }
         });
 
-        workingDirectoriesNamesAdaptor = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new ArrayList<>(Arrays.asList(workingDirectoriesNamesList)));
-        mWorkingDirectoryPathText.setAdapter(workingDirectoriesNamesAdaptor);
+        mWorkingDirectoriesNamesAdaptor = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new ArrayList<>(Arrays.asList(mWorkingDirectoriesNamesList)));
+        mWorkingDirectoryPathText.setAdapter(mWorkingDirectoriesNamesAdaptor);
     }
 
 
@@ -481,20 +481,20 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             }
 
             // Create a string array of filenames with the optional prefix for the drop down list
-            executableFileNamesList = new String[files.length];
+            mExecutableFileNamesList = new String[files.length];
             for (int i = 0; i < files.length; i++) {
-                executableFileNamesList[i] = executableFileNamesPrefix + files[i].getName();
+                mExecutableFileNamesList[i] = executableFileNamesPrefix + files[i].getName();
             }
         } else {
-            executableFileNamesList = new String[0];
+            mExecutableFileNamesList = new String[0];
         }
 
-        //Logger.logVerbose(LOG_TAG, Arrays.toString(executableFileNamesList));
+        //Logger.logVerbose(LOG_TAG, "mExecutableFileNamesList: " + Arrays.toString(mExecutableFileNamesList));
 
         // Update drop down list and show it
-        executableFileNamesAdaptor.clear();
-        executableFileNamesAdaptor.addAll(new ArrayList<>(Arrays.asList(executableFileNamesList)));
-        executableFileNamesAdaptor.notifyDataSetChanged();
+        mExecutableFileNamesAdaptor.clear();
+        mExecutableFileNamesAdaptor.addAll(new ArrayList<>(Arrays.asList(mExecutableFileNamesList)));
+        mExecutableFileNamesAdaptor.notifyDataSetChanged();
         if (mExecutablePathText.isFocused() && mExecutablePathText.getWindowToken() != null)
             mExecutablePathText.showDropDown();
     }
@@ -601,20 +601,20 @@ public final class EditConfigurationActivity extends AbstractPluginActivity {
             }
 
             // Create a string array of filenames with the optional prefix for the drop down list
-            workingDirectoriesNamesList = new String[files.length];
+            mWorkingDirectoriesNamesList = new String[files.length];
             for (int i = 0; i < files.length; i++) {
-                workingDirectoriesNamesList[i] = workingDirectoryFileNamesPrefix + files[i].getName();
+                mWorkingDirectoriesNamesList[i] = workingDirectoryFileNamesPrefix + files[i].getName();
             }
         } else {
-            workingDirectoriesNamesList = new String[0];
+            mWorkingDirectoriesNamesList = new String[0];
         }
 
-        //Logger.logVerbose(LOG_TAG, Arrays.toString(workingDirectoriesNamesList));
+        //Logger.logVerbose(LOG_TAG, "mWorkingDirectoriesNamesList: " + Arrays.toString(mWorkingDirectoriesNamesList));
 
         // Update drop down list and show it
-        workingDirectoriesNamesAdaptor.clear();
-        workingDirectoriesNamesAdaptor.addAll(new ArrayList<>(Arrays.asList(workingDirectoriesNamesList)));
-        workingDirectoriesNamesAdaptor.notifyDataSetChanged();
+        mWorkingDirectoriesNamesAdaptor.clear();
+        mWorkingDirectoriesNamesAdaptor.addAll(new ArrayList<>(Arrays.asList(mWorkingDirectoriesNamesList)));
+        mWorkingDirectoriesNamesAdaptor.notifyDataSetChanged();
         if (mWorkingDirectoryPathText.isFocused() && mWorkingDirectoryPathText.getWindowToken() != null)
             mWorkingDirectoryPathText.showDropDown();
     }

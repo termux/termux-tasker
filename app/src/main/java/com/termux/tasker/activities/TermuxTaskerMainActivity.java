@@ -14,6 +14,7 @@ import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.termux.theme.TermuxThemeUtils;
 import com.termux.shared.theme.NightMode;
 import com.termux.tasker.R;
+import com.termux.tasker.TermuxTaskerApplication;
 
 public class TermuxTaskerMainActivity extends AppCompatActivity {
 
@@ -39,6 +40,9 @@ public class TermuxTaskerMainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Set log level for the app
+        TermuxTaskerApplication.setLogConfig(this, false);
 
         Logger.logVerbose(LOG_TAG, "onResume");
 

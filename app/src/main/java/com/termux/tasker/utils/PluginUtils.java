@@ -184,7 +184,8 @@ public class PluginUtils {
 
             // Create PendingIntent that can be used by execution service to send result of commands
             // back to PluginResultsService
-            PendingIntent pendingIntent = PendingIntent.getService(context, getLastPendingIntentRequestCode(context), pluginResultsServiceIntent, PendingIntent.FLAG_ONE_SHOT);
+            PendingIntent pendingIntent = PendingIntent.getService(context, getLastPendingIntentRequestCode(context), pluginResultsServiceIntent,
+                    PendingIntent.FLAG_ONE_SHOT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_MUTABLE : 0));
             executionIntent.putExtra(TERMUX_SERVICE.EXTRA_PENDING_INTENT, pendingIntent);
         } else {
             // If execution result is not to be returned, do not expect results back from the

@@ -26,7 +26,7 @@ A [Termux] plugin app allowing `Termux` commands to be executed from [Tasker] an
 
 ### Installation
 
-Latest version is `v0.8.0`.
+Latest version is `v0.9.0`.
 
 Check [`termux-app` Installation](https://github.com/termux/termux-app#Installation) for details before reading forward.
 

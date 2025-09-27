@@ -1,0 +1,114 @@
+#include <iostream>
+#include <map>
+#include <string>
+#include <fstream>
+using namespace std;
+
+// Inventory stored as: item -> quantity
+map<string, int> inventory;
+string filename = "inventory.txt";
+
+// Save inventory to file
+void saveInventory() {
+    ofstream file(filename);
+    if (file.is_open()) {
+        for (auto &entry : inventory) {
+            file << entry.first << " " << entry.second << endl;
+        }
+        file.close();
+    }
+}
+
+// Load inventory from file
+void loadInventory() {
+    ifstream file(filename);
+    if (file.is_open()) {
+        string item;
+        int qty;
+        while (file >> item >> qty) {
+            inventory[item] = qty;
+        }
+        file.close();
+    }
+}
+
+void addItem(string item, int quantity) {
+    inventory[item] += quantity;
+    cout << "✅ Added " << quantity << " of " << item 
+         << ". Total: " << inventory[item] << endl;
+    saveInventory();
+}
+
+void removeItem(string item, int quantity) {
+    if (inventory.find(item) != inventory.end()) {
+        if (inventory[item] >= quantity) {
+            inventory[item] -= quantity;
+            cout << "❌ Removed " << quantity << " of " << item 
+                 << ". Remaining: " << inventory[item] << endl;
+            if (inventory[item] == 0) {
+                inventory.erase(item);
+            }
+            saveInventory();
+        } else {
+            cout << "⚠️ Not enough stock to remove." << endl;
+        }
+    } else {
+        cout << "⚠️ Item not found in inventory." << endl;
+    }
+}
+
+void checkInventory() {
+    if (inventory.empty()) {
+        cout << "📦 Inventory is empty." << endl;
+    } else {
+        cout << "📋 Current Inventory:" << endl;
+        for (auto &entry : inventory) {
+            cout << "- " << entry.first << ": " << entry.second << endl;
+        }
+    }
+}
+
+int main() {
+    loadInventory(); // Load data at startup
+    int choice;
+    string item;
+    int qty;
+
+    do {
+        cout << "\n=== INVENTORY MENU ===" << endl;
+        cout << "1. Add Item" << endl;
+        cout << "2. Remove Item" << endl;
+        cout << "3. View Inventory" << endl;
+        cout << "4. Exit" << endl;
+        cout << "Choose: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter item name: ";
+                cin >> item;
+                cout << "Enter quantity: ";
+                cin >> qty;
+                addItem(item, qty);
+                break;
+            case 2:
+                cout << "Enter item name: ";
+                cin >> item;
+                cout << "Enter quantity: ";
+                cin >> qty;
+                removeItem(item, qty);
+                break;
+            case 3:
+                checkInventory();
+                break;
+            case 4:
+                cout << "💾 Exiting... Inventory saved." << endl;
+                saveInventory();
+                break;
+            default:
+                cout << "⚠️ Invalid choice!" << endl;
+        }
+    } while (choice != 4);
+
+    return 0;
+}

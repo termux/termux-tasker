@@ -75,7 +75,7 @@ If you do not grant the permission, you will likely get errors like `receiver co
 #### `~/.termux/tasker/` Directory (Optional)
 The `~/.termux/tasker/` directory stores the scripts that can be run with the plugin without setting `allow-external-apps` property to `true` if you do not want to use absolute paths. Open a non-root termux session and run the below command to create it and give it read, write and executable permissions `(0700)`. The `tasker` directory must have read permission, otherwise the plugin will not be able to read the script files and give errors like `No regular file found at path` for any script name entered in the `Executable` field of plugin configuration. The `tasker` directory of the script must also have executable permissions for the script to be allowed to execute.
 
-```
+```shell
 mkdir -p /data/data/com.termux/files/home/.termux/tasker
 chmod 700 -R /data/data/com.termux/files/home/.termux
 ```
@@ -86,28 +86,28 @@ chmod 700 -R /data/data/com.termux/files/home/.termux
 `Termux:Tasker` version `>= 0.5` also allows commands to be run outside the `~/.termux/tasker/` directory by setting absolute paths in the `Executable` field of the plugin configuration **ONLY** if `allow-external-apps` property is set to `true` in `~/.termux/termux.properties` file. This is an added security measure. **DO NOT** set it to true if you have given a relatively untrusted app `com.termux.permission.RUN_COMMAND` permission, since it will be able to run arbitrary commands in termux or even root context (assuming termux has been granted root permissions) in the background without user intervention. The `~/.termux` directory must have read permission, otherwise the plugin will not be able to read the property values. This is also required for the [RUN_COMMAND Intent] intent.
 
 - Automatic
-    You can use the one-liner commands below to set the desired value. The commands will append the desired value using `echo` command to the file if the file doesn't exist or the property doesn't exist in the file, otherwise it will `sed` replace any existing values of the key with the desired value.  
+    You can use the one-liner commands below to set the desired value. The commands will append the desired value using `echo` command to the file if the file doesn't exist or the property doesn't exist in the file, otherwise it will `sed` replace any existing values of the key with the desired value.
 
-    To set `allow-external-apps` property to `true`.  
+    To set `allow-external-apps` property to `true`.
 
-    ```
+    ```shell
     value="true"; key="allow-external-apps"; file="/data/data/com.termux/files/home/.termux/termux.properties"; mkdir -p "$(dirname "$file")"; chmod 700 "$(dirname "$file")"; if ! grep -E '^'"$key"'=.*' $file &>/dev/null; then [[ -s "$file" && ! -z "$(tail -c 1 "$file")" ]] && newline=$'\n' || newline=""; echo "$newline$key=$value" >> "$file"; else sed -i'' -E 's/^'"$key"'=.*/'"$key=$value"'/' $file; fi
     ```
 
-    To set `allow-external-apps` property to `false`.  
+    To set `allow-external-apps` property to `false`.
 
-    ```
+    ```shell
     value="false"; key="allow-external-apps"; file="/data/data/com.termux/files/home/.termux/termux.properties"; mkdir -p "$(dirname "$file")"; chmod 700 "$(dirname "$file")"; if ! grep -E '^'"$key"'=.*' $file &>/dev/null; then [[ -s "$file" && ! -z "$(tail -c 1 "$file")" ]] && newline=$'\n' || newline=""; echo "$newline$key=$value" >> "$file"; else sed -i'' -E 's/^'"$key"'=.*/'"$key=$value"'/' $file; fi
     ```
 
 - Manual
-    You can do it manually by running the below commands to open the `nano` text editor in the terminal. Then add/update a line `allow-external-apps=true` to set the property to `true`, and press `Ctrl+o` and then `Enter` to save and `Ctrl+x` to exit.  
+    You can do it manually by running the below commands to open the `nano` text editor in the terminal. Then add/update a line `allow-external-apps=true` to set the property to `true`, and press `Ctrl+o` and then `Enter` to save and `Ctrl+x` to exit.
 
-```
+    ```shell
     file="/data/data/com.termux/files/home/.termux/termux.properties";
     mkdir -p "$(dirname "$file")";
     nano "$file"
-```
+    ```
 
 
 #### `Draw Over Apps` permission (Optional)
@@ -265,43 +265,43 @@ The templates were written for version `< 0.6.0` and currently have not been upd
 
 - `Tasks`
     - `XML`
-        Download the [Termux Tasker Plugin Basic Templates Task XML](templates/plugin_hosts/tasker/Termux_Tasker_Plugin_Basic_Templates.tsk.xml) file to the android download directory. To download, right-click or hold the `Raw` button at the top after opening a file link and select `Download/Save link` or use `curl` from a termux shell. Then import the downloaded task file into Tasker by long pressing the `Task` tab button in Tasker home and selecting `Import Task`.  
+        Download the [Termux Tasker Plugin Basic Templates Task XML](templates/plugin_hosts/tasker/Termux_Tasker_Plugin_Basic_Templates.tsk.xml) file to the android download directory. To download, right-click or hold the `Raw` button at the top after opening a file link and select `Download/Save link` or use `curl` from a termux shell. Then import the downloaded task file into Tasker by long pressing the `Task` tab button in Tasker home and selecting `Import Task`.
 
-        `curl -L 'https://github.com/termux/termux-tasker/raw/master/templates/plugin_hosts/tasker/Termux_Tasker_Plugin_Basic_Templates.tsk.xml' -o "/sdcard/Download/Termux_Tasker_Plugin_Basic_Templates.tsk.xml"`  
+        `curl -L 'https://github.com/termux/termux-tasker/raw/master/templates/plugin_hosts/tasker/Termux_Tasker_Plugin_Basic_Templates.tsk.xml' -o "/sdcard/Download/Termux_Tasker_Plugin_Basic_Templates.tsk.xml"`
 
     - `Taskernet`
-        Import `Termux Tasker Plugin Basic Templates Task` from `Taskernet` from [here](https://taskernet.com/shares/?user=AS35m8mXdvaT1Vj8TwkSaCaoMUv220IIGtHe3pG4MymrCUhpgzrat6njEOnDVVulhAIHLi6BPUt1&id=Task%3ATermux+Tasker+Plugin+Basic+Templates).  
+        Import `Termux Tasker Plugin Basic Templates Task` from `Taskernet` from [here](https://taskernet.com/shares/?user=AS35m8mXdvaT1Vj8TwkSaCaoMUv220IIGtHe3pG4MymrCUhpgzrat6njEOnDVVulhAIHLi6BPUt1&id=Task%3ATermux+Tasker+Plugin+Basic+Templates).
 
-    Check [Termux Tasker Plugin Basic Templates Task Info](templates/plugin_hosts/tasker/Termux_Tasker_Plugin_Basic_Templates.tsk.md) file for more info on the task.  
+    Check [Termux Tasker Plugin Basic Templates Task Info](templates/plugin_hosts/tasker/Termux_Tasker_Plugin_Basic_Templates.tsk.md) file for more info on the task.
 
 - `Scripts`
-    To use the above task, you will also need to place the [termux_tasker_basic_bash_test](templates/scripts/termux_tasker_basic_bash_test) and [termux_tasker_basic_python_test](templates/scripts/termux_tasker_basic_python_test) scripts in `~/.termux/tasker/` directory after following its [Setup Instructions](#Setup-Instructions). They basically just print the first `2` args to `stdout` if only `2` args are received, otherwise exit with error.  
+    To use the above task, you will also need to place the [termux_tasker_basic_bash_test](templates/scripts/termux_tasker_basic_bash_test) and [termux_tasker_basic_python_test](templates/scripts/termux_tasker_basic_python_test) scripts in `~/.termux/tasker/` directory after following its [Setup Instructions](#Setup-Instructions). They basically just print the first `2` args to `stdout` if only `2` args are received, otherwise exit with error.
 
-    1. Download the script files.  
+    1. Download the script files.
 
-        - Download to `~/.termux/tasker/` directly from github using `curl` using a non-root termux shell.  
+        - Download to `~/.termux/tasker/` directly from github using `curl` using a non-root termux shell.
 
-            `curl -L 'https://github.com/termux/termux-tasker/raw/master/templates/scripts/termux_tasker_basic_bash_test' -o "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_bash_test"`  
+            `curl -L 'https://github.com/termux/termux-tasker/raw/master/templates/scripts/termux_tasker_basic_bash_test' -o "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_bash_test"`
 
-            `curl -L 'https://github.com/termux/termux-tasker/raw/master/templates/scripts/termux_tasker_basic_python_test' -o "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_python_test"`  
+            `curl -L 'https://github.com/termux/termux-tasker/raw/master/templates/scripts/termux_tasker_basic_python_test' -o "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_python_test"`
 
-        - Download them manually to android download directory and then use `cat` to copy them to `~/.termux/tasker/` or manually do it with a [SAF file browser](#Creating-And-Modifying-Scripts).  
+        - Download them manually to android download directory and then use `cat` to copy them to `~/.termux/tasker/` or manually do it with a [SAF file browser](#Creating-And-Modifying-Scripts).
 
-            `cat "/sdcard/Download/termux_tasker_basic_bash_test" > "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_bash_test"`  
+            `cat "/sdcard/Download/termux_tasker_basic_bash_test" > "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_bash_test"`
 
-            `cat "/sdcard/Download/termux_tasker_basic_python_test" > "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_python_test"`  
+            `cat "/sdcard/Download/termux_tasker_basic_python_test" > "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_python_test"`
 
-    2. Set executable permissions.  
+    2. Set executable permissions.
 
-        `chmod 700 "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_bash_test"`  
+        `chmod 700 "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_bash_test"`
 
-        `chmod 700 "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_python_test"`  
+        `chmod 700 "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_python_test"`
 
 
-    To modify the scripts you can use `nano`.  
+    To modify the scripts you can use `nano`.
 
-    `nano "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_bash_test"`  
-    `nano "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_python_test"`  
+    `nano "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_bash_test"`
+    `nano "/data/data/com.termux/files/home/.termux/tasker/termux_tasker_basic_python_test"`
 
 
 Termux needs to be granted `Storage` permission to allow it to access `/sdcard/Download` directory, otherwise you will get permission denied errors while running commands.

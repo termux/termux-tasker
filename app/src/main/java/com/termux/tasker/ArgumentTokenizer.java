@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2001-2010, JavaPLT group at Rice University (drjava@rice.edu)
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *    * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *    * Neither the names of DrJava, the JavaPLT group, Rice University, nor the
  *      names of its contributors may be used to endorse or promote products
  *      derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -28,10 +28,10 @@
  *
  * This software is Open Source Initiative approved Open Source Software.
  * Open Source Initative Approved is a trademark of the Open Source Initiative.
- * 
+ *
  * This file is part of DrJava.  Download the current version of this project
  * from http://www.drjava.org/ or http://sourceforge.net/projects/drjava/
- * 
+ *
  * END_COPYRIGHT_BLOCK*/
 
 package com.termux.tasker;
@@ -53,7 +53,7 @@ public abstract class ArgumentTokenizer {
   private static final int NORMAL_TOKEN_STATE = 1;
   private static final int SINGLE_QUOTE_STATE = 2;
   private static final int DOUBLE_QUOTE_STATE = 3;
-  
+
   /** Tokenizes the given String into String tokens
     * @param arguments A String containing one or more command-line style arguments to be tokenized.
     * @return A list of parsed and properly escaped arguments.
@@ -61,20 +61,20 @@ public abstract class ArgumentTokenizer {
   public static List<String> tokenize(String arguments) {
     return tokenize(arguments, false);
   }
-  
+
   /** Tokenizes the given String into String tokens.
     * @param arguments A String containing one or more command-line style arguments to be tokenized.
     * @param stringify whether or not to include escape special characters
     * @return A list of parsed and properly escaped arguments.
     */
   public static List<String> tokenize(String arguments, boolean stringify) {
-    
+
     LinkedList<String> argList = new LinkedList<String>();
     StringBuilder currArg = new StringBuilder();
     boolean escaped = false;
     int state = NO_TOKEN_STATE;  // start in the NO_TOKEN_STATE
     int len = arguments.length();
-    
+
     // Loop over each character in the string
     for (int i = 0; i < len; i++) {
       char c = arguments.charAt(i);
@@ -167,7 +167,7 @@ public abstract class ArgumentTokenizer {
         }
       }
     }
-    
+
     // If we're still escaped, put in the backslash
     if (escaped) {
       currArg.append('\\');
@@ -185,14 +185,14 @@ public abstract class ArgumentTokenizer {
     }
     return argList;
   }
-  
+
   /** Inserts backslashes before any occurrences of a backslash or
    * quote in the given string.  Also converts any special characters
    * appropriately.
    */
   protected static String _escapeQuotesAndBackslashes(String s) {
     final StringBuilder buf = new StringBuilder(s);
-    
+
     // Walk backwards, looking for quotes or backslashes.
     //  If we see any, insert an extra backslash into the buffer at
     //  the same index.  (By walking backwards, the index into the buffer
